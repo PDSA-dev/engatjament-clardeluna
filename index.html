@@ -124,7 +124,7 @@ function buildTRI(rentreeISO, anneeLabel){
   ];
 }
 var TRI=buildTRI(RENTREE,ANNEE);
-var ELEVES={"6ème":["ARTAL TAULIER Sacha","BONNADIER Dario","DERAMAUDT Paul","DE SWARTE Orphée","FRANCO GARCIA Enoc","GRAMIEN Madi","HAM Salomé","HOULES Clara","MARTIN Jade","OTERO Eden","PLAZA BLASCO Lenny","RIQUELME LEGRAND Louis","RIBEIRO NOLET Shanna","RODRIGUEZ Hermine"],"5ème":["BERT LECHAT Eva","BONNADIER Roxane","CADILHAC Jules","ESTEVE ROSALES Roman","ESCALIER Marius","EVANO Lisa","FERRER Santino","GUIRAL HUDE Lilian","ICHE Dominique Antoine","JALLAN Leeloo","LLAO Marie","MORERA Ema","RIPALTI Elina"],"4ème":["ALONSO Rayan","BLAIN Lucas","COSSIA COLLYN Liam","CRASSOUS Inaya","DERAMAUDT Inès","ESCALIER TOBENA Jeanne","ESTEVE ROSALES Lissandre","FOURNIER Selona","GOSSENT Thomas","HUET Romane","JULIA Raphaël","LECAILLE Eloi","LEGUET AMADOR Livia","LOUVET Louis","LUGAGNE Louis","OUALI Souhayl","PASTOR BESSONNE Artémis","PIETRZAK Maëlyne","POUCIN Anna","RICOUL Phoebe","RIELLO LOPEZ Louka","SIMONIAN Ibrahim","ZAMITH Giulian"],"3ème":["ALONSO Célia","ALVES Axel","CAVANNA Angète","EYMARD Raphael","HAM Roméo","MARTINEZ LEE Elie","MENEAU RUF Titouan","ROUSSEAU Noël","SCHLEIFER Paul"]};
+var ELEVES={"6ème":["ARTAL TAULIER Sacha","BONNADIER Dario","DERAMAUDT Paul","DE SWARTE Orphée","FRANCO GARCIA Enoc","GRAMIEN Madi","HAM Salomé","HOULES Clara","MARTIN Jade","OTERO Eden","PLAZA BLASCO Lenny","RIQUELME LEGRAND Louis","RIBEIRO NOLET Shanna","RODRIGUEZ Hermine"],"5ème":["BERT LECHAT Eva","BONNADIER Roxane","CADILHAC Jules","ESTEVE ROSALES Roman","ESCALIER Marius","EVANO Lisa","FERRER Santino","GUIRAL HUDE Lilian","ICHE Dominique Antoine","JALLAN Leeloo","LLAO Marie","MORERA Ema","RIPALTI Elina"],"4ème":["ALONSO Rayan","BLAIN Lucas","COSSIA COLLYN Liam","CRASSOUS Inaya","DERAMAUDT Inès","ESCALIER TOBENA Jeanne","ESTEVE ROSALES Lissandre","FOURNIER Selona","GOSSENT Thomas","HUET Romane","JULIA Raphaël","LECAILLE Eloi","LEGUET AMADOR Livia","LUGAGNE Louis","OUALI Souhayl","PASTOR BESSONNE Artémis","PIETRZAK Maëlyne","RICOUL Phoebe","RIELLO LOPEZ Louka","SIMONIAN Ibrahim"],"3ème":["ALONSO Célia","ALVES Axel","CAVANNA Angète","EYMARD Raphael","HAM Roméo","MARTINEZ LEE Elie","MENEAU RUF Titouan","ROUSSEAU Noël","SCHLEIFER Paul"]};
 // Noms des parents par enfant — pré-remplis depuis le fichier Google Forms 2025-2026
 // Modifiable dans Admin → Réglages, sauvegardé dans Firebase
 var PARENTS_MAP={
@@ -208,7 +208,9 @@ var PRENOM_ALIASES={
   // Julie Pastor = Julie (PASTOR BESSONNE)
   "julie pas":"julie","juliepasto":"julie",
   // Siham+Benoit tag = Siham (ROUSSEAU)
-  "siham, b":"siham","sihambeno":"siham","benoitsiha":"benoit","benoit sia":"benoit"
+  "siham, b":"siham","sihambeno":"siham","benoitsiha":"benoit","benoit sia":"benoit",
+  // Paulo = Paul (ALVES)
+  "paulo":"paul","paul":"paul"
 };
 function canonPrenom(s){
   var raw=nrm(String(s||""));
@@ -966,7 +968,10 @@ function rRapport(fs,tot){
   // Filtrer les subs aux élèves présents dans ELEVES (exclure anciens élèves supprimés)
   var elevesActuels=[];
   Object.keys(ELEVES).forEach(function(cl){elevesActuels=elevesActuels.concat(ELEVES[cl]);});
-  var subsActuels=(S.subs||[]).filter(function(s){return elevesActuels.indexOf(s.eleve)!==-1;});
+  var subsActuels=(S.subs||[]).filter(function(s){
+    var eNrm=nrm(s.eleve);
+    return elevesActuels.some(function(e){return nrm(e)===eNrm;});
+  });
   // Inclure TOUTES les familles actuelles (même sans heures)
   var fsAll=buildFullFamilies(subsActuels);
   var OBJ=40;
