@@ -186,7 +186,7 @@ var PARENTS_MAP={
   "RIPALTI Elina":["Frédéric", "Véronique"],
   "RIQUELME LEGRAND Louis":["Florent", "Natacha"],
   "RODRIGUEZ Hermine":["Julien", "Julie"],
-  "ROUSSEAU Noël":["Siham"],
+  "ROUSSEAU Noël":["Siham","Benoit"],
   "SCHLEIFER Paul":["Olivier", "Colette"],
   "SIMONIAN Ibrahim":["Jess", "Nadia"],
   "SIMONIAN Isaac":["Jess", "Nadia"],
@@ -199,6 +199,7 @@ var ACTS={"Festivités":["Feria 2025 nouveaux parents","Fête du jeu","Dintrada 
 // ── FIREBASE ─────────────────────────────────
 var db=null;
 function fbLoad(){return db.collection("submissions").orderBy("ts","desc").get().then(function(s){return s.docs.map(function(d){return Object.assign({id:d.id},d.data());});});}
+function fbUpdate(id,d){return db.collection("submissions").doc(id).update(d);}
 function fbAdd(d){return db.collection("submissions").add(Object.assign({ts:new Date().toISOString()},d));}
 function fbDel(id){return db.collection("submissions").doc(id).delete();}
 function fbDeleteAll(){return db.collection("submissions").get().then(function(snap){var b=db.batch();snap.docs.forEach(function(d){b.delete(d.ref);});return b.commit();});}
@@ -392,7 +393,8 @@ var S={
   pinInput:"",pinErr:false,deleting:null,
   anneeSaved:false,anneeSaving:false,
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
-  manSaving:false,manSaved:false,manErr:""
+  manSaving:false,manSaved:false,manErr:"",
+  editSaisieId:null,editSaisieErr:""
 };
 // ── RENDU ─────────────────────────────────────
 function go(p){saveInputs();Object.assign(S,typeof p==="function"?p(S):p);render();}
@@ -922,7 +924,35 @@ function rSaisies(subs){
   }
   var listH=filtered.length?filtered.map(function(s){
     var d=new Date(s.ts),t=getTri(s.ts);
-    return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'" >'+
+    // Inline edit form
+    if(S.editSaisieId===s.id){
+      var pOpts=(PARENTS_MAP[s.eleve]||[]);
+      var pButtons=pOpts.length?
+        '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'+
+          pOpts.map(function(p){
+            return'<button class="fc2'+(s.parents===p?' on':'')+'" data-a="edit-saisie-par" data-id="'+esc(s.id)+'" data-p="'+esc(p)+'">'+esc(p)+'</button>';
+          }).join('')+
+        '</div>':
+        '<input class="inp" id="edit-par-inp" value="'+esc(s.parents)+'" style="font-size:13px;padding:7px 10px;margin-top:6px">';
+      return'<div class="si" style="background:var(--aml);border:1px solid var(--am)">'+
+        '<div style="font-size:12px;font-weight:700;color:var(--am);margin-bottom:6px">Modifier la saisie</div>'+
+        '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+' - '+esc(s.classe)+'</div>'+
+        '<div style="font-size:12px;color:var(--mu);margin-bottom:4px">'+esc(s.activiteType)+' -> '+esc(s.sousActivite)+'</div>'+
+        '<div style="font-size:11px;font-weight:700;color:var(--mu);margin-top:8px;text-transform:uppercase;letter-spacing:.04em">Parent</div>'+
+        pButtons+
+        '<div style="font-size:11px;font-weight:700;color:var(--mu);margin-top:8px;text-transform:uppercase;letter-spacing:.04em">Heures</div>'+
+        '<div class="chips" style="margin-top:4px">'+[0.5,1,1.5,2,3,4,5,6,7,8,9,10,12,15,20,22,25,30].map(function(n){
+          return'<div class="chip'+(String(n)===String(s.heures)?' on':'')+'" data-a="edit-saisie-h" data-id="'+esc(s.id)+'" data-v="'+n+'">'+n+'h</div>';
+        }).join('')+'</div>'+
+        '<input class="inp" id="edit-h-inp" type="number" min="0" step="any" value="'+esc(String(s.heures))+'" placeholder="Valeur libre" style="margin-top:6px;font-size:16px;text-align:center">'+
+        (S.editSaisieErr?'<div class="al ae mt8">'+esc(S.editSaisieErr)+'</div>':'')+
+        '<div style="display:flex;gap:8px;margin-top:10px">'+
+          '<button class="btn bp bsm" data-a="save-saisie-edit" data-id="'+esc(s.id)+'">Enregistrer</button>'+
+          '<button class="btn bo bsm" data-a="cancel-saisie-edit">Annuler</button>'+
+        '</div>'+
+      '</div>';
+    }
+    return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'" >';
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="flex:1;margin-right:10px">'+
           '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" - "+esc(s.classe)+'</div>'+
@@ -932,7 +962,8 @@ function rSaisies(subs){
         '</div>'+
         '<div style="text-align:right;flex-shrink:0">'+
           '<div style="font-size:18px;font-weight:700;color:var(--red)">'+s.heures+'h</div>'+
-          '<button style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit" data-a="del" data-id="'+esc(s.id)+'">'+(S.deleting===s.id?"...":"Supprimer")+'</button>'+
+          '<button style="font-size:11px;color:var(--am);background:none;border:none;cursor:pointer;font-family:inherit;margin-right:6px" data-a="edit-saisie" data-id="'+esc(s.id)+'">Modifier</button>'+
+          '<button style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit" data-a="del" data-id="'+esc(s.id)+'"+'+(S.deleting===s.id?"...":"Supprimer")+'</button>'+
         '</div>'+
       '</div></div>';
   }).join(""):'<p class="empty">Aucune saisie</p>';
@@ -1590,6 +1621,33 @@ function onClick(e){
         if(k.startsWith(oldFkx+"_")){CHEQUES_MAP[newFkx+k.slice(oldFkx.length)]=CHEQUES_MAP[k];delete CHEQUES_MAP[k];}
       });
       go({editEleveKey:null,regSaved:false});break;
+        case"edit-saisie":
+      go({editSaisieId:el.dataset.id,editSaisieErr:""});break;
+    case"cancel-saisie-edit":
+      go({editSaisieId:null,editSaisieErr:""});break;
+    case"edit-saisie-par":
+      var sid=el.dataset.id,newPar=el.dataset.p;
+      var sub2=( S.subs||[]).find(function(s){return s.id===sid;});
+      if(sub2){sub2.parents=newPar;go({editSaisieErr:""});}break;
+    case"edit-saisie-h":
+      var sidh=el.dataset.id,newH=parseFloat(el.dataset.v);
+      var sub3=(S.subs||[]).find(function(s){return s.id===sidh;});
+      if(sub3){sub3.heures=newH;go({editSaisieErr:""});}break;
+    case"save-saisie-edit":
+      var sid4=el.dataset.id;
+      var sub4=(S.subs||[]).find(function(s){return s.id===sid4;});
+      if(!sub4){go({editSaisieId:null});break;}
+      var hInp=document.getElementById("edit-h-inp");
+      var parInp=document.getElementById("edit-par-inp");
+      var finalH=hInp&&hInp.value?parseFloat(hInp.value):sub4.heures;
+      var finalP=parInp?parInp.value.trim():sub4.parents;
+      if(isNaN(finalH)||finalH<=0){go({editSaisieErr:"Heures invalides"});break;}
+      if(finalP)sub4.parents=finalP;
+      sub4.heures=finalH;
+      fbUpdate(sid4,{parents:sub4.parents,heures:sub4.heures})
+        .then(function(){go({editSaisieId:null,editSaisieErr:""});})
+        .catch(function(e){go({editSaisieErr:"Erreur: "+e.message});});
+      break;
         case"check-pin":checkPin();break;
     case"tab":go({adminTab:v});break;
     case"fcls":go({aCls:v});break;
