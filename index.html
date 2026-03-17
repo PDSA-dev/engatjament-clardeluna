@@ -873,8 +873,10 @@ function rAdmin(){
 }
 function rOverview(fs,tot){
   var att=rnd(hAtt()),ct=curTri();
-  var nLate=fs.filter(function(f){return status(f.totalH)==="late";}).length;
-  var nOk=fs.filter(function(f){var s=status(f.totalH);return s==="ok"||s==="complete";}).length;
+  // Inclure familles sans heures dans le décompte (buildFullFamilies)
+  var fsAll=buildFullFamilies(S.subs||[]);
+  var nLate=fsAll.filter(function(f){var s=status(f.totalH);return s==="late"||f.totalH===0;}).length;
+  var nOk=fsAll.filter(function(f){var s=status(f.totalH);return s==="ok"||s==="complete";}).length;
   var stats='<div class="srow">'+
     '<div class="sc"><div class="sv">'+fs.length+'</div><div class="slbl">Familles</div></div>'+
     '<div class="sc"><div class="sv">'+rnd(tot)+'h</div><div class="slbl">Total heures</div></div>'+
@@ -887,7 +889,7 @@ function rOverview(fs,tot){
     '<p>✅ Familles à jour : <strong style="color:var(--gn)">'+nOk+'</strong></p>'+
     '<p>⚠️ Familles en retard : <strong style="color:var(--red)">'+nLate+'</strong></p>'+
     '</div>';
-  var lates=fs.filter(function(f){return status(f.totalH)==="late";}).sort(function(a,b){return a.totalH-b.totalH;});
+  var lates=fsAll.filter(function(f){var s=status(f.totalH);return s==="late"||f.totalH===0;}).sort(function(a,b){return a.totalH-b.totalH;});
   var lateH=lates.length?lates.slice(0,10).map(function(f){
     var parentsDisp=f.parents.map(function(p){return displayPrenom(p.prenoms);}).join(", ");
     return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)">'+
