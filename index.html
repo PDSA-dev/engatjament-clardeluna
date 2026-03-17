@@ -441,6 +441,7 @@ var S={
   elevesOpen:null,regSaving:false,regSaved:false,promoSaved:false,pinSaved:false,
   pinInput:"",pinErr:false,deleting:null,
   anneeSaved:false,anneeSaving:false,
+  saisiesEleve:"",saisiesParents:[],  // filtres onglet Saisies
   actsCatOpen:null,actsSaved:false,actsSaving:false,actsErr:"",
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
   manSaving:false,manSaved:false,manErr:""
@@ -943,11 +944,81 @@ function rHeures(fs){
     '<p style="font-size:11px;color:var(--mu);margin-top:8px">'+filtered.length+' famille(s) · Objectif : '+OBJ+'h par famille</p>';
 }
 function rSaisies(subs){
+  // ── Étape 1 : filtrer par texte libre ────────────────────────
   var q=nrm(S.aSubQ||"");
-  var filtered=subs.filter(function(s){return!q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);});
+  var step1=subs.filter(function(s){
+    return !q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);
+  });
+  // ── Étape 2 : suggestions parents pour l'élève recherché ──────
+  var parentSuggestions=[];
+  if(q.length>=2){
+    // Collecter tous les parents uniques des saisies filtrées
+    var pSet={};
+    step1.forEach(function(s){
+      (s.parents||"").split(/\s*[&]\s*|\s+et\s+/).forEach(function(p){
+        var pn=p.trim();
+        if(pn&&!pSet[nrm(pn)]){pSet[nrm(pn)]=pn;}
+      });
+    });
+    // Ajouter aussi les parents de PARENTS_MAP pour les élèves trouvés
+    step1.forEach(function(s){
+      var fk=familyKey(s.eleve);
+      Object.keys(PARENTS_MAP).forEach(function(e){
+        if(familyKey(e)===fk)(PARENTS_MAP[e]||[]).forEach(function(p){
+          if(!pSet[nrm(p)])pSet[nrm(p)]=p;
+        });
+      });
+    });
+    parentSuggestions=Object.values(pSet).sort();
+  }
+  // ── Étape 3 : filtre par parents sélectionnés ────────────────
+  var selPars=S.saisiesParents||[];
+  var filtered=selPars.length===0?step1:step1.filter(function(s){
+    return selPars.some(function(sp){
+      return prenomMatch(sp,s.parents)||nrm(s.parents).includes(nrm(sp));
+    });
+  });
+  // ── Total par activité ────────────────────────────────────────
+  var actTotals={};
+  filtered.forEach(function(s){
+    var k=s.activiteType+" · "+s.sousActivite;
+    actTotals[k]=(actTotals[k]||0)+(parseFloat(s.heures)||0);
+  });
+  var totalH=filtered.reduce(function(a,s){return a+(parseFloat(s.heures)||0);},0);
+  // ── Total par activité HTML ──────────────────────────────────
+  var totActH='';
+  if(filtered.length>0){
+    var actRows=Object.keys(actTotals).sort().map(function(k){
+      return'<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--bd)">'+
+        '<span style="color:var(--mu)">'+esc(k)+'</span>'+
+        '<span style="font-weight:700;color:var(--red)">'+rnd(actTotals[k])+'h</span>'+
+      '</div>';
+    }).join('');
+    totActH='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:10px;margin-bottom:12px">'+
+      '<div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Total par activité</div>'+
+      actRows+
+      '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-top:6px;padding-top:6px;border-top:2px solid var(--bd)">'+
+        '<span>Total filtré</span><span style="color:var(--red)">'+rnd(totalH)+'h</span>'+
+      '</div>'+
+    '</div>';
+  }
+  // ── Chips parents ─────────────────────────────────────────────
+  var parentChips='';
+  if(parentSuggestions.length>0){
+    parentChips='<div style="margin-bottom:10px">'+
+      '<div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:5px">Filtrer par parent :</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
+      parentSuggestions.map(function(p){
+        var on=selPars.indexOf(p)!==-1;
+        return'<button class="fc2'+(on?' on':'')+'" data-a="tog-par-filter" data-p="'+esc(p)+'">'+esc(p)+'</button>';
+      }).join('')+
+      (selPars.length>0?'<button class="fc2" data-a="clear-par-filter" style="color:var(--red)">✕ Tout</button>':'')+
+      '</div></div>';
+  }
+  // ── Liste ──────────────────────────────────────────────────────
   var listH=filtered.length?filtered.map(function(s){
     var d=new Date(s.ts),t=getTri(s.ts);
-    return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'">'+
+    return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'" >'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="flex:1;margin-right:10px">'+
           '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" · "+esc(s.classe)+'</div>'+
@@ -961,13 +1032,17 @@ function rSaisies(subs){
         '</div>'+
       '</div></div>';
   }).join(""):'<p class="empty">Aucune saisie</p>';
+
   return'<div class="sbar">'+
-    '<input class="inp" id="sq" placeholder="Rechercher…" value="'+esc(S.aSubQ||"")+'">'+
-    '<button class="btn bo bsm" data-a="csv" style="flex-shrink:0">CSV</button>'+
+      '<input class="inp" id="sq" placeholder="Rechercher élève, parent, activité…" value="'+esc(S.aSubQ||"")+'" autocomplete="off">'+
+      '<button class="btn bo bsm" data-a="csv" style="flex-shrink:0">CSV</button>'+
     '</div>'+
-    '<p style="font-size:12px;color:var(--mu);margin-bottom:10px">'+filtered.length+' saisie'+(filtered.length>1?"s":"")+" / "+subs.length+' total</p>'+
+    parentChips+
+    '<p style="font-size:12px;color:var(--mu);margin-bottom:10px">'+filtered.length+' saisie'+(filtered.length>1?"s":"")+" / "+subs.length+' total · '+rnd(totalH)+'h</p>'+
+    totActH+
     '<div id="saisies-list">'+listH+'</div>';
 }
+
 function rRapport(fs,tot){
   // Filtrer les subs aux élèves présents dans ELEVES (exclure anciens élèves supprimés)
   var elevesActuels=[];
@@ -1281,7 +1356,7 @@ function rManSaisie(){
     '<div class="chips">'+[0.5,1,1.5,2,3,4,5,6,8].map(function(n){
       return'<div class="chip'+(String(n)===String(S.manHeures)?' on':'')+'" data-a="man-h" data-v="'+n+'">'+n+'h</div>';
     }).join('')+'</div>'+
-    '<input class="inp" id="man-h-inp" type="number" min="0" step="any" placeholder="Ou saisir une valeur précise" value="'+esc(String(S.manHeures||''))+'" style="margin-top:8px"></div>';
+    '<input class="inp" id="man-h-inp" type="number" min="0" step="any" placeholder="Valeur libre (ex: 42)" value="'+esc(String(S.manHeures||''))+'" style="margin-top:8px;font-size:18px;text-align:center" autofocus></div>';
   var today=new Date().toISOString().slice(0,10);
   var dateSec='<div class="field mt8"><label class="lbl">Date (aujourd\'hui par défaut)</label>'+
     '<input class="inp" id="man-date" type="date" value="'+esc(S.manDate||today)+'"></div>';
@@ -1427,33 +1502,9 @@ function bindAll(){
   var sq=document.getElementById("sq");
   if(sq){
     sq.addEventListener("input",function(){
-      sil({aSubQ:sq.value});
-      // Re-render just the list without losing focus
-      var subs=S.subs||[];
-      var q=nrm(sq.value||"");
-      var filtered=subs.filter(function(s){return!q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);});
-      var countEl=sq.closest(".wlg")?sq.closest(".wlg").querySelector("p"):null;
-      if(countEl)countEl.textContent=filtered.length+" saisie"+(filtered.length>1?"s":"")+" / "+subs.length+" total";
-      var listEl=document.getElementById("saisies-list");
-      if(listEl){
-        listEl.innerHTML=filtered.length?filtered.map(function(s){
-          var d=new Date(s.ts),t=getTri(s.ts);
-          return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'">'+
-            '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
-              '<div style="flex:1;margin-right:10px">'+
-                '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" · "+esc(s.classe)+'</div>'+
-                '<div style="font-size:12px;color:var(--mu)">'+esc(s.parents)+'</div>'+
-                '<div style="font-size:12px">'+esc(s.activiteType)+" → "+esc(s.sousActivite)+'</div>'+
-                '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+(s.manualEntry?'<span style="font-size:10px;background:#E8F5EE;color:#2E7D4F;border-radius:8px;padding:1px 5px;margin-left:4px">✏️ admin</span>':'')+'</div>'+
-              '</div>'+
-              '<div style="text-align:right;flex-shrink:0">'+
-                '<div style="font-size:18px;font-weight:700;color:var(--red)">'+s.heures+'h</div>'+
-                '<button style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit" data-a="del" data-id="'+esc(s.id)+'">'+( S.deleting===s.id?"…":"Supprimer")+'</button>'+
-              '</div>'+
-            '</div></div>';
-        }).join(""):'<p class="empty">Aucune saisie correspondante</p>';
-        reattach();
-      }
+      go({aSubQ:sq.value,saisiesParents:[]});
+      var newSq=document.getElementById("sq");
+      if(newSq){newSq.focus();newSq.setSelectionRange(newSq.value.length,newSq.value.length);}
     });
   }
 }
@@ -1582,8 +1633,15 @@ function onClick(e){
         setTimeout(function(){go({actsSaved:false});},3000);
       }).catch(function(e){go({actsSaving:false,actsErr:"Erreur : "+e.message});});
       break;
+        case"tog-par-filter":
+      var tp=el.dataset.p;
+      var cur=S.saisiesParents.slice();
+      var ti=cur.indexOf(tp);
+      if(ti===-1)cur.push(tp);else cur.splice(ti,1);
+      go({saisiesParents:cur});break;
+    case"clear-par-filter":go({saisiesParents:[]});break;
         case"check-pin":checkPin();break;
-    case"tab":go({adminTab:v});break;
+    case"tab":go({adminTab:v,saisiesParents:[],aSubQ:""});break;
     case"fcls":go({aCls:v});break;
     case"fst":go({aFilter:v});break;
     case"do-search":
