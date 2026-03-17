@@ -773,29 +773,28 @@ function rAdmin(){
 }
 function rOverview(fs,tot){
   var att=rnd(hAtt()),ct=curTri();
-  // Toutes les familles (y compris 0h) via buildFullFamilies
-  var fsAll=buildFullFamilies(S.subs||[]);
-  var nLate=fsAll.filter(function(f){var s=status(f.totalH);return s==="late"||f.totalH===0;}).length;
-  var nOk=fsAll.filter(function(f){var s=status(f.totalH);return s==="ok"||s==="complete";}).length;
+  // N utiliser buildFullFamilies que si subs sont charges
+  var fsForStats=(S.subs!==null)?buildFullFamilies(S.subs):fs;
+  var nLate=fsForStats.filter(function(f){var s=status(f.totalH);return s==="late"||f.totalH===0;}).length;
+  var nOk=fsForStats.filter(function(f){var s=status(f.totalH);return s==="ok"||s==="complete";}).length;
   var stats='<div class="srow">'+
-    '<div class="sc"><div class="sv">'+fsAll.length+'</div><div class="slbl">Familles</div></div>'+
+    '<div class="sc"><div class="sv">'+fsForStats.length+'</div><div class="slbl">Familles</div></div>'+
     '<div class="sc"><div class="sv">'+rnd(tot)+'h</div><div class="slbl">Total heures</div></div>'+
-    '<div class="sc"><div class="sv" style="color:'+(nLate?"var(--red)":"var(--gn)")+'">'+nLate+'</div><div class="slbl">En retard</div></div>'+
+    '<div class="sc"><div class="sv" style="color:'+(nLate?"var(--red)":"var(--gn)")+'">'+ nLate+'</div><div class="slbl">En retard</div></div>'+
     '</div>';
   var info='<div class="card mt12" style="font-size:13px;color:var(--mu);line-height:2">'+
-    '<p>📅 Année scolaire : <strong style="color:var(--tx)">'+ANNEE+'</strong></p>'+
-    '<p>📅 Trimestre en cours : <strong style="color:var(--tx)">T'+ct+(TRI[ct-1]?' — '+TRI[ct-1].m:'')+'</strong></p>'+
-    '<p>⏱ Heures attendues à ce jour : <strong style="color:var(--tx)">'+att+'h / famille</strong></p>'+
-    '<p>✅ Familles à jour : <strong style="color:var(--gn)">'+nOk+'</strong></p>'+
-    '<p>⚠️ Familles en retard / sans heure : <strong style="color:var(--red)">'+nLate+'</strong></p>'+
+    '<p>Annee scolaire : <strong style="color:var(--tx)">'+ANNEE+'</strong></p>'+
+    '<p>Trimestre en cours : <strong style="color:var(--tx)">T'+ct+(TRI[ct-1]?" - "+TRI[ct-1].m:"")+'</strong></p>'+
+    '<p>Heures attendues a ce jour : <strong style="color:var(--tx)">'+att+'h / famille</strong></p>'+
+    '<p>Familles a jour : <strong style="color:var(--gn)">'+nOk+'</strong></p>'+
+    '<p>Familles en retard / sans heure : <strong style="color:var(--red)">'+nLate+'</strong></p>'+
     '</div>';
-  var lates=fsAll.filter(function(f){var s=status(f.totalH);return s==="late"||f.totalH===0;})
+  var lates=fsForStats.filter(function(f){var s=status(f.totalH);return s==="late"||f.totalH===0;})
     .sort(function(a,b){return a.totalH-b.totalH;});
   var lateH=lates.length?lates.slice(0,15).map(function(f){
     var nbPar=f.parents.length||1,famObj=nbPar*OBJ;
-    var parentsDisp=f.parents.length?
-      f.parents.map(function(p){return displayPrenom(p.prenoms);}).join(", "):
-      (function(){var pp=[];Object.keys(PARENTS_MAP).forEach(function(e){if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){if(pp.indexOf(p)===-1)pp.push(p);});});return pp.join(", ");})();
+    var parentsDisp=f.parents.map(function(p){return displayPrenom(p.prenoms);}).join(", ");
+    if(!parentsDisp){var pp=[];Object.keys(PARENTS_MAP).forEach(function(e){if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){if(pp.indexOf(p)===-1)pp.push(p);});});parentsDisp=pp.join(", ");}
     return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div>'+
@@ -813,15 +812,16 @@ function rOverview(fs,tot){
       '</div>'+
     '</div>';
   }).join(""):
-    '<p class="empty" style="padding:14px">Toutes les familles sont à jour ✓</p>';
+    '<p class="empty" style="padding:14px">Toutes les familles sont a jour</p>';
   var lateCard=lates.length?
     '<div class="card mt12">'+
       '<h3 style="font-size:14px;font-weight:700;margin-bottom:4px">Familles en retard / sans heure ('+lates.length+')</h3>'+
       lateH+
-      (lates.length>15?'<p style="font-size:11px;color:var(--mu);text-align:center;margin-top:6px">+ '+(lates.length-15)+' autres — voir onglet Heures</p>':'')+
-    '</div>':"";
-  return stats+info+lateCard+
-    '<div class="mt16"><button class="btn bo" data-a="print-overview">🖨️ Exporter PDF</button></div>';
+      (lates.length>15?'<p style="font-size:11px;color:var(--mu);text-align:center;margin-top:6px">+ '+(lates.length-15)+' autres</p>':"")+
+    '</div>'  :"";
+  var loadingNote=S.subs===null?'<div class="al aw mt8">Chargement...</div>'  :"";
+  return stats+loadingNote+info+lateCard+
+    '<div class="mt16"><button class="btn bo" data-a="print-overview">Exporter PDF</button></div>';
 }
 
 function rHeures(fs){
