@@ -10,7 +10,7 @@
 html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.5}
 .wrap{max-width:480px;margin:0 auto;padding:0 16px 60px}
 .wlg{max-width:640px;margin:0 auto;padding:0 16px 60px}
-.topbar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--sf);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:9}
+.topbar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--sf);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:11}
 .tb-back{background:none;border:none;cursor:pointer;font-size:20px;color:var(--mu);padding:2px 6px;line-height:1}
 .tb-t{font-size:14px;font-weight:700}.tb-s{font-size:11px;color:var(--mu)}
 .pw{height:3px;background:var(--bd)}.pb{height:100%;background:var(--red);transition:width .3s}
@@ -42,7 +42,7 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:14px;text-align:center}
 .sv{font-size:24px;font-weight:700;color:var(--red)}.slbl{font-size:11px;color:var(--mu);margin-top:2px}
 .si{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px}
-.tabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto;position:sticky;top:42px;z-index:8}
+.tabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto;position:sticky;top:42px;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,.06)}
 .tab{flex:1;min-width:70px;padding:11px 8px;border:none;background:none;font-size:12px;cursor:pointer;color:var(--mu);border-bottom:2px solid transparent;font-family:inherit;white-space:nowrap;font-weight:600}
 .tab.on{color:var(--red);border-bottom-color:var(--red)}
 .fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
@@ -127,7 +127,7 @@ function buildTRI(rentreeISO, anneeLabel){
   ];
 }
 var TRI=buildTRI(RENTREE,ANNEE);
-var ELEVES={"6ème":["ARTAL TAULIER Sacha","BONNADIER Dario","DERAMAUDT Paul","DE SWARTE Orphée","FRANCO GARCIA Enoc","GRAMIEN Madi","HAM Salomé","HOULES Clara","MARTIN Jade","OTERO Eden","PLAZA BLASCO Lenny","RIQUELME LEGRAND Louis","RIBEIRO NOLET Shanna","RODRIGUEZ Hermine"],"5ème":["BERT LECHAT Eva","BONNADIER Roxane","CADILHAC Jules","ESTEVE ROSALES Roman","ESCALIER Marius","EVANO Lisa","FERRER Santino","GUIRAL HUDE Lilian","ICHE Dominique Antoine","JALLAN Leeloo","LLAO Marie","MORERA Ema","RIPALTI Elina"],"4ème":["ALONSO Rayan","BLAIN Lucas","COSSIA COLLYN Liam","CRASSOUS Inaya","DERAMAUDT Inès","ESCALIER TOBENA Jeanne","ESTEVE ROSALES Lissandre","FOURNIER Selona","GOSSENT Thomas","HUET Romane","JULIA Raphaël","LECAILLE Eloi","LEGUET AMADOR Livia","LOUVET Louis","LUGAGNE Louis","OUALI Souhayl","PASTOR BESSONNE Artémis","PIETRZAK Maëlyne","POUCIN Anna","RICOUL Phoebe","RIELLO LOPEZ Louka","SIMONIAN Ibrahim","ZAMITH Giulian"],"3ème":["ALONSO Célia","ALVES Axel","CAVANNA Angète","EYMARD Raphael","HAM Roméo","MARTINEZ LEE Elie","MENEAU RUF Titouan","ROUSSEAU Noël","SCHLEIFER Paul"]};
+var ELEVES={"6ème":["ARTAL TAULIER Sacha","BONNADIER Dario","DERAMAUDT Paul","DE SWARTE Orphée","FRANCO GARCIA Enoc","GRAMIEN Madi","HAM Salomé","HOULES Clara","MARTIN Jade","OTERO Eden","PLAZA BLASCO Lenny","RIQUELME LEGRAND Louis","RIBEIRO NOLET Shanna","RODRIGUEZ Hermine","SIMONIAN Isaac"],"5ème":["BERT LECHAT Eva","BONNADIER Roxane","CADILHAC SEFFINO Jules","ESTEVE ROSALES Roman","ESCALIER Marius","EVANO Lisa","FERRER RODRIGUEZ Santino","GUIRAL HUDE Lilian","ICHÉ Dominique-Antoine","JALLAN Leeloo","LLAO Marie","MORERA Ema","RIPALTI Elina"],"4ème":["ALONSO Rayan","BLAIN Lucas","COSSIA COLLYN Liam","CRASSOUS Inaya","DERAMAUDT Inès","ESCALIER TOBENA Jeanne","ESTEVE ROSALES Lissandre","FOURNIER Selona","GOSSENT Thomas","HUET Romane","JULIA Raphaël","LECAILLE Eloi","LEGUET AMADOR Livia","LOUVET Louis","LUGAGNE Louis","OUALI Souhayl","PASTOR BESSONNE Artémis","PIETRZAK Maëlyne","POUCIN Anna","RICOUL Phoebe","RIELLO LOPEZ Louka","SIMONIAN Ibrahim","ZAMITH Giulian"],"3ème":["ALONSO Célia","ALVES Axel","CAVANNA Angèle","EYMARD Raphael","HAM Roméo","MARTINEZ LEE Elie","MENEAU RUF Titoan","ROUSSEAU Noël","SCHLEIFER Paul"]};
 // Noms des parents par enfant — pré-remplis depuis le fichier Google Forms 2025-2026
 // Modifiable dans Admin → Réglages, sauvegardé dans Firebase
 var PARENTS_MAP={
@@ -139,8 +139,8 @@ var PARENTS_MAP={
   "BLAIN Lucas":["Eric", "Anne-Laure"],
   "BONNADIER Dario":["Philippine", "Steve"],
   "BONNADIER Roxane":["Philippine", "Steve"],
-  "CADILHAC Jules":["Christel", "Vincent"],
-  "CAVANNA Angète":["Gabrielle", "Stéphane"],
+  "CADILHAC SEFFINO Jules":["Christel", "Vincent"],
+  "CAVANNA Angèle":["Gabrielle", "Stéphane"],
   "COSSIA COLLYN Liam":["Laurent", "Laure"],
   "CRASSOUS Inaya":["Claire"],
   "DE SWARTE Orphée":["Juliette"],
@@ -152,7 +152,7 @@ var PARENTS_MAP={
   "ESTEVE ROSALES Roman":["Jean-Daniel", "Sophie"],
   "EVANO Lisa":["Jérôme", "Lætitia"],
   "EYMARD Raphael":["Philippe", "Laurence"],
-  "FERRER Santino":["Charlène", "Mickael"],
+  "FERRER RODRIGUEZ Santino":["Charlène", "Mickael"],
   "FOURNIER Selona":["Steeve", "Elisa"],
   "FRANCO GARCIA Enoc":["Laurie"],
   "GOSSENT Thomas":["Sébastien", "Agnès"],
@@ -162,7 +162,7 @@ var PARENTS_MAP={
   "HAM Salomé":["Lionel", "Cathy"],
   "HOULES Clara":["Benjamin", "Aurélie"],
   "HUET Romane":["Nicolas", "Marion"],
-  "ICHE Dominique Antoine":["Marcel", "Véronique"],
+  "ICHÉ Dominique-Antoine":["Marcel", "Véronique"],
   "JALLAN Leeloo":["Bastien", "Fiona"],
   "JULIA Raphaël":["Jérome", "Claire"],
   "LECAILLE Eloi":["Bruno", "Charlotte"],
@@ -172,7 +172,7 @@ var PARENTS_MAP={
   "LUGAGNE Louis":["Bérengère"],
   "MARTIN Jade":["Fabrice", "Emmanuelle", "Jean-Yves"],
   "MARTINEZ LEE Elie":["Franck", "Jeong-Mi"],
-  "MENEAU RUF Titouan":["Guilhem", "Caroline"],
+  "MENEAU RUF Titoan":["Guilhem", "Caroline"],
   "MORERA Ema":["Jean-Christophe"],
   "OTERO Eden":["Sandra"],
   "OUALI Souhayl":["Nabil", "Nadia"],
@@ -189,6 +189,7 @@ var PARENTS_MAP={
   "ROUSSEAU Noël":["Siham"],
   "SCHLEIFER Paul":["Olivier", "Colette"],
   "SIMONIAN Ibrahim":["Jess", "Nadia"],
+  "SIMONIAN Isaac":["Jess", "Nadia"],
   "ZAMITH Giulian":[]
 };
 
