@@ -229,7 +229,7 @@ var ACTS={"Festivités":["Feria 2025 nouveaux parents","Fête du jeu","Dintrada 
 // ── FIREBASE ─────────────────────────────────
 var db=null;
 function fbLoad(){return db.collection("submissions").orderBy("ts","desc").get().then(function(s){return s.docs.map(function(d){return Object.assign({id:d.id},d.data());});});}
-function fbAdd(d){return db.collection("submissions").add(Object.assign({ts:new Date().toISOString()},d));}
+function fbAdd(d){var data=Object.assign({},d);if(!data.ts)data.ts=new Date().toISOString();return db.collection("submissions").add(data);}
 function fbDel(id){return db.collection("submissions").doc(id).delete();}
 function fbDeleteAll(){return db.collection("submissions").get().then(function(snap){var b=db.batch();snap.docs.forEach(function(d){b.delete(d.ref);});return b.commit();});}
 function fbSaveEl(el){return db.collection("config").doc("eleves").set({eleves:el,parents:PARENTS_MAP});}
@@ -239,6 +239,8 @@ function fbSaveCheques(){return db.collection("config").doc("cheques").set({cheq
 function fbLoadCheques(){return db.collection("config").doc("cheques").get();}
 function fbSaveAnnee(){return db.collection("config").doc("annee").set({rentree:RENTREE,annee:ANNEE});}
 function fbLoadAnnee(){return db.collection("config").doc("annee").get();}
+function fbSaveActs(){return db.collection("config").doc("activites").set({acts:ACTS});}
+function fbLoadActs(){return db.collection("config").doc("activites").get();}
 // ── UTILITAIRES ───────────────────────────────
 function nrm(s){return String(s||"").replace(/æ/gi,"ae").replace(/œ/gi,"oe").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
@@ -439,6 +441,7 @@ var S={
   elevesOpen:null,regSaving:false,regSaved:false,promoSaved:false,pinSaved:false,
   pinInput:"",pinErr:false,deleting:null,
   anneeSaved:false,anneeSaving:false,
+  actsCatOpen:null,actsSaved:false,actsSaving:false,actsErr:"",
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
   manSaving:false,manSaved:false,manErr:""
 };
@@ -854,11 +857,12 @@ function rAdmin(){
   if(S.adminTab==="saisies")c=rSaisies(subs);
   if(S.adminTab==="rapport")c=rRapport(fs,tot);
   if(S.adminTab==="reglages")c=rReglages();
+  if(S.adminTab==="activites")c=rActivites();
   if(S.adminTab==="saisie-admin")c=rManSaisie();
   return tb("Tableau de bord","home",subs.length+" saisies · "+rnd(tot)+"h total")+
     (S.err?'<div class="al ae" style="margin:8px 16px">'+esc(S.err)+'</div>':"")+
     '<div class="tabs">'+
-      [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["reglages","⚙ Réglages"]].map(function(t){
+      [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["activites","📋 Activités"],["reglages","⚙ Réglages"]].map(function(t){
         return'<button class="tab'+(S.adminTab===t[0]?" on":"")+'" data-a="tab" data-v="'+t[0]+'">'+t[1]+'</button>';
       }).join("")+
     '</div>'+
@@ -949,7 +953,7 @@ function rSaisies(subs){
           '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" · "+esc(s.classe)+'</div>'+
           '<div style="font-size:12px;color:var(--mu)">'+esc(s.parents)+'</div>'+
           '<div style="font-size:12px">'+esc(s.activiteType)+" → "+esc(s.sousActivite)+'</div>'+
-          '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+'</div>'+
+          '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+(s.manualEntry?'<span style="font-size:10px;background:#E8F5EE;color:#2E7D4F;border-radius:8px;padding:1px 5px;margin-left:4px">✏️ admin</span>':'')+'</div>'+
         '</div>'+
         '<div style="text-align:right;flex-shrink:0">'+
           '<div style="font-size:18px;font-weight:700;color:var(--red)">'+s.heures+'h</div>'+
@@ -1277,7 +1281,7 @@ function rManSaisie(){
     '<div class="chips">'+[0.5,1,1.5,2,3,4,5,6,8].map(function(n){
       return'<div class="chip'+(String(n)===String(S.manHeures)?' on':'')+'" data-a="man-h" data-v="'+n+'">'+n+'h</div>';
     }).join('')+'</div>'+
-    '<input class="inp" id="man-h-inp" type="number" min="0.5" step="0.5" placeholder="Ou saisir une valeur précise" value="'+esc(String(S.manHeures||''))+'" style="margin-top:8px"></div>';
+    '<input class="inp" id="man-h-inp" type="number" min="0" step="any" placeholder="Ou saisir une valeur précise" value="'+esc(String(S.manHeures||''))+'" style="margin-top:8px"></div>';
   var today=new Date().toISOString().slice(0,10);
   var dateSec='<div class="field mt8"><label class="lbl">Date (aujourd\'hui par défaut)</label>'+
     '<input class="inp" id="man-date" type="date" value="'+esc(S.manDate||today)+'"></div>';
@@ -1302,9 +1306,74 @@ function doManSaisie(){
   go({manSaving:true,manErr:''});
   fbAdd(pl).then(function(ref){
     var ns=Object.assign({id:ref.id},pl);
-    go({manSaving:false,manSaved:true,manSousAct:'',manHeures:'',manDate:'',subs:(S.subs||[]).concat([ns])});
+    // Ajouter en tête de liste (ordre anti-chron.) + passer sur l'onglet Saisies
+    var newSubs=[ns].concat(S.subs||[]);
+    go({manSaving:false,manSaved:true,manSousAct:'',manHeures:'',manDate:'',
+        subs:newSubs,adminTab:'saisies'});
     setTimeout(function(){go({manSaved:false});},3000);
   }).catch(function(e){go({manSaving:false,manErr:'Erreur Firebase : '+e.message});});
+}
+
+// ── GESTION DES ACTIVITÉS ─────────────────────────────────────
+function rActivites(){
+  var cats=Object.keys(ACTS);
+  var saved=S.actsSaved?'<div class="al aok mt8">\u2713 Activit\u00e9s enregistr\u00e9es !</div>':"";
+  var saving=S.actsSaving?'<div class="al aw mt8">Enregistrement\u2026</div>':"";
+  var err=S.actsErr?'<div class="al ae mt8">'+esc(S.actsErr)+'</div>':"";
+
+  // Section ajout d'une nouvelle catégorie
+  var newCatSec='<div class="card mt8">'+
+    '<h3 style="font-size:14px;font-weight:700;margin-bottom:8px">\u2795 Nouvelle cat\u00e9gorie</h3>'+
+    '<div style="display:flex;gap:8px">'+
+      '<input class="inp" id="new-cat-inp" placeholder="Nom de la cat\u00e9gorie" style="flex:1;font-size:14px">'+
+      '<button class="btn bp bsm" data-a="add-cat" style="flex-shrink:0">Ajouter</button>'+
+    '</div>'+
+  '</div>';
+
+  var catSecs=cats.map(function(cat){
+    var isOpen=S.actsCatOpen===cat;
+    var acts=ACTS[cat]||[];
+    var inner='';
+    if(isOpen){
+      var actRows=acts.map(function(act,i){
+        return'<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--bd)">'+
+          '<span style="flex:1;font-size:13px">'+esc(act)+'</span>'+
+          '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;font-size:11px;padding:2px 8px;color:var(--am);font-family:inherit" data-a="move-act-up" data-cat="'+esc(cat)+'" data-idx="'+i+'" '+(i===0?'disabled':'')+'>↑</button>'+
+          '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;font-size:11px;padding:2px 8px;color:var(--am);font-family:inherit" data-a="move-act-dn" data-cat="'+esc(cat)+'" data-idx="'+i+'" '+(i===acts.length-1?'disabled':'')+'>↓</button>'+
+          '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;color:var(--red);font-size:11px;padding:2px 8px;font-family:inherit" data-a="del-act" data-cat="'+esc(cat)+'" data-idx="'+i+'">Supprimer</button>'+
+        '</div>';
+      }).join('');
+      inner='<div style="margin-top:10px">'+
+        (acts.length?actRows:'<p style="font-size:12px;color:var(--mu);padding:8px 0">Aucune activit\u00e9 dans cette cat\u00e9gorie.</p>')+
+        '<div style="background:var(--bg);border-radius:var(--rs);padding:10px;margin-top:10px">'+
+          '<div style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--mu)">\u2795 Ajouter une activit\u00e9</div>'+
+          '<div style="display:flex;gap:8px">'+
+            '<input class="inp" id="new-act-'+esc(cat).replace(/[^a-z0-9]/gi,'')+'" placeholder="Nom de l\'activit\u00e9" style="flex:1;font-size:13px;padding:8px 11px">'+
+            '<button class="btn bp bsm" data-a="add-act" data-cat="'+esc(cat)+'" style="flex-shrink:0">+ Activit\u00e9</button>'+
+          '</div>'+
+        '</div>'+
+        '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+
+          '<button class="btn bp bsm" data-a="save-acts">'+(S.actsSaving?'Enregistrement\u2026':'\U0001f4be Enregistrer')+' ('+acts.length+' activit\u00e9s)</button>'+
+          '<button class="btn bo bsm" data-a="close-cat">Fermer</button>'+
+          '<button style="background:none;border:1px solid var(--red);border-radius:var(--r);color:var(--red);font-size:12px;padding:6px 12px;cursor:pointer;font-family:inherit;font-weight:600" data-a="del-cat" data-cat="'+esc(cat)+'">Supprimer la cat\u00e9gorie</button>'+
+        '</div>'+
+      '</div>';
+    }
+    return'<div class="card" style="margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" data-a="toggle-cat" data-cat="'+esc(cat)+'">'+
+        '<div>'+
+          '<span style="font-size:15px;font-weight:700">'+esc(cat)+'</span>'+
+          '<span style="font-size:12px;color:var(--mu);margin-left:8px">'+acts.length+' activit\u00e9'+(acts.length>1?'s':'')+'</span>'+
+        '</div>'+
+        '<span style="font-size:16px;color:var(--mu)">'+(isOpen?'\u25b2':'\u25bc')+'</span>'+
+      '</div>'+inner+
+    '</div>';
+  }).join('');
+
+  return'<h2 style="font-size:17px;font-weight:700;margin-bottom:4px">\U0001f4cb Gestion des activit\u00e9s</h2>'+
+    '<p style="font-size:13px;color:var(--mu);margin-bottom:14px">G\u00e9rez les cat\u00e9gories et activit\u00e9s propos\u00e9es dans le formulaire de d\u00e9claration.</p>'+
+    saved+saving+err+
+    catSecs+newCatSec;
 }
 // ── ÉVÉNEMENTS ────────────────────────────────
 function bindAll(){
@@ -1375,7 +1444,7 @@ function bindAll(){
                 '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" · "+esc(s.classe)+'</div>'+
                 '<div style="font-size:12px;color:var(--mu)">'+esc(s.parents)+'</div>'+
                 '<div style="font-size:12px">'+esc(s.activiteType)+" → "+esc(s.sousActivite)+'</div>'+
-                '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+'</div>'+
+                '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+(s.manualEntry?'<span style="font-size:10px;background:#E8F5EE;color:#2E7D4F;border-radius:8px;padding:1px 5px;margin-left:4px">✏️ admin</span>':'')+'</div>'+
               '</div>'+
               '<div style="text-align:right;flex-shrink:0">'+
                 '<div style="font-size:18px;font-weight:700;color:var(--red)">'+s.heures+'h</div>'+
@@ -1391,9 +1460,11 @@ function bindAll(){
   // Saisie manuelle admin — listener heures libre
   var manHInp=document.getElementById('man-h-inp');
   if(manHInp)manHInp.addEventListener('input',function(){
-    sil({manHeures:manHInp.value});
-    var btn=document.querySelector('[data-a="man-submit"]');
-    if(btn)btn.disabled=!(S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct&&parseFloat(manHInp.value)>0);
+    // go() re-renders → canSubmit recalculé proprement
+    go({manHeures:manHInp.value});
+    // Restaurer le focus sur le champ (perdu après re-render)
+    var newInp=document.getElementById('man-h-inp');
+    if(newInp){newInp.focus();newInp.setSelectionRange(newInp.value.length,newInp.value.length);}
   });
 function bindChequeSelects(){
   document.querySelectorAll('[data-a="set-cheque"]').forEach(function(sel){
@@ -1466,6 +1537,51 @@ function onClick(e){
       var mhS=document.getElementById('man-h-inp');if(mhS&&mhS.value)sil({manHeures:mhS.value});
       var mdS=document.getElementById('man-date');if(mdS&&mdS.value)sil({manDate:mdS.value});
       doManSaisie();break;
+        case"toggle-cat":
+      go({actsCatOpen:S.actsCatOpen===el.dataset.cat?null:el.dataset.cat,actsSaved:false});break;
+    case"close-cat":go({actsCatOpen:null});break;
+    case"add-cat":
+      var ncEl=document.getElementById("new-cat-inp"),ncv=ncEl?ncEl.value.trim():"";
+      if(!ncv){alert("Saisissez un nom de catégorie");break;}
+      if(ACTS[ncv]){alert("Cette catégorie existe déjà");break;}
+      ACTS[ncv]=[];
+      go({actsCatOpen:ncv,actsSaved:false});break;
+    case"del-cat":
+      var dc=el.dataset.cat;
+      if(!confirm("Supprimer la catégorie \""+dc+"\" et toutes ses activités ?"))break;
+      delete ACTS[dc];
+      go({actsCatOpen:null,actsSaved:false});break;
+    case"add-act":
+      var aCat=el.dataset.cat;
+      var naId="new-act-"+aCat.replace(/[^a-z0-9]/gi,"");
+      var naEl=document.getElementById(naId),nav=naEl?naEl.value.trim():"";
+      if(!nav){alert("Saisissez un nom d\'activité");break;}
+      if((ACTS[aCat]||[]).indexOf(nav)!==-1){alert("Cette activité existe déjà");break;}
+      if(!ACTS[aCat])ACTS[aCat]=[];
+      ACTS[aCat]=ACTS[aCat].concat([nav]);
+      go({actsSaved:false});break;
+    case"del-act":
+      var daCat=el.dataset.cat,daIdx=parseInt(el.dataset.idx);
+      var daAct=ACTS[daCat]&&ACTS[daCat][daIdx];
+      if(!daAct)break;
+      if(!confirm("Supprimer l\'activité \""+daAct+"\" ?"))break;
+      ACTS[daCat]=ACTS[daCat].filter(function(_,i){return i!==daIdx;});
+      go({actsSaved:false});break;
+    case"move-act-up":
+      var muCat=el.dataset.cat,muIdx=parseInt(el.dataset.idx);
+      if(muIdx>0){var arr=ACTS[muCat].slice();var t2=arr[muIdx-1];arr[muIdx-1]=arr[muIdx];arr[muIdx]=t2;ACTS[muCat]=arr;}
+      go({actsSaved:false});break;
+    case"move-act-dn":
+      var mdCat=el.dataset.cat,mdIdx=parseInt(el.dataset.idx);
+      if(mdIdx<ACTS[mdCat].length-1){var arr2=ACTS[mdCat].slice();var t3=arr2[mdIdx+1];arr2[mdIdx+1]=arr2[mdIdx];arr2[mdIdx]=t3;ACTS[mdCat]=arr2;}
+      go({actsSaved:false});break;
+    case"save-acts":
+      go({actsSaving:true,actsSaved:false,actsErr:""});
+      fbSaveActs().then(function(){
+        go({actsSaving:false,actsSaved:true});
+        setTimeout(function(){go({actsSaved:false});},3000);
+      }).catch(function(e){go({actsSaving:false,actsErr:"Erreur : "+e.message});});
+      break;
         case"check-pin":checkPin();break;
     case"tab":go({adminTab:v});break;
     case"fcls":go({aCls:v});break;
@@ -1618,9 +1734,11 @@ function loadElevesConfig(){
       if(data.rentree)RENTREE=data.rentree;
       if(data.annee)ANNEE=data.annee;
       TRI=buildTRI(RENTREE,ANNEE);
-      // Mettre à jour le titre de la page
       document.title="Clardeluna "+ANNEE;
     }
+  }).catch(function(){});
+  fbLoadActs().then(function(doc){
+    if(doc.exists){var data=doc.data();if(data.acts)Object.assign(ACTS,data.acts);}
   }).catch(function(){});
 }
 function doPromotion(){
