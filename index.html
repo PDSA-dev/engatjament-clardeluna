@@ -461,44 +461,64 @@ function rPortal(){
 }
 function portalResults(){
   var q=S.portalQ;
-  if(!q||q.length<2)return q.length===1?'<p style="font-size:13px;color:var(--mu);text-align:center;margin-top:16px">Saisissez au moins 2 caractères…</p>':"";
+  if(!q||q.length<2)return q.length===1?'<p style="font-size:13px;color:var(--mu);text-align:center;margin-top:16px">Saisissez au moins 2 caracteres...</p>':"";
   if(S.loading)return'<div class="loader"><div class="spin"></div></div>';
   if(S.err)return'<div class="al ae">'+esc(S.err)+'</div>';
-  if(!S.subs)return'<div class="loader"><div class="spin"></div>Chargement…</div>';
+  if(!S.subs)return'<div class="loader"><div class="spin"></div>Chargement...</div>';
   var qn=nrm(q);
-  var allFams=computeFamilies(S.subs);
-  var found=allFams.filter(function(f){
-    // Recherche par nom de famille
+  // Index complet: familles avec saisies + TOUTES les familles de ELEVES
+  var allFamsComplete=buildFullFamilies(S.subs);
+  var found=allFamsComplete.filter(function(f){
+    // 1. Nom de famille
     if(nrm(f.key).includes(qn))return true;
-    // Recherche par prénom d'un parent
-    return f.parents.some(function(p){
-      return p.prenoms.some(function(pr){return nrm(pr).includes(qn);});
-    });
-    // Recherche par nom d'enfant complet
-    return Object.keys(f.children).some(function(ch){return nrm(ch).includes(qn);});
+    // 2. Nom complet ou prénom de l'élève
+    if(Object.keys(f.children).some(function(ch){return nrm(ch).includes(qn);}))return true;
+    // 3. Prénom parent (saisies Firebase)
+    if(f.parents.some(function(p){return p.prenoms.some(function(pr){return nrm(pr).includes(qn);});}))return true;
+    // 4. Prénom parent (PARENTS_MAP)
+    var allP=[];Object.keys(PARENTS_MAP).forEach(function(e){if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){if(allP.indexOf(p)===-1)allP.push(p);});});
+    if(allP.some(function(p){return nrm(p).includes(qn);}))return true;
+    return false;
   });
-  if(!found.length)return'<p class="empty">Aucun résultat pour <strong>'+esc(q)+'</strong></p>';
-  return found.map(function(f){
-    var s=status(f.totalH),p=pct(f.totalH,OBJ);
+  if(!found.length)return'<p class="empty">Aucun resultat pour <strong>'+esc(q)+'</strong><br><span style="font-size:12px;color:var(--mu)">Essayez le nom de famille, le prenom de l\'enfant ou d\'un parent</span></p>';
+  return found.sort(function(a,b){return a.key.localeCompare(b.key);}).map(function(f){
+    var totCheqR=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
+    var nbPar=f.parents.length||1,famObj2=nbPar*OBJ;
+    var s=f.totalH>=famObj2?"complete":status(f.totalH);
+    var p2=pct(f.totalH,famObj2);
     var enfants=Object.keys(f.children).map(function(ch){return ch+" ("+f.children[ch]+")";}).join(", ");
-    var parentsDisp=f.parents.map(function(p2){return displayPrenom(p2.prenoms);}).join(" · ");
+    var dispPars=[];
+    Object.keys(PARENTS_MAP).forEach(function(e){if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){if(dispPars.indexOf(p)===-1)dispPars.push(p);});});
+    if(!dispPars.length)dispPars=f.parents.map(function(p2){return displayPrenom(p2.prenoms);});
+    var parentsDisp=dispPars.join(' - ');
+    var hoursDisplay;
+    if(f.totalH===0){
+      hoursDisplay='<div style="font-size:12px;color:var(--mu);font-style:italic;margin-top:2px">Aucune heure declaree</div>';
+    }else if(f.subs&&f.subs.length===0&&totCheqR>0){
+      hoursDisplay='<div style="font-size:20px;font-weight:700;color:var(--am)">'+rnd(totCheqR)+'h</div>'+
+        '<div style="font-size:10px;color:var(--am)">cheque(s)</div>';
+    }else{
+      hoursDisplay='<div style="font-size:22px;font-weight:700;color:var(--red)">'+rnd(f.totalH)+'h</div>'+
+        (totCheqR>0?'<div style="font-size:10px;color:var(--am)">dont '+rnd(totCheqR)+'h cheques</div>':'')+
+        '<div style="font-size:10px;color:var(--mu)">/ '+famObj2+'h</div>';
+    }
     return'<button class="li" style="margin-bottom:10px" data-a="portal-sel" data-key="'+esc(f.key)+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'+
         '<div style="flex:1;min-width:0">'+
           '<div style="font-weight:700;font-size:15px">Famille '+esc(f.key)+'</div>'+
           '<div style="font-size:12px;color:var(--mu);margin-top:2px">'+esc(enfants)+'</div>'+
           '<div style="font-size:12px;color:var(--mu)">Parents : '+esc(parentsDisp)+'</div>'+
-          '<div style="margin-top:6px"><div class="pt2"><div class="pf '+fcls(s)+'" style="width:'+p+'%"></div></div></div>'+
+          (f.totalH>0?'<div style="margin-top:6px"><div class="pt2"><div class="pf '+fcls(s)+'" style="width:'+p2+'%"></div></div></div>':'')+
         '</div>'+
         '<div style="text-align:right;flex-shrink:0">'+
-          '<div style="font-size:22px;font-weight:700;color:var(--red)">'+rnd(f.totalH)+'h</div>'+
-          '<div style="font-size:10px;color:var(--mu)">/ '+OBJ+'h</div>'+
-          badge(s)+
+          hoursDisplay+
+          (f.totalH>0?badge(s):'')+
         '</div>'+
       '</div>'+
     '</button>';
   }).join("");
 }
+
 // ── VUE FAMILLE ───────────────────────────────
 function rView(){
   var f=S.portalFam;if(!f)return rPortal();
@@ -952,7 +972,7 @@ function rSaisies(subs){
         '</div>'+
       '</div>';
     }
-    return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'" >';
+    return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'" >'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="flex:1;margin-right:10px">'+
           '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" - "+esc(s.classe)+'</div>'+
