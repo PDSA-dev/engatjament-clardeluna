@@ -931,17 +931,23 @@ function printOverview(){
     '<tbody>'+rows+'</tbody></table>'+
     '<p style="font-size:11px;color:#aaa;margin-top:12px;text-align:right">Clardeluna '+ANNEE+' &middot; Généré le '+dt+'</p>'+
     '<scr'+'ipt>window.print();<\/scr'+'ipt></body></html>';
-  var w=window.open("","_blank","width=900,height=700");
-  w.document.write(html);
-  w.document.close();
+  // Ouvrir via Blob URL (évite le blocage popup navigateur)
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.target='_blank';
+  a.rel='noopener';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
 }
 
 function printRapport(){
   var content=document.getElementById("rapport-content");
   if(!content){alert("Ouvrez d'abord l'onglet Rapport");return;}
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
-  var w=window.open("","_blank","width=900,height=700");
-  w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'+
+  var htmlR='<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'+
     '<title>Rapport Clardeluna '+dt+'</title>'+
     '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;font-size:13px;padding:20px;color:#1C1814}'+
     'table{width:100%;border-collapse:collapse}th,td{padding:8px 10px;border-bottom:1px solid #E0D9D3}'+
@@ -952,9 +958,13 @@ function printRapport(){
     '<h1>Clardeluna — Rapport d\'investissement familial 2025-2026</h1>'+
     '<div class="meta"><span>Date d\'édition : '+dt+'</span><span>Objectif : 40h par famille</span></div>'+
     content.outerHTML+
-    '<script>window.print();<\/script>'+
-    '</body></html>');
-  w.document.close();
+    '<scr'+'ipt>window.print();<\/scr'+'ipt>'+
+    '</body></html>';
+  var blobR=new Blob([htmlR],{type:'text/html;charset=utf-8'});
+  var urlR=URL.createObjectURL(blobR);
+  var aR=document.createElement('a');aR.href=urlR;aR.target='_blank';aR.rel='noopener';
+  document.body.appendChild(aR);aR.click();
+  setTimeout(function(){document.body.removeChild(aR);URL.revokeObjectURL(urlR);},1000);
 }
 
 function rReglages(){
