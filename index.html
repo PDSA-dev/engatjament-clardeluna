@@ -983,7 +983,7 @@ function rSaisies(subs){
         '<div style="text-align:right;flex-shrink:0">'+
           '<div style="font-size:18px;font-weight:700;color:var(--red)">'+s.heures+'h</div>'+
           '<button style="font-size:11px;color:var(--am);background:none;border:none;cursor:pointer;font-family:inherit;margin-right:6px" data-a="edit-saisie" data-id="'+esc(s.id)+'">Modifier</button>'+
-          '<button style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit" data-a="del" data-id="'+esc(s.id)+'"+'+(S.deleting===s.id?"...":"Supprimer")+'</button>'+
+          '<button style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit" data-a="del" data-id="'+esc(s.id)+'">'+(S.deleting===s.id?"...":"Supprimer")+'</button>'+
         '</div>'+
       '</div></div>';
   }).join(""):'<p class="empty">Aucune saisie</p>';
