@@ -848,41 +848,72 @@ function rOverview(fs,tot){
 
 function rHeures(fs){
   var cls=["all"].concat(Object.keys(ELEVES));
-  var sts=["all","ok","warn","late","complete"];
-  var slbls={all:"Tous",ok:"À jour",warn:"Vigilance",late:"En retard",complete:"Objectif atteint"};
-  var fCls='<div class="fbar">'+cls.map(function(c){return'<button class="fc2'+(S.aCls===c?" on":"")+'" data-a="fcls" data-v="'+c+'">'+(c==="all"?"Toutes classes":c)+'</button>';}).join("")+'</div>';
-  var fSt='<div class="fbar">'+sts.map(function(st){return'<button class="fc2'+(S.aFilter===st?" on":"")+'" data-a="fst" data-v="'+st+'">'+slbls[st]+'</button>';}).join("")+'</div>';
-  var filtered=fs.filter(function(f){
+  var sts=["all","ok","warn","late","zero","complete"];
+  var slbls={all:"Tous","ok":"A jour",warn:"Vigilance",late:"En retard",zero:"Aucune heure",complete:"Objectif atteint"};
+  // Utiliser buildFullFamilies pour inclure les familles à 0h
+  var fsAll=(S.subs!==null)?buildFullFamilies(S.subs):fs;
+  var fCls='<div class="fbar">'+cls.map(function(cl){
+    return'<button class="fc2'+(S.aCls===cl?" on":"")+'" data-a="fcls" data-v="'+cl+'">'+(cl==="all"?"Toutes classes":cl)+'</button>';
+  }).join("")+'</div>';
+  var fSt='<div class="fbar">'+sts.map(function(st){
+    return'<button class="fc2'+(S.aFilter===st?" on":"")+'" data-a="fst" data-v="'+st+'">'+slbls[st]+'</button>';
+  }).join("")+'</div>';
+  var filtered=fsAll.filter(function(f){
     var clsOk=S.aCls==="all"||Object.values(f.children).indexOf(S.aCls)!==-1;
-    return clsOk&&(S.aFilter==="all"||status(f.totalH)===S.aFilter);
+    var stOk;
+    if(S.aFilter==="all")stOk=true;
+    else if(S.aFilter==="zero")stOk=f.totalH===0;
+    else stOk=f.totalH>0&&status(f.totalH)===S.aFilter;
+    return clsOk&&stOk;
   }).sort(function(a,b){return a.key.localeCompare(b.key);});
   if(!filtered.length)return fCls+fSt+'<p class="empty">Aucune famille</p>';
   var rows=filtered.map(function(f){
-    var s=status(f.totalH),p=pct(f.totalH,OBJ);
-    var bc=s==="complete"||s==="ok"?"var(--gn)":s==="warn"?"#E6A817":"var(--red)";
-    var parentsDisp=f.parents.map(function(par){return displayPrenom(par.prenoms);}).join(", ");
-    var cats=Object.keys(f.byAct).map(function(k){return'<span style="font-size:10px;color:var(--mu)">'+esc(k)+' '+rnd(f.byAct[k])+'h</span>';}).join(" · ");
+    var s=f.totalH===0?"zero":status(f.totalH);
+    var nbPar=f.parents.length||1,famObj=nbPar*OBJ;
+    var p=Math.min(100,Math.round(f.totalH/famObj*100));
+    var bc=s==="complete"||s==="ok"?"var(--gn)":s==="warn"?"#E6A817":s==="zero"?"#bbb":"var(--red)";
+    // Parents: merge Firebase + PARENTS_MAP
+    var dispPars=[];
+    Object.keys(PARENTS_MAP).forEach(function(e){
+      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p2){if(dispPars.indexOf(p2)===-1)dispPars.push(p2);});
+    });
+    if(!dispPars.length)dispPars=f.parents.map(function(par){return displayPrenom(par.prenoms);});
+    var cats=Object.keys(f.byAct).map(function(k){
+      return'<span style="font-size:10px;color:var(--mu)">'+esc(k)+' '+rnd(f.byAct[k])+'h</span>';
+    }).join(" - ");
+    var badgeHtml;
+    if(s==="zero"){
+      badgeHtml='<span style="font-size:11px;background:#F5F5F5;color:#999;padding:2px 8px;border-radius:10px;font-weight:600">Aucune heure</span>';
+    }else{
+      badgeHtml=badge(s);
+    }
     return'<tr>'+
       '<td>'+
         '<div style="font-size:13px;font-weight:700">Famille '+esc(f.key)+'</div>'+
-        '<div style="font-size:11px;color:var(--mu)">'+esc(parentsDisp)+'</div>'+
+        '<div style="font-size:11px;color:var(--mu)">'+esc(dispPars.join(", "))+'</div>'+
         '<div style="font-size:11px;color:var(--mu)">'+esc(Object.keys(f.children).join(", "))+'</div>'+
         (cats?'<div style="margin-top:2px">'+cats+'</div>':"")+
       '</td>'+
       '<td style="white-space:nowrap">'+
         '<div class="hbw"><div class="hb" style="width:'+p+'%;background:'+bc+'"></div></div>'+
-        '<span style="font-size:13px;font-weight:700;color:'+bc+'">'+rnd(f.totalH)+'h</span>'+
+        '<span style="font-size:13px;font-weight:700;color:'+bc+'">'+(f.totalH===0?"0h":rnd(f.totalH)+"h")+'</span>'+
+        '<span style="font-size:10px;color:var(--mu);margin-left:3px">/ '+famObj+'h</span>'+
       '</td>'+
-      '<td>'+badge(s)+'</td>'+
+      '<td>'+badgeHtml+'</td>'+
     '</tr>';
   }).join("");
+  var totalH=filtered.reduce(function(a,f){return a+f.totalH;},0);
   return fCls+fSt+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+      '<p style="font-size:11px;color:var(--mu)">'+filtered.length+' famille(s) - Objectif : '+OBJ+'h par famille'+(filtered.length?(' - Total : '+rnd(totalH)+'h'):'')+'</p>'+
+      '<button class="btn bo bsm" data-a="print-heures">Imprimer / PDF</button>'+
+    '</div>'+
     '<div style="overflow-x:auto"><table class="htbl">'+
       '<thead><tr><th>Famille</th><th>Total</th><th>Statut</th></tr></thead>'+
       '<tbody>'+rows+'</tbody>'+
-    '</table></div>'+
-    '<p style="font-size:11px;color:var(--mu);margin-top:8px">'+filtered.length+' famille(s) · Objectif : '+OBJ+'h par famille</p>';
+    '</table></div>';
 }
+
 function rSaisies(subs){
   var q=nrm(S.aSubQ||"");
   var step1=subs.filter(function(s){
@@ -1163,6 +1194,66 @@ function printOverview(){
       '<tbody>'+rows+'</tbody>'+
     '</table>'+
     '<p style="font-size:11px;color:#aaa;margin-top:12px;text-align:right">Clardeluna '+ANNEE+' - '+dt+'</p>';
+  var overlay=document.getElementById("print-overlay");
+  if(overlay){overlay.innerHTML=html;window.print();setTimeout(function(){overlay.innerHTML="";},2000);}
+}
+
+function printHeures(){
+  var fsAll=(S.subs!==null)?buildFullFamilies(S.subs):computeFamilies(S.subs||[]);
+  var filtered=fsAll.filter(function(f){
+    var clsOk=S.aCls==="all"||Object.values(f.children).indexOf(S.aCls)!==-1;
+    var stOk;
+    if(S.aFilter==="all")stOk=true;
+    else if(S.aFilter==="zero")stOk=f.totalH===0;
+    else stOk=f.totalH>0&&status(f.totalH)===S.aFilter;
+    return clsOk&&stOk;
+  }).sort(function(a,b){return a.key.localeCompare(b.key);});
+  var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
+  var clsLabel=S.aCls==="all"?"Toutes classes":S.aCls;
+  var stLabels={all:"Tous","ok":"A jour",warn:"Vigilance",late:"En retard",zero:"Aucune heure",complete:"Objectif atteint"};
+  var stLabel=stLabels[S.aFilter]||"Tous";
+  var rows=filtered.map(function(f){
+    var s=f.totalH===0?"zero":status(f.totalH);
+    var nbPar=f.parents.length||1,famObj=nbPar*OBJ;
+    var p=Math.min(100,Math.round(f.totalH/famObj*100));
+    var color=s==="complete"||s==="ok"?"#2E7D4F":s==="warn"?"#8B6000":s==="zero"?"#999":"#C0472A";
+    var dispPars=[];
+    Object.keys(PARENTS_MAP).forEach(function(e){
+      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p2){if(dispPars.indexOf(p2)===-1)dispPars.push(p2);});
+    });
+    if(!dispPars.length)dispPars=f.parents.map(function(par){return displayPrenom(par.prenoms);});
+    var stLabel2=s==="zero"?"Aucune heure":s==="complete"?"Objectif atteint":s==="ok"?"A jour":s==="warn"?"Vigilance":"En retard";
+    return'<tr>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #E0D9D3;font-size:12px">'+
+        '<strong>Famille '+esc(f.key)+'</strong>'+
+        '<div style="color:#888">'+esc(dispPars.join(", "))+'</div>'+
+        '<div style="color:#888">'+esc(Object.keys(f.children).join(", "))+'</div>'+
+      '</td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #E0D9D3;text-align:right;font-weight:700;color:'+color+'">'+
+        (f.totalH===0?"0h":rnd(f.totalH)+"h")+
+        '<div style="font-size:10px;color:#999">/ '+famObj+'h</div>'+
+      '</td>'+
+      '<td style="padding:8px 10px;border-bottom:1px solid #E0D9D3">'+
+        '<div style="height:5px;background:#E0D9D3;border-radius:3px;margin-bottom:3px">'+
+          '<div style="height:100%;width:'+p+'%;background:'+color+';border-radius:3px"></div>'+
+        '</div>'+
+        '<span style="font-size:10px;background:#F5F5F5;color:'+color+';padding:1px 6px;border-radius:8px;font-weight:700">'+p+'% - '+stLabel2+'</span>'+
+      '</td>'+
+    '</tr>';
+  }).join("");
+  var totalH=filtered.reduce(function(a,f){return a+f.totalH;},0);
+  var html=
+    '<h1 style="font-size:16px;font-weight:700;color:#C0472A;margin-bottom:4px">Clardeluna - Heures par famille</h1>'+
+    '<div style="font-size:11px;color:#666;margin-bottom:12px">'+dt+' - '+ANNEE+' - '+clsLabel+' - Filtre : '+stLabel+'</div>'+
+    '<table style="width:100%;border-collapse:collapse">'+
+      '<thead><tr>'+
+        '<th style="padding:7px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Famille</th>'+
+        '<th style="padding:7px 10px;text-align:right;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Heures</th>'+
+        '<th style="padding:7px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Progression</th>'+
+      '</tr></thead>'+
+      '<tbody>'+rows+'</tbody>'+
+    '</table>'+
+    '<p style="font-size:11px;color:#aaa;margin-top:8px">'+filtered.length+' familles - Total filtre : '+rnd(totalH)+'h</p>';
   var overlay=document.getElementById("print-overlay");
   if(overlay){overlay.innerHTML=html;window.print();setTimeout(function(){overlay.innerHTML="";},2000);}
 }
@@ -1688,6 +1779,7 @@ function onClick(e){
         .catch(function(e){go({editSaisieErr:"Erreur: "+e.message});});
       break;
         case"tog-pw-vis":var tEl=document.getElementById(el.dataset.t);if(tEl)tEl.type=tEl.type==="password"?"text":"password";reattach();break;
+        case"print-heures":printHeures();break;
         case"check-pin":checkPin();break;
     case"tab":go({adminTab:v});break;
     case"fcls":go({aCls:v});break;
