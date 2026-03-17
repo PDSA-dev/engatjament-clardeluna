@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Clardeluna 2025-2026</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#C0472A;--redl:#F5EAE7;--redm:#E8C4BA;--bg:#F7F4F1;--sf:#fff;--tx:#1C1814;--mu:#7A7268;--hi:#B0A89E;--bd:#E0D9D3;--gn:#2E7D4F;--gnl:#E8F5EE;--am:#8B6000;--aml:#FFF8E1;--r:10px;--rs:6px}
+html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.5}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px 60px}
+.wlg{max-width:640px;margin:0 auto;padding:0 16px 60px}
+.topbar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--sf);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:9}
+.tb-back{background:none;border:none;cursor:pointer;font-size:20px;color:var(--mu);padding:2px 6px;line-height:1}
+.tb-t{font-size:14px;font-weight:700}.tb-s{font-size:11px;color:var(--mu)}
+.pw{height:3px;background:var(--bd)}.pb{height:100%;background:var(--red);transition:width .3s}
+.btn{display:block;width:100%;padding:13px 20px;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;text-align:center;border:none;transition:opacity .15s,transform .1s;font-family:inherit}
+.btn:active:not(:disabled){transform:scale(.98)}
+.bp{background:var(--red);color:#fff}.bo{background:var(--sf);color:var(--tx);border:1px solid var(--bd)}.bgh{background:none;color:var(--hi);border:none;font-size:13px}
+.bsm{padding:8px 16px;font-size:13px;width:auto;display:inline-block}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+.bgrp{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:16px}.card+.card{margin-top:10px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.sbtn{background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);padding:18px 12px;cursor:pointer;text-align:center;transition:border-color .15s,background .15s}
+.sbtn.on{border-color:var(--red);background:var(--redl)}
+.sn{font-size:28px;font-weight:700;color:var(--red)}.sl2{font-size:12px;color:var(--mu);margin-top:2px}
+.li{display:block;width:100%;padding:12px 14px;margin-bottom:6px;background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--rs);cursor:pointer;text-align:left;font-size:14px;transition:border-color .1s;font-family:inherit}
+.li.on{border-color:var(--red);background:var(--redl);font-weight:600;color:var(--red)}
+.field{margin-top:14px}
+.lbl{display:block;font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.inp{width:100%;padding:11px 13px;border:1px solid var(--bd);border-radius:var(--rs);font-size:15px;background:var(--sf);color:var(--tx);font-family:inherit}
+.inp:focus{outline:2px solid var(--red);border-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{padding:9px 16px;background:var(--sf);border:1.5px solid var(--bd);border-radius:30px;cursor:pointer;font-size:15px;font-weight:500}
+.chip.on{border-color:var(--red);background:var(--redl);color:var(--red);font-weight:700}
+.pt2{height:8px;background:var(--bd);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px;transition:width .4s}.fg{background:var(--gn)}.fr{background:var(--red)}.fa{background:#E6A817}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.bg2{background:var(--gnl);color:var(--gn)}.br2{background:var(--redl);color:var(--red)}.ba{background:var(--aml);color:var(--am)}
+.srow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:14px;text-align:center}
+.sv{font-size:24px;font-weight:700;color:var(--red)}.slbl{font-size:11px;color:var(--mu);margin-top:2px}
+.si{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px}
+.tabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto}
+.tab{flex:1;min-width:70px;padding:11px 8px;border:none;background:none;font-size:12px;cursor:pointer;color:var(--mu);border-bottom:2px solid transparent;font-family:inherit;white-space:nowrap;font-weight:600}
+.tab.on{color:var(--red);border-bottom-color:var(--red)}
+.fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.fc2{padding:6px 12px;border-radius:20px;border:1px solid var(--bd);background:var(--sf);font-size:12px;cursor:pointer;font-family:inherit;color:var(--mu)}
+.fc2.on{background:var(--red);color:#fff;border-color:var(--red)}
+.scard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-top:14px}
+.sr2{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--bd);font-size:14px}
+.sr2:last-child{border-bottom:none}.sml{color:var(--mu)}
+.sedit{font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;margin-left:8px;font-family:inherit}
+.loader{text-align:center;padding:48px 16px;color:var(--mu);font-size:14px}
+.spin{width:28px;height:28px;border:3px solid var(--bd);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.al{padding:11px 14px;border-radius:var(--rs);font-size:13px;margin-top:10px}
+.aw{background:var(--aml);color:var(--am);border:1px solid #F0D060}
+.ae{background:var(--redl);color:var(--red);border:1px solid var(--redm)}
+.aok{background:var(--gnl);color:var(--gn);border:1px solid #A8D8BE}
+.hlogo{display:flex;align-items:center;justify-content:center;width:68px;height:68px;background:var(--red);color:#fff;font-size:22px;font-weight:700;border-radius:16px;margin:52px auto 18px;letter-spacing:1px}
+.okc{width:68px;height:68px;border-radius:50%;background:var(--gnl);display:flex;align-items:center;justify-content:center;margin:48px auto 18px;font-size:30px;color:var(--gn)}
+.htbl{width:100%;border-collapse:collapse;font-size:13px;min-width:380px}
+.htbl th{padding:9px 10px;text-align:left;font-weight:700;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.03em;border-bottom:2px solid var(--bd);background:var(--bg);white-space:nowrap}
+.htbl th.nr{text-align:right}.htbl td{padding:9px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.htbl td.nr{text-align:right;font-weight:600}.htbl tr:last-child td{border-bottom:none}.htbl tbody tr:hover td{background:#FAF7F4}
+.hbw{width:60px;height:6px;background:var(--bd);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:4px}
+.hb{height:100%;border-radius:3px}
+.sbar{display:flex;gap:8px;margin-bottom:14px}.sbar .inp{flex:1}
+.cat-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.cat-pill{padding:3px 10px;border-radius:20px;font-size:12px;background:var(--bg);border:1px solid var(--bd)}
+.cat-pill span{font-weight:700}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt24{margin-top:24px}
+.empty{text-align:center;padding:32px;color:var(--mu);font-size:14px}
+h2.ptt{font-size:20px;font-weight:700;margin-bottom:4px}
+p.pss{font-size:14px;color:var(--mu);margin-bottom:16px}
+/* Fiche parent */
+.parent-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.parent-card-head{display:flex;justify-content:space-between;align-items:flex-start}
+.parent-name{font-size:15px;font-weight:700}
+.parent-hours{font-size:22px;font-weight:700;color:var(--red);text-align:right}
+.parent-total-lbl{font-size:10px;color:var(--mu);text-align:right}
+@media(max-width:380px){.srow{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="app"><div class="loader"><div class="spin"></div>Connexion…</div></div>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+// ── CONFIG ───────────────────────────────────
+var FB_CFG={apiKey:"AIzaSyB-wIHxxQKYKlss2byJiN26d4VPc5dozlc",authDomain:"clardeluna-2026.firebaseapp.com",projectId:"clardeluna-2026",storageBucket:"clardeluna-2026.firebasestorage.app",messagingSenderId:"65241322899",appId:"1:65241322899:web:0c94d1ab9c178f030f0466"};
+var PIN="2026", OBJ=40;
+// ── ANNÉE SCOLAIRE — modifiable dans Réglages ────────────────
+var RENTREE="2025-09-02"; // date de rentrée ISO
+var ANNEE="2025-2026";    // libellé affiché
+
+// Découpe l'année en 3 trimestres égaux continus + 1 été
+// T1+T2+T3 couvrent de la rentrée au 30 juin (sans tenir compte des vacances)
+function buildTRI(rentreeISO, anneeLabel){
+  var d0=new Date(rentreeISO+"T00:00:00");
+  var yr=d0.getFullYear(); // ex: 2025
+  // Fin d'année scolaire = 30 juin de l'année suivante
+  var finAnnee=new Date((yr+1)+"-06-30T23:59:59");
+  // Durée totale en ms
+  var dur=finAnnee-d0;
+  var t=Math.floor(dur/3); // durée d'un trimestre en ms
+  var t1s=new Date(d0);
+  var t1e=new Date(d0.getTime()+t-1);
+  var t2s=new Date(t1e.getTime()+1);
+  var t2e=new Date(d0.getTime()+2*t-1);
+  var t3s=new Date(t2e.getTime()+1);
+  var t3e=new Date(finAnnee);
+  // T4 : été (1er juillet → 31 août)
+  var t4s=new Date((yr+1)+"-07-01T00:00:00");
+  var t4e=new Date((yr+1)+"-08-31T23:59:59");
+  function fmt(d){return d.toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"2-digit"});}
+  return[
+    {n:1,l:"T1",s:t1s,e:t1e,m:fmt(t1s)+" → "+fmt(t1e)},
+    {n:2,l:"T2",s:t2s,e:t2e,m:fmt(t2s)+" → "+fmt(t2e)},
+    {n:3,l:"T3",s:t3s,e:t3e,m:fmt(t3s)+" → "+fmt(t3e)},
+    {n:4,l:"T4",s:t4s,e:t4e,m:"Été "+(yr+1)}
+  ];
+}
+var TRI=buildTRI(RENTREE,ANNEE);
+var ELEVES={"6ème":["ARTAL TAULIER Sacha","BONNADIER Dario","DERAMAUDT Paul","DE SWARTE Orphée","FRANCO GARCIA Enoc","GRAMIEN Madi","HAM Salomé","HOULES Clara","MARTIN Jade","OTERO Eden","PLAZA BLASCO Lenny","RIQUELME LEGRAND Louis","RIBEIRO NOLET Shanna","RODRIGUEZ Hermine"],"5ème":["BERT LECHAT Eva","BONNADIER Roxane","CADILHAC Jules","ESTEVE ROSALES Roman","ESCALIER Marius","EVANO Lisa","FERRER Santino","GUIRAL HUDE Lilian","ICHE Dominique Antoine","JALLAN Leeloo","LLAO Marie","MORERA Ema","RIPALTI Elina"],"4ème":["ALONSO Rayan","BLAIN Lucas","COSSIA COLLYN Liam","CRASSOUS Inaya","DERAMAUDT Inès","ESCALIER TOBENA Jeanne","ESTEVE ROSALES Lissandre","FOURNIER Selona","GOSSENT Thomas","HUET Romane","JULIA Raphaël","LECAILLE Eloi","LEGUET AMADOR Livia","LOUVET Louis","LUGAGNE Louis","OUALI Souhayl","PASTOR BESSONNE Artémis","PIETRZAK Maëlyne","POUCIN Anna","RICOUL Phoebe","RIELLO LOPEZ Louka","SIMONIAN Ibrahim","ZAMITH Giulian"],"3ème":["ALONSO Célia","ALVES Axel","CAVANNA Angète","EYMARD Raphael","HAM Roméo","MARTINEZ LEE Elie","MENEAU RUF Titouan","ROUSSEAU Noël","SCHLEIFER Paul"]};
+// Noms des parents par enfant — pré-remplis depuis le fichier Google Forms 2025-2026
+// Modifiable dans Admin → Réglages, sauvegardé dans Firebase
+var PARENTS_MAP={
+  "ALONSO Célia":["Paméla", "Sylvain"],
+  "ALONSO Rayan":["Paméla", "Sylvain"],
+  "ALVES Axel":["Paul", "Virginie"],
+  "ARTAL TAULIER Sacha":["William", "Géraldine"],
+  "BERT LECHAT Eva":["Sophie", "François"],
+  "BLAIN Lucas":["Eric", "Anne-Laure"],
+  "BONNADIER Dario":["Philippine", "Steve"],
+  "BONNADIER Roxane":["Philippine", "Steve"],
+  "CADILHAC Jules":["Christel", "Vincent"],
+  "CAVANNA Angète":["Gabrielle", "Stéphane"],
+  "COSSIA COLLYN Liam":["Laurent", "Laure"],
+  "CRASSOUS Inaya":["Claire"],
+  "DE SWARTE Orphée":["Juliette"],
+  "DERAMAUDT Inès":["Matthieu", "Alexandra"],
+  "DERAMAUDT Paul":["Matthieu", "Alexandra"],
+  "ESCALIER Marius":["Sebastien", "Gaelle"],
+  "ESCALIER TOBENA Jeanne":["Sebastien", "Gaelle"],
+  "ESTEVE ROSALES Lissandre":["Jean-Daniel", "Sophie"],
+  "ESTEVE ROSALES Roman":["Jean-Daniel", "Sophie"],
+  "EVANO Lisa":["Jérôme", "Lætitia"],
+  "EYMARD Raphael":["Philippe", "Laurence"],
+  "FERRER Santino":["Charlène", "Mickael"],
+  "FOURNIER Selona":["Steeve", "Elisa"],
+  "FRANCO GARCIA Enoc":["Laurie"],
+  "GOSSENT Thomas":["Sébastien", "Agnès"],
+  "GRAMIEN Madi":["Aria", "Mina"],
+  "GUIRAL HUDE Lilian":["Guillaume", "Emmanuelle"],
+  "HAM Roméo":["Lionel", "Cathy"],
+  "HAM Salomé":["Lionel", "Cathy"],
+  "HOULES Clara":["Benjamin", "Aurélie"],
+  "HUET Romane":["Nicolas", "Marion"],
+  "ICHE Dominique Antoine":["Marcel", "Véronique"],
+  "JALLAN Leeloo":["Bastien", "Fiona"],
+  "JULIA Raphaël":["Jérome", "Claire"],
+  "LECAILLE Eloi":["Bruno", "Charlotte"],
+  "LEGUET AMADOR Livia":["Candy", "Christophe"],
+  "LLAO Marie":["Florent", "Melanie"],
+  "LUGAGNE Louis":["Bérengère"],
+  "MARTIN Jade":["Fabrice", "Emmanuelle"],
+  "MARTINEZ LEE Elie":["Franck", "Jeong-Mi"],
+  "MENEAU RUF Titouan":["Guilhem", "Caroline"],
+  "MORERA Ema":["Jean-Christophe"],
+  "OTERO Eden":["Sandra"],
+  "OUALI Souhayl":["Nabil", "Nadia"],
+  "PASTOR BESSONNE Artémis":["Julie", "Cyrille"],
+  "PIETRZAK Maëlyne":["Ronnie", "Carine"],
+  "PLAZA BLASCO Lenny":["Nicolas", "Ketsia"],
+  "RIBEIRO NOLET Shanna":["Maïron", "Aurélie"],
+  "RICOUL Phoebe":["Teddy", "Heidi"],
+  "RIELLO LOPEZ Louka":["Diego", "Virginie"],
+  "RIPALTI Elina":["Frédéric", "Véronique"],
+  "RIQUELME LEGRAND Louis":["Florent", "Natacha"],
+  "RODRIGUEZ Hermine":["Julien", "Julie"],
+  "ROUSSEAU Noël":["Siham"],
+  "SCHLEIFER Paul":["Olivier", "Colette"],
+  "SIMONIAN Ibrahim":["Jess", "Nadia"]
+};
+
+var CHEQUES_MAP={};// clé: "FAMILLE_prenomNorm" → nbChèques (0-4). 1 chèque=25%=10h
+
+var ACTS={"Festivités":["Feria 2025 nouveaux parents","Fête du jeu","Dintrada Sept. 2025","Portes ouvertes","Martror (Halloween)","Vide-grenier","Loto","Prima bela","FAUM Maraussan","Guinguette","Total festum","Course d'obstacle","Vente de chocolats, miel","Marchés divers","Feria 2026","Forfait festivités","Cap d'An","Maraussan musique","Journée des familles","Projet Fédé","Pasqueta"],"Commissions":["Remplacement journée","Ménage fin journée et vacances scolaires","Cantine gestion et relations prestataire","Ménage gestion et relations prestataires","Environnement","Dossier d'inscription","Mercat","Camel / référent feria 2026","Travaux","Sécurité","Informatique","Mécénat","Photos de classe","Communication","Ateliers / activités","Suivi des heures d'investissement","Festivités","CDI","Achats scolaires et péri-scolaire","Livret culturel","Soleth Cantadis","Mission coups de main","Forfait commissions"],"Administratif / CA":["Bureau","Conseil d'administration (2h/CA)","Contractualisation","Aide pédagogique"]};
+// ── FIREBASE ─────────────────────────────────
+var db=null;
+function fbLoad(){return db.collection("submissions").orderBy("ts","desc").get().then(function(s){return s.docs.map(function(d){return Object.assign({id:d.id},d.data());});});}
+function fbAdd(d){return db.collection("submissions").add(Object.assign({ts:new Date().toISOString()},d));}
+function fbDel(id){return db.collection("submissions").doc(id).delete();}
+function fbDeleteAll(){return db.collection("submissions").get().then(function(snap){var b=db.batch();snap.docs.forEach(function(d){b.delete(d.ref);});return b.commit();});}
+function fbSaveEl(el){return db.collection("config").doc("eleves").set({eleves:el,parents:PARENTS_MAP});}
+function fbSaveParents(){return db.collection("config").doc("eleves").set({eleves:ELEVES,parents:PARENTS_MAP});}
+function fbLoadEl(){return db.collection("config").doc("eleves").get();}
+function fbSaveCheques(){return db.collection("config").doc("cheques").set({cheques:CHEQUES_MAP});}
+function fbLoadCheques(){return db.collection("config").doc("cheques").get();}
+function fbSaveAnnee(){return db.collection("config").doc("annee").set({rentree:RENTREE,annee:ANNEE});}
+function fbLoadAnnee(){return db.collection("config").doc("annee").get();}
+// ── UTILITAIRES ───────────────────────────────
+function nrm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function rnd(v){return Math.round(v*2)/2;}
+function pct(v,m){return Math.min(100,Math.round(v/m*100));}
+function getTri(ts){var d=new Date(ts);for(var i=0;i<TRI.length;i++)if(d>=TRI[i].s&&d<=TRI[i].e)return TRI[i].n;return null;}
+function curTri(){var n=new Date();for(var i=0;i<TRI.length;i++)if(n>=TRI[i].s&&n<=TRI[i].e)return TRI[i].n;return 4;}
+function hAtt(){var n=new Date(),t=0;for(var i=0;i<TRI.length;i++){var tr=TRI[i];if(n>tr.e)t+=10;else if(n>=tr.s)t+=(n-tr.s)/(tr.e-tr.s)*10;}return Math.min(OBJ,t);}
+// ── NOM DE FAMILLE depuis nom d'élève ─────────
+function familyKey(eleve){
+  // Prend le premier mot en majuscules (nom de famille)
+  var parts=String(eleve||"").trim().split(" ");
+  return parts[0].toUpperCase();
+}
+// ── NORMALISATION PRÉNOM PARENT ──────────────
+// "Paul", "Paulo", "Paul Alves", "paulo alves" → même prénom
+// Extrait le prénom principal (1er mot significatif)
+function chequeKey(fk,prenom){return fk+"_"+nrm(prenom).replace(/\s+/g,"").slice(0,8);}
+function chequesH(fk,prenom){return (CHEQUES_MAP[chequeKey(fk,prenom)]||0)*10;}
+function normPrenom(s){
+  var p=nrm((String(s||"").split(/\s*[&\+]\s*|\s+et\s+/)[0]||"").trim());
+  // Prend le 1er mot de plus de 2 lettres (ignore titres courts)
+  var words=p.split(/\s+/).filter(function(w){return w.length>2;});
+  return (words[0]||p.slice(0,6)).slice(0,6);
+}
+// Deux chaînes partagent-elles le même prénom principal ?
+function prenomMatch(a,b){
+  var na=normPrenom(a), nb=normPrenom(b);
+  if(!na||!nb||na.length<3||nb.length<3)return false;
+  if(na===nb)return true;
+  // Tolérance 1 caractère (faute de frappe): Bérengère/Béerngère
+  var min=Math.min(na.length,nb.length);
+  var diff=0;
+  for(var i=0;i<min;i++){if(na[i]!==nb[i])diff++;}
+  diff+=Math.abs(na.length-nb.length);
+  if(diff<=1&&min>=4)return true;
+  // Préfixe commun 4 chars
+  if(min>=4&&na.slice(0,4)===nb.slice(0,4))return true;
+  return false;
+}
+// ── EXTRACTION DES PRÉNOMS depuis une saisie ──
+function extractPrenoms(s){
+  // Gère : "Cathy et Lionel", "Paul & Marie", "sophie", "Cathy"
+  var raw=String(s.parents||"").trim();
+  var parts;
+  if(s.nbParents>=2){
+    parts=raw.split(/\s*[&\+]\s*|\s+et\s+/);
+    if(parts.length===1)parts=[raw]; // fallback si pas de séparateur
+  }else{
+    // Même si nbParents=1, peut contenir "Cathy et Lionel"
+    parts=raw.split(/\s+et\s+|\s*&\s*/);
+  }
+  return parts.map(function(p){return p.trim();}).filter(function(p){return p.length>0;});
+}
+// ── CALCUL DES FAMILLES ───────────────────────
+// Une famille = même nom de famille (fratrie incluse)
+// Les parents sont regroupés par prénom fuzzy
+function computeFamilies(subs){
+  var families={};
+  subs.forEach(function(s){
+    var fk=familyKey(s.eleve);
+    if(!families[fk])families[fk]={key:fk,children:{},parents:[],totalH:0,byAct:{},subs:[]};
+    var fam=families[fk];
+    // Enregistrer l'enfant
+    fam.children[s.eleve]=s.classe;
+    fam.subs.push(s);
+    // Extraire les prénoms
+    var prenoms=extractPrenoms(s);
+    var hpp=(parseFloat(s.heures)||0)/prenoms.length;
+    prenoms.forEach(function(prenom){
+      if(!prenom)return;
+      // Chercher un parent existant avec prénom similaire
+      var found=null;
+      for(var i=0;i<fam.parents.length;i++){
+        if(prenomMatch(prenom,fam.parents[i].prenoms[0])){found=fam.parents[i];break;}
+      }
+      if(!found){
+        found={prenoms:[],totalH:0,byAct:{},byTri:{1:0,2:0,3:0,4:0},subs:[]};
+        fam.parents.push(found);
+      }
+      // Ajouter variation de prénom si nouvelle
+      var pnrm=nrm(prenom);
+      var dejavu=found.prenoms.some(function(x){return nrm(x)===pnrm;});
+      if(!dejavu)found.prenoms.push(prenom);
+      // Cumuler heures
+      found.totalH+=hpp;
+      fam.totalH+=hpp;
+      var at=s.activiteType||"Autre";
+      found.byAct[at]=(found.byAct[at]||0)+hpp;
+      fam.byAct[at]=(fam.byAct[at]||0)+hpp;
+      var t=getTri(s.ts);
+      if(t)found.byTri[t]+=hpp;
+      found.subs.push(s);
+    });
+  });
+  // Ajouter les heures-chèques après calcul des subs réelles
+  Object.values(families).forEach(function(fam){
+    fam.parents.forEach(function(par){
+      var pname=displayPrenom(par.prenoms);
+      var ch=chequesH(fam.key,pname);
+      par.chequeH=ch;
+      par.realH=par.totalH;
+      if(ch>0){par.totalH+=ch;fam.totalH+=ch;}
+    });
+    fam.nbParentsObligation=fam.parents.length; // pour affichage objectif
+  });
+  return Object.values(families).sort(function(a,b){return a.key.localeCompare(b.key);});
+}
+// Affichage du prénom principal (le plus long = le plus complet)
+function displayPrenom(prenoms){
+  return prenoms.slice().sort(function(a,b){return b.length-a.length;})[0]||"";
+}
+// Status basé sur le total famille
+function status(h){if(h>=OBJ)return"complete";var a=hAtt();if(a<=0||h>=a)return"ok";if(h>=a*.7)return"warn";return"late";}
+function badge(s){if(s==="complete")return'<span class="badge bg2">Objectif atteint ✓</span>';if(s==="ok")return'<span class="badge bg2">À jour</span>';if(s==="warn")return'<span class="badge ba">Vigilance</span>';return'<span class="badge br2">En retard</span>';}
+function fcls(s){return(s==="complete"||s==="ok")?"fg":s==="warn"?"fa":"fr";}
+function catPills(byAct){
+  return'<div class="cat-bar">'+Object.keys(byAct).map(function(k){
+    return'<span class="cat-pill">'+esc(k)+' <span>'+rnd(byAct[k])+'h</span></span>';
+  }).join("")+'</div>';
+}
+// ── INDEX COMPLET (saisies + ELEVES sans heures) ────────────
+function buildFullFamilies(subs){
+  var base=computeFamilies(subs||[]);
+  var idx={};
+  base.forEach(function(f){idx[f.key]=f;});
+  Object.keys(ELEVES).forEach(function(cl){
+    ELEVES[cl].forEach(function(e){
+      var fk=familyKey(e);
+      if(!idx[fk])idx[fk]={key:fk,children:{},parents:[],totalH:0,byAct:{},subs:[],ghost:true};
+      var fam=idx[fk];
+      if(!fam.children[e])fam.children[e]=cl;
+      (PARENTS_MAP[e]||[]).forEach(function(p){
+        var already=fam.parents.some(function(par){
+          return par.prenoms.some(function(pr){return nrm(pr)===nrm(p);});
+        });
+        if(!already){
+          var ch=chequesH(fk,p);
+          fam.parents.push({prenoms:[p],totalH:ch,chequeH:ch,realH:0,byAct:{},byTri:{1:0,2:0,3:0,4:0},subs:[]});
+          fam.totalH+=ch;
+        }
+      });
+    });
+  });
+  return Object.values(idx).sort(function(a,b){return a.key.localeCompare(b.key);});
+}
+// ── ÉTAT ──────────────────────────────────────
+var S={
+  page:"home",subs:null,loading:false,err:"",
+  step:0,form:{cl:"",eleve:"",nbParents:1,p1:"",p2:"",typeAct:"",sousAct:"",heures:""},
+  done:false,sending:false,sendErr:"",eleveQ:"",
+  portalQ:"",portalFam:null,
+  adminTab:"overview",aFilter:"all",aCls:"all",aSubQ:"",
+  elevesOpen:null,regSaving:false,regSaved:false,promoSaved:false,pinSaved:false,
+  pinInput:"",pinErr:false,deleting:null,
+  anneeSaved:false,anneeSaving:false,
+  manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
+  manSaving:false,manSaved:false,manErr:""
+};
+// ── RENDU ─────────────────────────────────────
+function go(p){saveInputs();Object.assign(S,typeof p==="function"?p(S):p);render();}
+function sil(p){Object.assign(S,typeof p==="function"?p(S):p);}
+function saveInputs(){
+  ["ip1","ip2","ih","pi","np"].forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el)return;
+    if(id==="ip1")sil(function(s){return{form:Object.assign({},s.form,{p1:el.value})};});
+    else if(id==="ip2")sil(function(s){return{form:Object.assign({},s.form,{p2:el.value})};});
+    else if(id==="ih")sil(function(s){return{form:Object.assign({},s.form,{heures:el.value})};});
+    else if(id==="pi")sil({pinInput:el.value});
+  });
+  var pq=document.getElementById("pq");if(pq)sil({portalQ:pq.value});
+  var eq=document.getElementById("eq");if(eq)sil({eleveQ:eq.value});
+  var sq=document.getElementById("sq");if(sq)sil({aSubQ:sq.value});
+}
+function render(){
+  var h="";
+  if(S.page==="home")h=rHome();
+  else if(S.page==="portal")h=rPortal();
+  else if(S.page==="portal-view")h=rView();
+  else if(S.page==="form")h=rForm();
+  else if(S.page==="login")h=rLogin();
+  else if(S.page==="admin")h=rAdmin();
+  else h=rHome();
+  document.getElementById("app").innerHTML=h;
+  bindAll();
+}
+function tb(title,back,sub){
+  return'<div class="topbar"><button class="tb-back" data-a="back" data-v="'+back+'">←</button>'+
+    '<div><div class="tb-t">'+esc(title)+'</div>'+(sub?'<div class="tb-s">'+esc(sub)+'</div>':"")+
+  "</div></div>";
+}
+// ── HOME ──────────────────────────────────────
+function rHome(){
+  return'<div class="wrap"><div class="hlogo">CL</div>'+
+    '<h1 style="font-size:26px;font-weight:700;text-align:center">Clardeluna</h1>'+
+    '<p style="text-align:center;color:var(--mu);font-size:14px;margin-top:4px;margin-bottom:40px">Heures d\'investissement '+ANNEE+'</p>'+
+    '<div class="bgrp"><button class="btn bp" data-a="go-portal">Consulter mes heures</button>'+
+    '<button class="btn bo" data-a="go-form">Déclarer des heures</button></div>'+
+    '<div style="margin-top:28px;text-align:center"><button class="btn bgh" data-a="go-login">Administration</button></div>'+
+    '<p style="text-align:center;font-size:11px;color:var(--hi);margin-top:20px">Objectif : 40h par famille</p>'+
+  '</div>';
+}
+// ── PORTAIL ───────────────────────────────────
+function rPortal(){
+  return tb("Consulter mes heures","home")+
+    '<div class="wrap" style="padding-top:20px">'+
+      '<h2 class="ptt">Votre progression</h2>'+
+      '<p class="pss">Recherchez par nom de famille, élève ou prénom d un parent</p>'+
+      (S.loading?'<div class="al aw" style="margin-bottom:10px">Chargement des données…</div>':'')+
+      (S.err?'<div class="al ae" style="margin-bottom:10px">'+esc(S.err)+'</div>':'')+
+      '<div style="display:flex;gap:8px">'+
+        '<input class="inp" id="pq" placeholder="ex: DUPONT ou Sophie" value="'+esc(S.portalQ)+'" autocomplete="off" style="flex:1">'+
+        '<button class="btn bp" data-a="do-search" style="width:auto;padding:11px 18px;flex-shrink:0">Rechercher</button>'+
+      '</div>'+
+      '<div id="portal-results" style="margin-top:12px">'+portalResults()+'</div>'+
+      '<div class="mt20"><button class="btn bo" data-a="go-form">Déclarer des heures</button></div>'+
+    '</div>';
+}
+function portalResults(){
+  var q=S.portalQ;
+  if(!q||q.length<2)return q.length===1?'<p style="font-size:13px;color:var(--mu);text-align:center;margin-top:16px">Saisissez au moins 2 caract\u00e8res\u2026</p>':"";
+  if(S.loading)return'<div class="loader"><div class="spin"></div></div>';
+  if(S.err)return'<div class="al ae">'+esc(S.err)+'</div>';
+  if(!S.subs)return'<div class="loader"><div class="spin"></div>Chargement\u2026</div>';
+  var qn=nrm(q);
+
+  // Index complet via helper partagé
+  var allFamsComplete=buildFullFamilies(S.subs);
+
+  // ── Filtre de recherche ──────────────────────────────────────────────────
+  var found=allFamsComplete.filter(function(f){
+    // 1. Nom de famille
+    if(nrm(f.key).includes(qn))return true;
+    // 2. N'importe quel mot du nom complet d'un enfant (prénom ou NOM)
+    if(Object.keys(f.children).some(function(ch){
+      return nrm(ch).split(' ').some(function(w){return w.length>1&&w.startsWith(qn)||nrm(ch).includes(qn);});
+    }))return true;
+    // 3. Prénom d'un parent (toutes sources)
+    var allParNames=[];
+    f.parents.forEach(function(par){par.prenoms.forEach(function(pr){allParNames.push(nrm(pr));});});
+    // Ajouter aussi parents PARENTS_MAP non encore dans f.parents
+    Object.keys(PARENTS_MAP).forEach(function(e){
+      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){
+        if(allParNames.indexOf(nrm(p))===-1)allParNames.push(nrm(p));
+      });
+    });
+    if(allParNames.some(function(pn){return pn.includes(qn);}))return true;
+    return false;
+  });
+
+  if(!found.length)return'<p class="empty">Aucun résultat pour <strong>'+esc(q)+'</strong><br><span style="font-size:12px;color:var(--mu)">Essayez le nom de famille, le prénom de l\'éève ou d\'un parent</span></p>';
+
+  return found.sort(function(a,b){return a.key.localeCompare(b.key);}).map(function(f){
+    // Recalcul propre des chèques (les parents fantômes ont déjà chequeH)
+    var totCheqR=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
+    var nbPar=f.parents.length||1;
+    var famObj2=nbPar*OBJ;
+    var s=f.totalH>=famObj2?"complete":status(f.totalH);
+    var p2=pct(f.totalH,famObj2);
+    var enfants=Object.keys(f.children).map(function(ch){return ch+" ("+f.children[ch]+")";}).join(", ");
+    // Liste des parents (PARENTS_MAP en priorité pour l'affichage)
+    var dispPars=[];
+    Object.keys(PARENTS_MAP).forEach(function(e){
+      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){
+        if(dispPars.indexOf(p)===-1)dispPars.push(p);
+      });
+    });
+    if(!dispPars.length)dispPars=f.parents.map(function(par){return displayPrenom(par.prenoms);});
+    var parentsDisp=dispPars.join(' \u00b7 ');
+    // Affichage des heures
+    var hoursDisplay;
+    if(f.totalH===0){
+      hoursDisplay='<div style="font-size:12px;color:var(--mu);font-style:italic;margin-top:2px">Aucune heure d\u00e9clar\u00e9e</div>';
+    }else if(f.subs&&f.subs.length===0&&totCheqR>0){
+      hoursDisplay='<div style="font-size:20px;font-weight:700;color:var(--am)">'+rnd(totCheqR)+'h</div>'+
+        '<div style="font-size:10px;color:var(--am)">\uD83D\uDCB3 ch\u00e8que(s)</div>';
+    }else{
+      hoursDisplay='<div style="font-size:22px;font-weight:700;color:var(--red)">'+rnd(f.totalH)+'h</div>'+
+        (totCheqR>0?'<div style="font-size:10px;color:var(--am)">dont '+rnd(totCheqR)+'h \uD83D\uDCB3</div>':'')+
+        '<div style="font-size:10px;color:var(--mu)">/ '+famObj2+'h</div>';
+    }
+    return'<button class="li" style="margin-bottom:10px" data-a="portal-sel" data-key="'+esc(f.key)+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-weight:700;font-size:15px">Famille '+esc(f.key)+'</div>'+
+          '<div style="font-size:12px;color:var(--mu);margin-top:2px">'+esc(enfants)+'</div>'+
+          '<div style="font-size:12px;color:var(--mu)">Parents\u00a0: '+esc(parentsDisp)+'</div>'+
+          (f.totalH>0?'<div style="margin-top:6px"><div class="pt2"><div class="pf '+fcls(s)+'" style="width:'+p2+'%"></div></div></div>':'')+
+        '</div>'+
+        '<div style="text-align:right;flex-shrink:0">'+
+          hoursDisplay+
+          (f.totalH>0?badge(s):'')+
+        '</div>'+
+      '</div>'+
+    '</button>';
+  }).join("");
+}
+// ── VUE FAMILLE ───────────────────────────────
+function rView(){
+  var f=S.portalFam;if(!f)return rPortal();
+  // Objectif = nb de parents × 40h (chèques par parent inclus)
+  var nbPar=f.parents.length||1;
+  var famObj=nbPar*OBJ;
+  var totChequeH=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
+  var s=f.totalH>=famObj?"complete":status(f.totalH);
+  var p=pct(f.totalH,famObj);
+  var att=rnd(hAtt()*nbPar),manque=rnd(Math.max(0,famObj-f.totalH)),retard=rnd(Math.max(0,att-f.totalH));
+  // Alerte chèques
+  var cheqBanner=totChequeH>0?'<div class="al aw" style="margin-top:6px">💳 '+rnd(totChequeH)+'h comptabilisées via chèque(s) encaissé(s)</div>':"";
+  // Alerte globale famille
+  var alH="";
+  if(f.totalH>=famObj)alH='<div class="al aok">Objectif familial de '+famObj+'h atteint ✓</div>'+cheqBanner;
+  else if(s==="ok")alH='<div class="al aok">Famille à jour ✓ — Il reste <strong>'+manque+'h</strong> à effectuer.</div>'+cheqBanner;
+  else if(s==="warn")alH='<div class="al aw">Légèrement en retard — <strong>'+retard+'h</strong> de retard ('+att+'h attendues à ce jour).</div>'+cheqBanner;
+  else alH='<div class="al ae">En retard — <strong>'+retard+'h</strong> de retard sur les '+att+'h attendues.</div>'+cheqBanner;
+  // Enfants
+  var enfantsH=Object.keys(f.children).map(function(ch){
+    return'<span style="display:inline-block;margin:2px 4px 2px 0;padding:3px 10px;background:var(--bg);border:1px solid var(--bd);border-radius:20px;font-size:12px">'+esc(ch)+' <span style="color:var(--mu)">'+f.children[ch]+'</span></span>';
+  }).join("");
+  // Répartition globale par catégorie
+  var totCheqFam=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
+  var realHFam=f.totalH-totCheqFam;
+  var catH=catPills(f.byAct);
+  // Message si aucune heure réelle
+  var noHoursMsg="";
+  if(f.subs.length===0&&totCheqFam===0){
+    noHoursMsg='<div class="al aw" style="margin-top:10px">⏳ Vous n\'avez encore enregistré aucune heure cette année.</div>';
+  }else if(f.subs.length===0&&totCheqFam>0){
+    noHoursMsg='<div class="al aw" style="margin-top:10px">💳 Aucune heure saisie — uniquement des chèques encaissés ('+rnd(totCheqFam)+'h comptabilisées).</div>';
+  }
+  // Détail par parent
+  var parentsH=f.parents.map(function(par){
+    var pname=displayPrenom(par.prenoms);
+    var allNames=par.prenoms.join(" / ");
+    var parCheqH=par.chequeH||0;
+    var parRealH=par.realH!==undefined?par.realH:par.totalH;
+    var parFamKey=f.key;
+    var parObj=OBJ;
+    var parPct=Math.min(100,Math.round(par.totalH/parObj*100));
+    var parPcls=par.totalH>=parObj?"fg":par.totalH>=parObj*.7?"fa":"fr";
+    var parBadge=par.totalH>=parObj?'<span class="badge bg2">✓ Objectif</span>':
+      '<span style="font-size:11px;color:var(--mu)">'+parPct+'% / '+parObj+'h</span>';
+    return'<div class="parent-card">'+
+      '<div class="parent-card-head">'+
+        '<div>'+
+          '<div class="parent-name">'+esc(pname)+'</div>'+
+          (par.prenoms.length>1?'<div style="font-size:11px;color:var(--mu)">Aussi : '+esc(allNames)+'</div>':"")+
+          '<div style="margin-top:4px">'+parBadge+'</div>'+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div class="parent-hours">'+rnd(par.totalH)+'h</div>'+
+          (parCheqH>0?'<div style="font-size:11px;color:var(--am)">dont '+rnd(parCheqH)+'h 💳</div>':'')+
+          '<div style="font-size:10px;color:var(--mu)">/ '+parObj+'h</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="margin-top:6px"><div class="pt2"><div class="pf '+parPcls+'" style="width:'+parPct+'%"></div></div></div>'+
+      catPills(par.byAct)+
+      '<div style="margin-top:10px">'+
+        (function(){
+          var sorted=par.subs.slice().reverse();
+          var pkey=displayPrenom(par.prenoms).replace(/[^a-z0-9]/gi,'');
+          var expandId='exp-'+pkey+'-'+Math.floor(par.totalH);
+          function rowHtml(sub){
+            var d=new Date(sub.ts);
+            return'<div style="display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid var(--bd);font-size:12px">'+
+              '<span style="color:var(--mu)">'+esc(sub.sousActivite)+(sub.manualEntry?'<span style="font-size:10px;background:#E8F5EE;color:#2E7D4F;border-radius:8px;padding:1px 5px;margin-left:4px">admin</span>':'')+
+              '<span style="margin-left:6px;color:var(--hi)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short"})+'</span></span>'+
+              '<span style="font-weight:600;color:var(--red)">'+sub.heures+'h</span>'+
+            '</div>';
+          }
+          if(sorted.length<=5)return sorted.map(rowHtml).join('');
+          var first5=sorted.slice(0,5).map(rowHtml).join('');
+          var rest=sorted.slice(5).map(rowHtml).join('');
+          return first5+
+            '<div id="'+expandId+'-more" style="display:none">'+rest+'</div>'+
+            '<button id="'+expandId+'-btn" onclick="(function(){'+
+              'var m=document.getElementById(\''+expandId+'-more\');'+
+              'var b=document.getElementById(\''+expandId+'-btn\');'+
+              'if(m.style.display===\'none\'){m.style.display=\'block\';b.textContent=\'▲ Masquer\';b.style.color=\'var(--mu)\';}'+
+              'else{m.style.display=\'none\';b.textContent=\'+ '+(sorted.length-5)+' autre(s) saisie(s)\';b.style.color=\'var(--red)\';}'+
+            '})()" style="display:block;width:100%;background:none;border:none;cursor:pointer;font-size:12px;color:var(--red);font-weight:600;padding:8px 0;text-align:center;font-family:inherit;border-top:1px solid var(--bd)">+ '+(sorted.length-5)+' autre(s) saisie(s)</button>';
+        })()+
+      '</div>'+
+    '</div>';
+  }).join("");
+  return tb("Famille "+f.key,"portal")+
+    '<div class="wrap" style="padding-top:18px">'+
+      '<div style="font-size:12px;color:var(--mu);margin-bottom:6px">'+esc(Object.keys(f.children).join(" · "))+'</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+        '<div style="font-size:32px;font-weight:700;color:var(--red)">'+rnd(f.totalH)+'h <span style="font-size:18px;color:var(--mu);font-weight:400">/ '+famObj+'h</span></div>'+
+        badge(s)+
+      '</div>'+
+      '<div class="mt8"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:4px"><span>Progression famille (obj. '+famObj+'h)</span><span>'+p+'%</span></div>'+
+      '<div class="pt2"><div class="pf '+fcls(s)+'" style="width:'+p+'%"></div></div></div>'+
+      alH+noHoursMsg+
+      '<div style="margin-top:14px">'+enfantsH+'</div>'+
+      '<h3 style="font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-top:20px;margin-bottom:4px">Total par catégorie</h3>'+
+      catH+
+      '<h3 style="font-size:14px;font-weight:700;margin-top:20px;margin-bottom:10px">Détail par parent</h3>'+
+      parentsH+
+      '<div class="mt20"><button class="btn bp" data-a="go-form">Déclarer des heures</button></div>'+
+    '</div>';
+}
+// ── FORMULAIRE ────────────────────────────────
+var STEPS=["Classe","Élève","Parents","Activité","Heures","Vérification"];
+function rForm(){
+  if(S.done)return rSuccess();
+  var p=Math.round((S.step+1)/STEPS.length*100);
+  return tb(STEPS[S.step],"form-back","Étape "+(S.step+1)+"/"+STEPS.length)+
+    '<div class="pw"><div class="pb" style="width:'+p+'%"></div></div>'+
+    '<div class="wrap" style="padding-top:22px">'+rStep()+'</div>';
+}
+function rStep(){
+  var f=S.form;
+  switch(S.step){
+    case 0:
+      return'<h2 class="ptt">Classe de votre enfant</h2>'+
+        '<div class="sg">'+Object.keys(ELEVES).map(function(cl){
+          return'<div class="sbtn'+(f.cl===cl?" on":"")+'" data-a="s0" data-v="'+cl+'">'+
+            '<div class="sn">'+cl.replace("ème","")+'</div><div class="sl2">'+cl+'</div></div>';
+        }).join("")+'</div>';
+    case 1:
+      var list=(ELEVES[f.cl]||[]).filter(function(e){return!S.eleveQ||nrm(e).includes(nrm(S.eleveQ));});
+      // Récupérer les parents connus pour cet enfant
+      var knownParents=[];
+      if(S.subs&&f.cl){
+        var fs2=computeFamilies(S.subs);
+        var fk=familyKey(f.cl+"_dummy");
+        fs2.forEach(function(fam){
+          Object.keys(fam.children).forEach(function(ch){
+            if(ch===f.eleve||(!f.eleve&&fam.children[ch]===f.cl)){
+              fam.parents.forEach(function(par){knownParents.push(displayPrenom(par.prenoms));});
+            }
+          });
+        });
+      }
+      return'<h2 class="ptt">Votre enfant</h2><p class="pss">'+f.cl+'</p>'+
+        '<input class="inp" id="eq" placeholder="Rechercher…" value="'+esc(S.eleveQ)+'">'+
+        '<div style="margin-top:10px">'+(list.map(function(e){
+          // Chercher les parents connus pour cet enfant
+          var pknown=[];
+          // 1. Depuis PARENTS_MAP (réglages)
+          if(PARENTS_MAP[e]&&PARENTS_MAP[e].length){
+            PARENTS_MAP[e].forEach(function(p){if(p)pknown.push(p);});
+          }
+          // 2. Depuis les saisies Firebase si aucun parent enregistré
+          if(pknown.length===0&&S.subs){
+            var fkE=familyKey(e);
+            computeFamilies(S.subs).forEach(function(fam){
+              if(fam.key===fkE){
+                Object.keys(fam.children).forEach(function(ch){
+                  if(ch===e)fam.parents.forEach(function(par){
+                    var pn=displayPrenom(par.prenoms);
+                    if(pknown.indexOf(pn)===-1)pknown.push(pn);
+                  });
+                });
+              }
+            });
+          }
+          var parentsTag=pknown.length?
+            '<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">'+
+              pknown.map(function(p){
+                return'<span style="font-size:11px;background:'+(f.eleve===e?"rgba(255,255,255,0.4)":"var(--redl)")+';color:'+(f.eleve===e?"#fff":"var(--red)")+';padding:2px 8px;border-radius:10px">'+esc(p)+'</span>';
+              }).join("")+
+            '</div>':"";
+          return'<button class="li'+(f.eleve===e?" on":"")+'" data-a="s1" data-v="'+esc(e)+'" style="text-align:left">'+
+            '<div style="font-weight:600">'+(f.eleve===e?"✓  ":"")+esc(e)+'</div>'+
+            parentsTag+
+          '</button>';
+        }).join("")||'<p class="empty">Aucun résultat</p>')+'</div>';
+    case 2:
+      // ── Parents enregistrés depuis l'admin (PARENTS_MAP uniquement) ──
+      var plist2=[];
+      if(f.eleve&&PARENTS_MAP[f.eleve])PARENTS_MAP[f.eleve].forEach(function(p){if(p&&plist2.indexOf(p)===-1)plist2.push(p);});
+      var nbSel2=(f.p1?1:0)+(f.p2?1:0);
+      var selInfo2='';
+      if(nbSel2>0){
+        var selN2=[f.p1,f.p2].filter(Boolean);
+        selInfo2='<div style="margin-top:12px;background:var(--gnl);border:1px solid #A8D8BE;border-radius:var(--rs);padding:12px;font-size:14px">'+
+          '<strong>✔ Sélectionné'+(nbSel2>1?'s':'')+'</strong> : '+
+          selN2.map(function(p){return'<span style="font-weight:700;color:var(--gn)">'+esc(p)+'</span>';}).join(' &amp; ')+
+          (nbSel2===2?'<div style="font-size:11px;color:var(--mu);margin-top:4px">Les heures seront réparties équitablement entre les deux parents.</div>':'')+
+        '</div>';
+      }
+      return'<h2 class="ptt">Parent(s) concerné(s)</h2>'+
+        '<p class="pss">'+esc(f.eleve)+'</p>'+
+        (plist2.length===0?
+          '<div class="al ae" style="margin-top:10px">Aucun parent enregistré pour cet élève.<br><span style="font-size:12px">Contactez l\'administration pour mettre à jour la liste.</span></div>':
+          '<p style="font-size:14px;color:var(--mu);margin-bottom:16px">Touchez votre prénom ci-dessous. Touchez à nouveau pour désélectionner.</p>'+
+          '<div style="display:flex;flex-direction:column;gap:10px">'+
+            plist2.map(function(p){
+              var isSel=(f.p1===p||f.p2===p);
+              return'<button class="btn'+(isSel?' bp':' bo')+'" data-a="sel-parent" data-p="'+esc(p)+'" style="font-size:16px;padding:14px 20px">'+
+                (isSel?'✓  ':'')+esc(p)+
+              '</button>';
+            }).join('')+
+          '</div>'+
+          selInfo2
+        )+
+        '<div class="mt20"><button class="btn bp" '+(nbSel2>=1?'':'disabled')+' data-a="next">Continuer</button></div>';
+    case 3:
+      return'<h2 class="ptt">Type d\'activité</h2>'+
+        '<div style="display:flex;flex-direction:column;gap:8px;margin:16px 0 20px">'+
+        Object.keys(ACTS).map(function(t){
+          return'<div class="sbtn'+(f.typeAct===t?" on":"")+'" style="text-align:left;padding:14px" data-a="s3t" data-v="'+esc(t)+'"><span style="font-size:14px;font-weight:700">'+esc(t)+'</span></div>';
+        }).join("")+'</div>'+
+        (f.typeAct?'<h3 style="font-size:16px;font-weight:700;margin-bottom:10px">Sous-activité</h3>'+
+          ACTS[f.typeAct].map(function(a){
+            return'<button class="li'+(f.sousAct===a?" on":"")+'" data-a="s3a" data-v="'+esc(a)+'">'+(f.sousAct===a?"✓  ":"")+esc(a)+'</button>';
+          }).join("")+
+          (f.sousAct?'<div class="mt16"><button class="btn bp" data-a="next">Continuer</button></div>':""):"");
+    case 4:
+      var hv=parseFloat(f.heures||""),ok4=!isNaN(hv)&&hv>0;
+      return'<h2 class="ptt">Heures effectuées</h2><p class="pss">'+esc(f.sousAct)+'</p>'+
+        '<div class="chips">'+[0.5,1,1.5,2,3,4,5,6,8].map(function(n){
+          return'<div class="chip'+(String(n)===String(f.heures)?" on":"")+'" data-a="sh" data-v="'+n+'">'+n+'h</div>';
+        }).join("")+'</div>'+
+        '<div class="field"><label class="lbl">Ou entrez une valeur précise</label>'+
+          '<input class="inp" id="ih" type="number" min="0.5" step="0.5" placeholder="ex: 2.5" value="'+esc(f.heures||"")+'" style="font-size:20px;text-align:center"></div>'+
+        '<div class="mt20"><button class="btn bp" '+(ok4?"":"disabled")+' id="bn4" data-a="next">Vérifier ma saisie</button></div>';
+    case 5:
+      var hf=parseFloat(f.heures),parents=f.nbParents===2?(f.p1+" & "+f.p2):f.p1;
+      var rows=[["Classe",f.cl,0],["Élève",f.eleve,1],["Parent(s)",parents,2],["Activité",f.typeAct,3],["Sous-activité",f.sousAct,3],["Heures",hf+"h",4]];
+      return'<h2 class="ptt">Vérification</h2>'+
+        '<div class="scard">'+rows.map(function(r){
+          return'<div class="sr2"><span class="sml">'+r[0]+'</span>'+
+            '<div><span style="font-weight:500">'+esc(String(r[1]))+'</span>'+
+            '<button class="sedit" data-a="goto" data-v="'+r[2]+'">modifier</button></div></div>';
+        }).join("")+'</div>'+
+        (f.nbParents===2?'<div class="al aw">'+hf+'h réparties : '+rnd(hf/2)+'h pour '+esc(f.p1)+' et '+rnd(hf/2)+'h pour '+esc(f.p2)+'</div>':"")+
+        (S.sendErr?'<div class="al ae">'+esc(S.sendErr)+'</div>':"")+
+        '<div class="mt20"><button class="btn bp" '+(S.sending?"disabled":"")+' data-a="submit">'+(S.sending?"Envoi…":"Confirmer et enregistrer")+'</button></div>';
+  }
+  return"";
+}
+function rSuccess(){
+  var f=S.form,h=parseFloat(f.heures);
+  return'<div class="wrap"><div class="okc">✓</div>'+
+    '<h2 style="text-align:center;font-size:22px;font-weight:700">Enregistré !</h2>'+
+    '<p style="text-align:center;color:var(--mu);margin-top:8px">'+h+'h pour <strong>'+esc(f.eleve)+'</strong></p>'+
+    '<p style="text-align:center;color:var(--mu);font-size:13px;margin-top:4px">'+esc(f.sousAct)+'</p>'+
+    (f.nbParents===2?'<p style="text-align:center;font-size:12px;color:var(--mu);margin-top:4px">Soit '+rnd(h/2)+'h par parent</p>':"")+
+    '<div class="bgrp mt24">'+
+      '<button class="btn bp" data-a="new-form">Nouvelle saisie</button>'+
+      '<button class="btn bo" data-a="go-portal">Consulter mes heures</button>'+
+      '<button class="btn bgh" data-a="go-home">Retour à l\'accueil</button>'+
+    '</div></div>';
+}
+// ── LOGIN ─────────────────────────────────────
+function rLogin(){
+  return tb("Administration","home")+
+    '<div class="wrap" style="text-align:center;padding-top:0">'+
+      '<div style="font-size:48px;margin:44px 0 16px">🔒</div>'+
+      '<h2 class="ptt">Espace administrateur</h2>'+
+      '<p class="pss">Entrez le code PIN</p>'+
+      '<input class="inp" id="pi" type="password" placeholder="Code PIN" value="'+esc(S.pinInput)+'" style="text-align:center;font-size:22px;letter-spacing:8px;'+(S.pinErr?"border-color:var(--red)":"")+'" autofocus>'+
+      (S.pinErr?'<div class="al ae mt8">Code incorrect</div>':"")+
+      '<div class="mt16"><button class="btn bp" data-a="check-pin">Accéder</button></div>'+
+    '</div>';
+}
+// ── ADMIN ─────────────────────────────────────
+function rAdmin(){
+  var subs=S.subs||[],fs=computeFamilies(subs);
+  var tot=subs.reduce(function(a,s){return a+(parseFloat(s.heures)||0);},0);
+  var c="";
+  if(S.adminTab==="overview")c=rOverview(fs,tot);
+  if(S.adminTab==="heures")c=rHeures(fs);
+  if(S.adminTab==="saisies")c=rSaisies(subs);
+  if(S.adminTab==="rapport")c=rRapport(fs,tot);
+  if(S.adminTab==="reglages")c=rReglages();
+  if(S.adminTab==="saisie-admin")c=rManSaisie();
+  return tb("Tableau de bord","home",subs.length+" saisies · "+rnd(tot)+"h total")+
+    (S.err?'<div class="al ae" style="margin:8px 16px">'+esc(S.err)+'</div>':"")+
+    '<div class="tabs">'+
+      [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["reglages","⚙ Réglages"]].map(function(t){
+        return'<button class="tab'+(S.adminTab===t[0]?" on":"")+'" data-a="tab" data-v="'+t[0]+'">'+t[1]+'</button>';
+      }).join("")+
+    '</div>'+
+    '<div class="wlg" style="padding-top:16px">'+c+'</div>';
+}
+function rOverview(fs,tot){
+  var att=rnd(hAtt()),ct=curTri();
+  var nLate=fs.filter(function(f){return status(f.totalH)==="late";}).length;
+  var nOk=fs.filter(function(f){var s=status(f.totalH);return s==="ok"||s==="complete";}).length;
+  var stats='<div class="srow">'+
+    '<div class="sc"><div class="sv">'+fs.length+'</div><div class="slbl">Familles</div></div>'+
+    '<div class="sc"><div class="sv">'+rnd(tot)+'h</div><div class="slbl">Total heures</div></div>'+
+    '<div class="sc"><div class="sv" style="color:'+(nLate?"var(--red)":"var(--gn)")+'">'+nLate+'</div><div class="slbl">En retard</div></div>'+
+    '</div>';
+  var info='<div class="card mt12" style="font-size:13px;color:var(--mu);line-height:2">'+
+    '<p>📅 Année scolaire : <strong style="color:var(--tx)">'+ANNEE+'</strong></p>'+
+    '<p>📅 Trimestre en cours : <strong style="color:var(--tx)">T'+ct+(TRI[ct-1]?' — '+TRI[ct-1].m:'')+'</strong></p>'+
+    '<p>⏱ Heures attendues à ce jour : <strong style="color:var(--tx)">'+att+'h / famille</strong></p>'+
+    '<p>✅ Familles à jour : <strong style="color:var(--gn)">'+nOk+'</strong></p>'+
+    '<p>⚠️ Familles en retard : <strong style="color:var(--red)">'+nLate+'</strong></p>'+
+    '</div>';
+  var lates=fs.filter(function(f){return status(f.totalH)==="late";}).sort(function(a,b){return a.totalH-b.totalH;});
+  var lateH=lates.length?lates.slice(0,10).map(function(f){
+    var parentsDisp=f.parents.map(function(p){return displayPrenom(p.prenoms);}).join(", ");
+    return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div>'+
+          '<div style="font-size:13px;font-weight:600">Famille '+esc(f.key)+'</div>'+
+          '<div style="font-size:11px;color:var(--mu)">'+esc(parentsDisp)+'</div>'+
+          '<div style="font-size:11px;color:var(--mu)">'+esc(Object.keys(f.children).join(", "))+'</div>'+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:15px;font-weight:700;color:var(--red)">'+rnd(f.totalH)+'h <span style="font-size:10px;color:var(--mu)">/'+OBJ+'h</span></div>'+
+          badge(status(f.totalH))+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join(""):
+    '<p class="empty" style="padding:14px">Toutes les familles sont à jour ✓</p>';
+  var lateCard=lates.length?'<div class="card mt12"><h3 style="font-size:14px;font-weight:700;margin-bottom:4px">Familles en retard ('+lates.length+')</h3>'+lateH+'</div>':"";
+  return stats+info+lateCard+'<div class="mt16"><button class="btn bo" data-a="csv">⬇ Exporter CSV</button></div>';
+}
+function rHeures(fs){
+  var cls=["all"].concat(Object.keys(ELEVES));
+  var sts=["all","ok","warn","late","complete"];
+  var slbls={all:"Tous",ok:"À jour",warn:"Vigilance",late:"En retard",complete:"Objectif atteint"};
+  var fCls='<div class="fbar">'+cls.map(function(c){return'<button class="fc2'+(S.aCls===c?" on":"")+'" data-a="fcls" data-v="'+c+'">'+(c==="all"?"Toutes classes":c)+'</button>';}).join("")+'</div>';
+  var fSt='<div class="fbar">'+sts.map(function(st){return'<button class="fc2'+(S.aFilter===st?" on":"")+'" data-a="fst" data-v="'+st+'">'+slbls[st]+'</button>';}).join("")+'</div>';
+  var filtered=fs.filter(function(f){
+    var clsOk=S.aCls==="all"||Object.values(f.children).indexOf(S.aCls)!==-1;
+    return clsOk&&(S.aFilter==="all"||status(f.totalH)===S.aFilter);
+  }).sort(function(a,b){return a.key.localeCompare(b.key);});
+  if(!filtered.length)return fCls+fSt+'<p class="empty">Aucune famille</p>';
+  var rows=filtered.map(function(f){
+    var s=status(f.totalH),p=pct(f.totalH,OBJ);
+    var bc=s==="complete"||s==="ok"?"var(--gn)":s==="warn"?"#E6A817":"var(--red)";
+    var parentsDisp=f.parents.map(function(par){return displayPrenom(par.prenoms);}).join(", ");
+    var cats=Object.keys(f.byAct).map(function(k){return'<span style="font-size:10px;color:var(--mu)">'+esc(k)+' '+rnd(f.byAct[k])+'h</span>';}).join(" · ");
+    return'<tr>'+
+      '<td>'+
+        '<div style="font-size:13px;font-weight:700">Famille '+esc(f.key)+'</div>'+
+        '<div style="font-size:11px;color:var(--mu)">'+esc(parentsDisp)+'</div>'+
+        '<div style="font-size:11px;color:var(--mu)">'+esc(Object.keys(f.children).join(", "))+'</div>'+
+        (cats?'<div style="margin-top:2px">'+cats+'</div>':"")+
+      '</td>'+
+      '<td style="white-space:nowrap">'+
+        '<div class="hbw"><div class="hb" style="width:'+p+'%;background:'+bc+'"></div></div>'+
+        '<span style="font-size:13px;font-weight:700;color:'+bc+'">'+rnd(f.totalH)+'h</span>'+
+      '</td>'+
+      '<td>'+badge(s)+'</td>'+
+    '</tr>';
+  }).join("");
+  return fCls+fSt+
+    '<div style="overflow-x:auto"><table class="htbl">'+
+      '<thead><tr><th>Famille</th><th>Total</th><th>Statut</th></tr></thead>'+
+      '<tbody>'+rows+'</tbody>'+
+    '</table></div>'+
+    '<p style="font-size:11px;color:var(--mu);margin-top:8px">'+filtered.length+' famille(s) · Objectif : '+OBJ+'h par famille</p>';
+}
+function rSaisies(subs){
+  var q=nrm(S.aSubQ||"");
+  var filtered=subs.filter(function(s){return!q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);});
+  var listH=filtered.length?filtered.map(function(s){
+    var d=new Date(s.ts),t=getTri(s.ts);
+    return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div style="flex:1;margin-right:10px">'+
+          '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" · "+esc(s.classe)+'</div>'+
+          '<div style="font-size:12px;color:var(--mu)">'+esc(s.parents)+'</div>'+
+          '<div style="font-size:12px">'+esc(s.activiteType)+" → "+esc(s.sousActivite)+'</div>'+
+          '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+'</div>'+
+        '</div>'+
+        '<div style="text-align:right;flex-shrink:0">'+
+          '<div style="font-size:18px;font-weight:700;color:var(--red)">'+s.heures+'h</div>'+
+          '<button style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit" data-a="del" data-id="'+esc(s.id)+'">'+(S.deleting===s.id?"…":"Supprimer")+'</button>'+
+        '</div>'+
+      '</div></div>';
+  }).join(""):'<p class="empty">Aucune saisie</p>';
+  return'<div class="sbar">'+
+    '<input class="inp" id="sq" placeholder="Rechercher…" value="'+esc(S.aSubQ||"")+'">'+
+    '<button class="btn bo bsm" data-a="csv" style="flex-shrink:0">CSV</button>'+
+    '</div>'+
+    '<p style="font-size:12px;color:var(--mu);margin-bottom:10px">'+filtered.length+' saisie'+(filtered.length>1?"s":"")+" / "+subs.length+' total</p>'+
+    '<div id="saisies-list">'+listH+'</div>';
+}
+function rRapport(fs,tot){
+  // Inclure TOUTES les familles (même sans heures)
+  var fsAll=buildFullFamilies(S.subs||[]);
+  var OBJ=40;
+  var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
+  var allParents=[];
+  fsAll.forEach(function(f){f.parents.forEach(function(p){allParents.push(p);});});
+  var nOk=allParents.filter(function(p){return p.totalH>=OBJ;}).length;
+  var nZero=allParents.filter(function(p){return p.totalH===0;}).length;
+  function slabel(h,isCheque){
+    if(isCheque&&h>0)return["Chèque(s)","#8B6000","#FFF8E1"];
+    if(h>=OBJ)return["Objectif atteint","#2E7D4F","#E8F5EE"];
+    if(h>=30)return["Bon avancement","#2E7D4F","#E8F5EE"];
+    if(h>=20)return["En cours","#8B6000","#FFF8E1"];
+    if(h>=10)return["À renforcer","#C0472A","#F5EAE7"];
+    if(h>0)return["Insuffisant","#C0472A","#FDECEA"];
+    return["Aucune heure","#999","#F5F5F5"];
+  }
+  var rows=fsAll.map(function(f){
+    var enfants=Object.keys(f.children).join(" + ");
+    var classes=Object.values(f.children).filter(function(v,i,a){return a.indexOf(v)===i;}).join(" / ");
+    var famTot=rnd(f.totalH||0);
+    var famCheqTot=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
+    var parRows=f.parents.map(function(par){
+      var ph=par.totalH||0;
+      var ch=par.chequeH||0;
+      var realH=ph-ch;
+      var onlyCheque=(realH===0&&ch>0);
+      var lbl=slabel(ph,onlyCheque),pp=Math.min(100,Math.round(ph/OBJ*100));
+      var pname=displayPrenom(par.prenoms);
+      var cats=Object.keys(par.byAct).map(function(k){return esc(k)+": "+rnd(par.byAct[k])+"h";}).join(" · ");
+      // Détail heures
+      var heureDetail='';
+      if(onlyCheque){
+        heureDetail='<span style="font-size:10px;background:#FFF8E1;color:#8B6000;border-radius:8px;padding:1px 5px;margin-left:4px">'+
+          Math.round(ch/10)+' chèque'+(ch>=20?'s':'')+'</span>';
+      }else if(ch>0){
+        heureDetail='<span style="font-size:10px;color:#8B6000;margin-left:4px">dont '+rnd(ch)+'h 💳</span>';
+      }
+      var noHoursNote=ph===0?'<div style="font-size:11px;color:#999;font-style:italic">Aucune heure déclarée</div>':'';
+      return'<tr style="background:#FAFAF8;border-bottom:1px solid #EEE">'+
+        '<td style="padding:7px 10px 7px 22px;font-size:12px;color:#444;vertical-align:middle">'+
+          '<span style="color:#999;margin-right:4px">↳</span><strong>'+esc(pname)+'</strong>'+
+          (par.prenoms.length>1?'<span style="font-size:10px;color:#aaa;margin-left:6px">(aussi: '+esc(par.prenoms.filter(function(x){return x!==pname;}).join(", "))+')</span>':"")+
+          heureDetail+
+          (cats?'<div style="font-size:11px;color:#888;margin-top:2px">'+cats+'</div>':"")+
+          noHoursNote+
+        '</td>'+
+        '<td style="padding:7px 10px;font-weight:700;font-size:14px;color:'+lbl[1]+';text-align:right;vertical-align:middle;white-space:nowrap">'+
+          (ph===0?'<span style="color:#bbb">—</span>':rnd(ph)+'h')+
+        '</td>'+
+        '<td style="padding:7px 10px;vertical-align:middle;min-width:150px">'+
+          (ph>0?
+            '<div style="height:6px;background:#E0D9D3;border-radius:3px;overflow:hidden;margin-bottom:3px">'+
+              '<div style="height:100%;width:'+pp+'%;background:'+lbl[1]+';border-radius:3px"></div>'+
+            '</div>':
+            '<div style="height:6px;background:#E0D9D3;border-radius:3px;margin-bottom:3px"></div>'
+          )+
+          '<span style="font-size:10px;background:'+lbl[2]+';color:'+lbl[1]+';padding:2px 7px;border-radius:10px;font-weight:700">'+pp+'% — '+lbl[0]+'</span>'+
+        '</td>'+
+      '</tr>';
+    }).join("");
+    // Ligne famille
+    var famBg=f.totalH===0?"#FFF5F5":"#F7F4F1";
+    var famExtra=famCheqTot>0&&f.subs&&f.subs.length===0?
+      '<span style="font-size:11px;background:#FFF8E1;color:#8B6000;padding:1px 6px;border-radius:8px;margin-left:8px">💳 chèques uniquement</span>':"";
+    return'<tr style="border-top:2px solid #C0472A">'+
+      '<td colspan="3" style="padding:10px;background:'+famBg+'">'+
+        '<span style="font-weight:700;font-size:14px">'+esc(enfants)+'</span>'+
+        '<span style="font-size:11px;color:#888;margin-left:8px">'+esc(classes)+'</span>'+
+        '<span style="font-size:12px;color:#7A7268;margin-left:12px">Total famille : <strong style="color:'+(f.totalH>0?"#C0472A":"#bbb")+'">'+
+          (f.totalH===0?"—":famTot+"h")+
+        '</strong></span>'+famExtra+
+      '</td>'+
+    '</tr>'+parRows;
+  }).join("");
+  var legendH='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;font-size:11px">'+
+    '<span style="font-weight:700;color:var(--mu);margin-right:4px">Objectif : 40h / parent —</span>'+
+    [["≥40h Objectif atteint","#2E7D4F","#E8F5EE"],["≥30h Bon avancement","#2E7D4F","#E8F5EE"],["≥20h En cours","#8B6000","#FFF8E1"],["≥10h À renforcer","#C0472A","#F5EAE7"],["<10h Insuffisant","#C0472A","#FDECEA"],["Chèque(s)","#8B6000","#FFF8E1"],["Aucune heure","#999","#F5F5F5"]].map(function(l){
+      return'<span style="background:'+l[2]+';color:'+l[1]+';padding:2px 8px;border-radius:10px;font-weight:600">'+l[0]+'</span>';
+    }).join("")+
+  '</div>';
+  var table='<div style="overflow-x:auto">'+
+    '<table style="width:100%;border-collapse:collapse;font-size:13px">'+
+      '<thead><tr style="background:var(--bg)">'+
+        '<th style="padding:9px 10px;text-align:left;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--bd)">Enfant(s) / Parent</th>'+
+        '<th style="padding:9px 10px;text-align:right;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--bd)">Heures</th>'+
+        '<th style="padding:9px 10px;text-align:left;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--bd)">Progression / 40h</th>'+
+      '</tr></thead>'+
+      '<tbody>'+rows+'</tbody>'+
+    '</table>'+
+  '</div>';
+  var statsH='<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px">'+
+    [["Familles",fsAll.length,"var(--red)"],["Parents recensés",allParents.length,"var(--red)"],["Objectif atteint ✓",nOk+" parents","var(--gn)"],["Sans heures",nZero+" parents","var(--mu)"]].map(function(s){
+      return'<div class="sc"><div class="sv" style="font-size:18px;color:'+s[2]+'">'+s[1]+'</div><div class="slbl">'+s[0]+'</div></div>';
+    }).join("")+
+  '</div>';
+  return'<div id="rapport-content">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'+
+      '<div>'+
+        '<h2 style="font-size:17px;font-weight:700">Rapport d\'investissement</h2>'+
+        '<p style="font-size:12px;color:var(--mu)">Édition du '+dt+' · '+ANNEE+' · Objectif : 40h / parent</p>'+
+      '</div>'+
+      '<button class="btn bp bsm" onclick="printRapport()">🖨️ Imprimer / PDF</button>'+
+    '</div>'+
+    statsH+legendH+table+
+    '<p style="font-size:11px;color:var(--mu);margin-top:10px;text-align:right">Clardeluna '+ANNEE+' · Généré le '+dt+'</p>'+
+  '</div>';
+}
+
+function printRapport(){
+  var content=document.getElementById("rapport-content");
+  if(!content){alert("Ouvrez d'abord l'onglet Rapport");return;}
+  var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
+  var w=window.open("","_blank","width=900,height=700");
+  w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'+
+    '<title>Rapport Clardeluna '+dt+'</title>'+
+    '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;font-size:13px;padding:20px;color:#1C1814}'+
+    'table{width:100%;border-collapse:collapse}th,td{padding:8px 10px;border-bottom:1px solid #E0D9D3}'+
+    'thead tr{background:#F7F4F1}@media print{button{display:none}}'+
+    'h1{font-size:20px;font-weight:700;color:#C0472A;margin-bottom:4px}'+
+    '.meta{display:flex;gap:20px;margin:10px 0 16px;font-size:12px;color:#666}'+
+    '</style></head><body>'+
+    '<h1>Clardeluna — Rapport d\'investissement familial 2025-2026</h1>'+
+    '<div class="meta"><span>Date d\'édition : '+dt+'</span><span>Objectif : 40h par famille</span></div>'+
+    content.outerHTML+
+    '<script>window.print();<\/script>'+
+    '</body></html>');
+  w.document.close();
+}
+
+function rReglages(){
+  var cls=Object.keys(ELEVES);
+  var saved=S.regSaved?'<div class="al aok mt8">✓ Enregistré !</div>':"";
+  var saving=S.regSaving?'<div class="al aw mt8">Enregistrement…</div>':"";
+  // ── Section Année scolaire ──────────────────────────────
+  var triRows=TRI.slice(0,3).map(function(t){
+    return'<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--bd)">'+
+      '<span style="font-weight:700;color:var(--red)">'+t.l+'</span>'+
+      '<span style="color:var(--mu)">'+t.m+'</span>'+
+    '</div>';
+  }).join('');
+  var anneeSec='<div class="card" style="margin-bottom:12px">'+
+    '<h3 style="font-size:15px;font-weight:700;margin-bottom:10px">📅 Année scolaire</h3>'+
+    '<div style="margin-bottom:12px;background:var(--bg);border-radius:var(--rs);padding:10px">'+
+      '<div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Trimestres actuels (3 parts égales)</div>'+
+      triRows+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'+
+      '<div>'+
+        '<label class="lbl">Date de rentrée</label>'+
+        '<input class="inp" id="rentree-inp" type="date" value="'+RENTREE+'" style="font-size:14px">'+
+      '</div>'+
+      '<div>'+
+        '<label class="lbl">Libellé année</label>'+
+        '<input class="inp" id="annee-inp" type="text" placeholder="ex: 2025-2026" value="'+ANNEE+'" style="font-size:14px">'+
+      '</div>'+
+    '</div>'+
+    '<button class="btn bp bsm" data-a="save-annee">'+
+      (S.anneeSaving?'Enregistrement…':'💾 Recalculer & enregistrer')+
+    '</button>'+
+    (S.anneeSaved?'<div class="al aok mt8">✓ Année et trimestres mis à jour !</div>':'')+
+  '</div>';
+  var promo='<div class="card">'+
+    '<h3 style="font-size:15px;font-weight:700;margin-bottom:8px">🎓 Promotion annuelle</h3>'+
+    '<div style="background:var(--amberl);border:1px solid #F0D060;border-radius:var(--rs);padding:12px;font-size:12px;color:var(--am);margin-bottom:12px">'+
+      '<p style="font-weight:700;margin-bottom:4px">⚠️ Action irréversible</p>'+
+      '<p>Cette action :</p>'+
+      '<ul style="margin:4px 0 4px 16px;line-height:1.8">'+
+        '<li>Monte tous les élèves d une classe</li>'+
+        '<li><strong>Efface toutes les heures</strong> de l annee en cours</li>'+
+        '<li>Génère automatiquement un CSV de sauvegarde</li>'+
+      '</ul>'+
+      '<p style="margin-top:4px">👉 <strong>Exportez avant tout le rapport PDF</strong> (onglet Rapport - Imprimer / PDF)</p>'+
+    '</div>'+
+    '<p style="font-size:12px;color:var(--mu);margin-bottom:12px">3ème → diplômés · 4ème → 3ème · 5ème → 4ème · 6ème → 5ème</p>'+
+    '<button class="btn bo" data-a="do-promote" style="border-color:var(--red);color:var(--red);font-weight:700">🎓 Effectuer la promotion de fin d annee</button>'+
+    (S.promoSaved?'<div class="al aok mt8">✅ Promotion effectuée ! Les heures ont été remises à zéro. Un CSV a été téléchargé automatiquement.</div>':"")+
+  '</div>';
+  var clsSecs=cls.map(function(cl){
+    var isOpen=S.elevesOpen===cl,eleves=ELEVES[cl];
+    var inner="";
+    if(isOpen){
+      var eleveRows=eleves.map(function(e,i){
+        var knownParents=PARENTS_MAP[e]||[];
+        var parentTags=knownParents.map(function(p,pi){
+          return'<span style="display:inline-flex;align-items:center;gap:3px;background:var(--redl);color:var(--red);border-radius:12px;padding:2px 8px;font-size:11px;margin:2px 3px 2px 0">'+
+            esc(p)+
+            '<button data-a="del-parent" data-el="'+esc(e)+'" data-pi="'+pi+'" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;line-height:1;padding:0 0 0 2px">×</button>'+
+          '</span>';
+        }).join("");
+        var inputId="np-"+i+"-"+cl.replace(/[^a-z0-9]/gi,"");
+        // Dropdown chèques par parent
+        var fkE=familyKey(e);
+        var chequeDropdowns=knownParents.length?
+          '<div style="margin-top:6px;padding:6px 8px;background:var(--aml);border-radius:var(--rs)">'+
+            '<div style="font-size:11px;font-weight:700;color:var(--am);margin-bottom:5px">💳 Chèques encaissés (1 chèque = 10h = 25%)</div>'+
+            knownParents.map(function(p){
+              var ck=chequeKey(fkE,p);
+              var nbCh=CHEQUES_MAP[ck]||0;
+              return'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'+
+                '<span style="font-size:12px;font-weight:600">'+esc(p)+'</span>'+
+                '<div style="display:flex;align-items:center;gap:6px">'+
+                  '<select data-a="set-cheque" data-ck="'+esc(ck)+'" style="padding:4px 8px;border:1px solid var(--bd);border-radius:var(--rs);font-size:12px;background:var(--sf);font-family:inherit">'+
+                    [0,1,2,3,4].map(function(n){
+                      return'<option value="'+n+'"'+(nbCh===n?' selected':'')+'>'+n+' chèque'+(n>1?'s':n===0?' (aucun':'')+( n>0?' = '+rnd(n*10)+'h'+(n===4?' ✓ 100%':''): n===0?')':'')+' </option>';
+                    }).join('')+
+                  '</select>'+
+                '</div>'+
+              '</div>';
+            }).join('')+
+          '</div>':'';
+        return'<div style="padding:8px 0;border-bottom:1px solid var(--bd)">'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+            '<span style="flex:1;font-size:13px;font-weight:600">'+esc(e)+'</span>'+
+            '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;color:var(--red);font-size:11px;padding:2px 6px;font-family:inherit" data-a="del-eleve" data-cl="'+esc(cl)+'" data-idx="'+i+'">Supprimer</button>'+
+          '</div>'+
+          '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:4px">'+
+            (parentTags||'<span style="font-size:11px;color:var(--hi)">Aucun parent enregistré</span>')+
+          '</div>'+
+          chequeDropdowns+
+          '<div style="display:flex;gap:6px;margin-top:6px">'+
+            '<input class="inp" id="'+inputId+'" placeholder="Ajouter un prénom parent" style="flex:1;font-size:12px;padding:6px 10px">'+
+            '<button class="btn bp bsm" data-a="add-parent" data-el="'+esc(e)+'" data-iid="'+inputId+'" style="flex-shrink:0;font-size:12px;padding:6px 12px">+ Parent</button>'+
+          '</div>'+
+        '</div>';
+      }).join("");
+      inner='<div style="margin-top:10px">'+
+        eleveRows+
+        '<div style="background:var(--bg);border-radius:var(--rs);padding:10px;margin-top:12px">'+
+          '<div style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--mu)">Ajouter un élève</div>'+
+          '<div style="display:flex;gap:8px">'+
+            '<input class="inp" id="ne-'+cl.replace(/[^a-z0-9]/gi,"")+'" placeholder="Prénom NOM de l eleve" style="flex:1;font-size:13px;padding:9px 11px">'+
+            '<button class="btn bp bsm" data-a="add-eleve" data-cl="'+esc(cl)+'" style="flex-shrink:0">+ Élève</button>'+
+          '</div>'+
+        '</div>'+
+        '<div style="margin-top:12px;display:flex;gap:8px">'+
+          '<button class="btn bp bsm" data-a="save-eleves">Enregistrer tout</button>'+
+          '<button class="btn bo bsm" data-a="close-classe">Fermer</button>'+
+        '</div>'+
+      '</div>';
+    }
+    return'<div class="card" style="margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" data-a="toggle-classe" data-cl="'+esc(cl)+'">'+
+        '<div><span style="font-size:15px;font-weight:700">'+esc(cl)+'</span>'+
+        '<span style="font-size:12px;color:var(--mu);margin-left:8px">'+eleves.length+' élève'+(eleves.length>1?"s":"")+'</span></div>'+
+        '<span style="font-size:16px;color:var(--mu)">'+(isOpen?"▲":"▼")+'</span>'+
+      '</div>'+inner+'</div>';
+  }).join("");
+  var pinSec='<div class="card" style="margin-top:8px">'+
+    '<h3 style="font-size:15px;font-weight:700;margin-bottom:8px">🔒 Code PIN</h3>'+
+    '<div style="display:flex;gap:8px">'+
+      '<input class="inp" id="np" type="password" placeholder="Nouveau code (min 4 car.)" style="flex:1;font-size:14px">'+
+      '<button class="btn bp bsm" data-a="save-pin" style="flex-shrink:0">Modifier</button>'+
+    '</div>'+
+    (S.pinSaved?'<div class="al aok mt8">Code PIN modifié ✓</div>':"")+
+  '</div>';
+  return'<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">Réglages</h2>'+
+    anneeSec+promo+
+    '<h3 style="font-size:13px;font-weight:700;margin:16px 0 10px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em">Listes des élèves</h3>'+
+    clsSecs+saved+saving+pinSec;
+}
+
+// ── SAISIE MANUELLE ADMIN ─────────────────────
+function rManSaisie(){
+  var sousActs=S.manTypeAct&&ACTS[S.manTypeAct]?ACTS[S.manTypeAct]:[];
+  var parentOpts=S.manEleve&&PARENTS_MAP[S.manEleve]?PARENTS_MAP[S.manEleve]:[];
+  var hv=parseFloat(S.manHeures||""),canSubmit=S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct&&!isNaN(hv)&&hv>0&&!S.manSaving;
+  var clChips='<div class="fbar">'+Object.keys(ELEVES).map(function(cl){
+    return'<button class="fc2'+(S.manCl===cl?' on':'')+'" data-a="man-cl" data-v="'+esc(cl)+'">'+esc(cl)+'</button>';
+  }).join('')+'</div>';
+  var eleveList='';
+  if(S.manCl){
+    var eButtons=ELEVES[S.manCl].map(function(e){
+      return'<button class="li'+(S.manEleve===e?' on':'')+'" data-a="man-eleve" data-v="'+esc(e)+'" style="padding:8px 12px;font-size:13px">'+(S.manEleve===e?'✓ ':'')+esc(e)+'</button>';
+    }).join('');
+    eleveList='<div class="field mt8"><label class="lbl">Élève</label>'+
+      '<div style="max-height:180px;overflow-y:auto;border:1px solid var(--bd);border-radius:var(--rs);padding:6px">'+eButtons+'</div></div>';
+  }
+  var parentSec='';
+  if(S.manEleve){
+    parentSec=parentOpts.length===0?
+      '<div class="al aw mt8">Aucun parent enregistré pour cet élève — ajoutez-en dans Réglages.</div>':
+      '<div class="field mt8"><label class="lbl">Parent</label>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:8px">'+
+        parentOpts.map(function(p){
+          return'<button class="chip'+(S.manParent===p?' on':'')+'" data-a="man-parent" data-v="'+esc(p)+'">'+esc(p)+'</button>';
+        }).join('')+
+      '</div></div>';
+  }
+  var catSec='<div class="field mt12"><label class="lbl">Catégorie</label>'+
+    '<div style="display:flex;flex-direction:column;gap:6px">'+Object.keys(ACTS).map(function(t){
+      return'<button class="sbtn'+(S.manTypeAct===t?' on':'')+'" style="text-align:left;padding:10px 14px" data-a="man-type" data-v="'+esc(t)+'">'+
+        '<span style="font-size:13px;font-weight:700">'+esc(t)+'</span></button>';
+    }).join('')+'</div></div>';
+  var sousActSec=S.manTypeAct?
+    '<div class="field mt8"><label class="lbl">Activité</label>'+
+    '<div style="max-height:200px;overflow-y:auto;border:1px solid var(--bd);border-radius:var(--rs);padding:6px">'+
+      sousActs.map(function(a){
+        return'<button class="li'+(S.manSousAct===a?' on':'')+'" data-a="man-sous" data-v="'+esc(a)+'" style="padding:8px 12px;font-size:13px">'+(S.manSousAct===a?'✓ ':'')+esc(a)+'</button>';
+      }).join('')+
+    '</div></div>':'';
+  var heurSec='<div class="field mt8"><label class="lbl">Heures effectuées</label>'+
+    '<div class="chips">'+[0.5,1,1.5,2,3,4,5,6,8].map(function(n){
+      return'<div class="chip'+(String(n)===String(S.manHeures)?' on':'')+'" data-a="man-h" data-v="'+n+'">'+n+'h</div>';
+    }).join('')+'</div>'+
+    '<input class="inp" id="man-h-inp" type="number" min="0.5" step="0.5" placeholder="Ou saisir une valeur précise" value="'+esc(String(S.manHeures||''))+'" style="margin-top:8px"></div>';
+  var today=new Date().toISOString().slice(0,10);
+  var dateSec='<div class="field mt8"><label class="lbl">Date (aujourd\'hui par défaut)</label>'+
+    '<input class="inp" id="man-date" type="date" value="'+esc(S.manDate||today)+'"></div>';
+  return'<h2 style="font-size:17px;font-weight:700;margin-bottom:4px">✏️ Saisie manuelle</h2>'+
+    '<p style="font-size:13px;color:var(--mu);margin-bottom:14px">Enregistrer des heures au nom d\'un parent</p>'+
+    (S.manSaved?'<div class="al aok" style="margin-bottom:12px">✓ Saisie enregistrée avec succès !</div>':'')+
+    (S.manErr?'<div class="al ae" style="margin-bottom:8px">'+esc(S.manErr)+'</div>':'')+
+    '<div class="card">'+clChips+eleveList+parentSec+catSec+sousActSec+heurSec+dateSec+
+    '<div class="mt16"><button class="btn bp" '+(canSubmit?'':'disabled')+' data-a="man-submit">'+
+      (S.manSaving?'Enregistrement…':'✓ Enregistrer les heures')+
+    '</button></div>'+
+    '</div>';
+}
+function doManSaisie(){
+  var manH=document.getElementById('man-h-inp');
+  var manD=document.getElementById('man-date');
+  var heures=manH&&manH.value?parseFloat(manH.value):parseFloat(String(S.manHeures||''));
+  var dateStr=manD&&manD.value?manD.value:S.manDate;
+  if(isNaN(heures)||heures<=0){go({manErr:"Veuillez indiquer le nombre d'heures"});return;}
+  var ts=dateStr?new Date(dateStr+'T12:00:00').toISOString():new Date().toISOString();
+  var pl={classe:S.manCl,eleve:S.manEleve,nbParents:1,parents:S.manParent,activiteType:S.manTypeAct,sousActivite:S.manSousAct,heures:heures,ts:ts,manualEntry:true};
+  go({manSaving:true,manErr:''});
+  fbAdd(pl).then(function(ref){
+    var ns=Object.assign({id:ref.id},pl);
+    go({manSaving:false,manSaved:true,manSousAct:'',manHeures:'',manDate:'',subs:(S.subs||[]).concat([ns])});
+    setTimeout(function(){go({manSaved:false});},3000);
+  }).catch(function(e){go({manSaving:false,manErr:'Erreur Firebase : '+e.message});});
+}
+// ── ÉVÉNEMENTS ────────────────────────────────
+function bindAll(){
+  document.addEventListener("click",onClick,{once:true});
+  var pi=document.getElementById("pi");
+  if(pi)pi.addEventListener("keydown",function(e){if(e.key==="Enter")checkPin();});
+  // Validation dynamique step 2
+  var bn2=document.getElementById("bn2");
+  if(bn2){
+    function chk2(){
+      var i1=document.getElementById("ip1"),i2=document.getElementById("ip2");
+      bn2.disabled=!((i1&&i1.value.trim().length>1)&&(S.form.nbParents===1||(i2&&i2.value.trim().length>1)));
+    }
+    var i1=document.getElementById("ip1"),i2=document.getElementById("ip2");
+    if(i1)i1.addEventListener("input",chk2);
+    if(i2)i2.addEventListener("input",chk2);
+  }
+  // Validation dynamique step 4
+  var bn4=document.getElementById("bn4"),ih=document.getElementById("ih");
+  if(bn4&&ih)ih.addEventListener("input",function(){bn4.disabled=isNaN(parseFloat(ih.value))||parseFloat(ih.value)<=0;});
+  // Recherche portail — live sans re-render complet
+  var pq=document.getElementById("pq");
+  if(pq){
+    // Live search as user types (if data already loaded)
+    pq.addEventListener("input",function(){
+      sil({portalQ:pq.value});
+      if(S.subs!==null){
+        var res=document.getElementById("portal-results");
+        if(res){res.innerHTML=portalResults();reattach();}
+      }
+    });
+    // Trigger search on Enter key
+    pq.addEventListener("keydown",function(e){
+      if(e.key==="Enter"){doSearch();}
+    });
+  }
+  // Recherche élève
+  var eq=document.getElementById("eq");
+  if(eq){
+    eq.addEventListener("input",function(){
+      sil({eleveQ:eq.value});
+      var c=document.querySelector("#eq + div");
+      if(!c)return;
+      var list=(ELEVES[S.form.cl]||[]).filter(function(e){return!S.eleveQ||nrm(e).includes(nrm(S.eleveQ));});
+      c.innerHTML=list.map(function(e){
+        return'<button class="li'+(S.form.eleve===e?" on":"")+'" data-a="s1" data-v="'+esc(e)+'">'+(S.form.eleve===e?"✓  ":"")+esc(e)+'</button>';
+      }).join("")||'<p class="empty">Aucun résultat</p>';
+      reattach();
+    });
+  }
+  var sq=document.getElementById("sq");
+  if(sq){
+    sq.addEventListener("input",function(){
+      sil({aSubQ:sq.value});
+      // Re-render just the list without losing focus
+      var subs=S.subs||[];
+      var q=nrm(sq.value||"");
+      var filtered=subs.filter(function(s){return!q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);});
+      var countEl=sq.closest(".wlg")?sq.closest(".wlg").querySelector("p"):null;
+      if(countEl)countEl.textContent=filtered.length+" saisie"+(filtered.length>1?"s":"")+" / "+subs.length+" total";
+      var listEl=document.getElementById("saisies-list");
+      if(listEl){
+        listEl.innerHTML=filtered.length?filtered.map(function(s){
+          var d=new Date(s.ts),t=getTri(s.ts);
+          return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'">'+
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+              '<div style="flex:1;margin-right:10px">'+
+                '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" · "+esc(s.classe)+'</div>'+
+                '<div style="font-size:12px;color:var(--mu)">'+esc(s.parents)+'</div>'+
+                '<div style="font-size:12px">'+esc(s.activiteType)+" → "+esc(s.sousActivite)+'</div>'+
+                '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+'</div>'+
+              '</div>'+
+              '<div style="text-align:right;flex-shrink:0">'+
+                '<div style="font-size:18px;font-weight:700;color:var(--red)">'+s.heures+'h</div>'+
+                '<button style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit" data-a="del" data-id="'+esc(s.id)+'">'+( S.deleting===s.id?"…":"Supprimer")+'</button>'+
+              '</div>'+
+            '</div></div>';
+        }).join(""):'<p class="empty">Aucune saisie correspondante</p>';
+        reattach();
+      }
+    });
+  }
+}
+  // Saisie manuelle admin — listener heures libre
+  var manHInp=document.getElementById('man-h-inp');
+  if(manHInp)manHInp.addEventListener('input',function(){
+    sil({manHeures:manHInp.value});
+    var btn=document.querySelector('[data-a="man-submit"]');
+    if(btn)btn.disabled=!(S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct&&parseFloat(manHInp.value)>0);
+  });
+function bindChequeSelects(){
+  document.querySelectorAll('[data-a="set-cheque"]').forEach(function(sel){
+    sel.onchange=function(){
+      var ck=sel.dataset.ck,v=parseInt(sel.value);
+      CHEQUES_MAP[ck]=v;
+      fbSaveCheques().then(function(){
+        sel.style.background="#E8F5EE";
+        setTimeout(function(){sel.style.background="";},1200);
+      }).catch(function(e){alert("Erreur Firebase chèque: "+e.message);});
+    };
+  });
+}
+function reattach(){document.addEventListener("click",onClick,{once:true});bindChequeSelects();}
+function onClick(e){
+  var el=e.target.closest("[data-a]");if(!el){reattach();return;}
+  var a=el.dataset.a,v=el.dataset.v;
+  var nf={cl:"",eleve:"",nbParents:1,p1:"",p2:"",typeAct:"",sousAct:"",heures:""};
+  switch(a){
+    case"go-home":go({page:"home"});break;
+    case"go-portal":go({page:"portal",portalQ:""});break;
+    case"go-form":go({page:"form",step:0,form:nf,done:false,sendErr:"",eleveQ:""});break;
+    case"go-login":go({page:"login",pinInput:"",pinErr:false});break;
+    case"back":
+      if(v==="form-back"){saveInputs();S.step===0?go({page:"home"}):go({step:S.step-1});}
+      else go({page:v});break;
+    case"s0":go(function(s){return{step:1,form:Object.assign({},s.form,{cl:v,eleve:""}),eleveQ:""};});break;
+    case"s1":go(function(s){return{step:2,form:Object.assign({},s.form,{eleve:v,p1:'',p2:'',nbParents:1})};});break;
+    case"nb":saveInputs();go(function(s){return{form:Object.assign({},s.form,{nbParents:parseInt(v)})};});break;
+    case"next":saveInputs();go({step:S.step+1});break;
+    case"goto":saveInputs();go({step:parseInt(v)});break;
+    case"s3t":go(function(s){return{form:Object.assign({},s.form,{typeAct:v,sousAct:""})};});break;
+    case"s3a":go(function(s){return{form:Object.assign({},s.form,{sousAct:v})};});break;
+    case"sh":go(function(s){return{form:Object.assign({},s.form,{heures:v})};});break;
+    case"pick-parent":
+      // Clic sur un bouton de parent connu → remplit p1 ou p2
+      var pp=el.dataset.p;
+      var ip1=document.getElementById("ip1");
+      if(ip1&&!ip1.value.trim()){ip1.value=pp;sil(function(s){return{form:Object.assign({},s.form,{p1:pp})};});var bn2e=document.getElementById("bn2");if(bn2e)bn2e.disabled=false;}
+      else{var ip2=document.getElementById("ip2");if(ip2){ip2.value=pp;sil(function(s){return{form:Object.assign({},s.form,{p2:pp})};});}}
+      reattach();break;
+    case"sel-parent":
+      var selP2=el.dataset.p;
+      go(function(s){
+        var f2=Object.assign({},s.form);
+        if(f2.p1===selP2){f2.p1=f2.p2||'';f2.p2='';}
+        else if(f2.p2===selP2){f2.p2='';}
+        else if(!f2.p1){f2.p1=selP2;}
+        else if(!f2.p2){f2.p2=selP2;}
+        else{f2.p2=selP2;}
+        f2.nbParents=(f2.p1&&f2.p2)?2:(f2.p1?1:0);
+        return{form:f2};
+      });break;
+        case"submit":saveInputs();doSubmit();break;
+    case"new-form":go({page:"form",step:0,form:nf,done:false,sendErr:"",eleveQ:""});break;
+    case"portal-sel":
+      var key=el.dataset.key;
+      var allFams=computeFamilies(S.subs||[]);
+      var fm=allFams.find(function(f){return f.key===key;});
+      if(fm)go({page:"portal-view",portalFam:fm});break;
+    case"man-cl":go({manCl:v,manEleve:'',manParent:'',manSousAct:'',manHeures:''});break;
+    case"man-eleve":go({manEleve:v,manParent:''});break;
+    case"man-parent":go({manParent:v});break;
+    case"man-type":go({manTypeAct:v,manSousAct:''});break;
+    case"man-sous":go({manSousAct:v});break;
+    case"man-h":
+      var mhI=document.getElementById('man-h-inp');if(mhI)mhI.value=v;
+      go({manHeures:v});break;
+    case"man-submit":
+      var mhS=document.getElementById('man-h-inp');if(mhS&&mhS.value)sil({manHeures:mhS.value});
+      var mdS=document.getElementById('man-date');if(mdS&&mdS.value)sil({manDate:mdS.value});
+      doManSaisie();break;
+        case"check-pin":checkPin();break;
+    case"tab":go({adminTab:v});break;
+    case"fcls":go({aCls:v});break;
+    case"fst":go({aFilter:v});break;
+    case"do-search":
+      var pqEl=document.getElementById("pq");
+      if(pqEl)sil({portalQ:pqEl.value});
+      doSearch();
+      break;
+    case"del":doDel(el.dataset.id);break;
+    case"csv":exportCsv();break;
+    case"toggle-classe":go({elevesOpen:S.elevesOpen===el.dataset.cl?null:el.dataset.cl,regSaved:false});break;
+    case"close-classe":go({elevesOpen:null});break;
+    case"del-eleve":
+      var dcl=el.dataset.cl,didx=parseInt(el.dataset.idx);
+      if(confirm("Supprimer cet élève et ses parents enregistrés ?")){
+        var eName=ELEVES[dcl][didx];
+        delete PARENTS_MAP[eName];
+        ELEVES[dcl]=ELEVES[dcl].filter(function(_,i){return i!==didx;});
+        go({regSaved:false});
+      }break;
+    case"add-parent":
+      var aEl=el.dataset.el,iid=el.dataset.iid;
+      var ni2=document.getElementById(iid);
+      var pnom=ni2?ni2.value.trim():"";
+      if(pnom.length<2){alert("Saisissez un prénom valide");break;}
+      if(!PARENTS_MAP[aEl])PARENTS_MAP[aEl]=[];
+      if(PARENTS_MAP[aEl].indexOf(pnom)===-1){PARENTS_MAP[aEl].push(pnom);}
+      go({regSaved:false});break;
+    case"del-parent":
+      var dpEl=el.dataset.el,dpPi=parseInt(el.dataset.pi);
+      if(PARENTS_MAP[dpEl]){
+        PARENTS_MAP[dpEl]=PARENTS_MAP[dpEl].filter(function(_,i){return i!==dpPi;});
+        if(PARENTS_MAP[dpEl].length===0)delete PARENTS_MAP[dpEl];
+        go({regSaved:false});
+      }break;
+    case"add-eleve":
+      var acl=el.dataset.cl;
+      var ni=document.getElementById("ne-"+acl.replace(/[^a-z0-9]/gi,""));
+      var nom=ni?ni.value.trim():"";
+      if(nom.length<2){alert("Saisissez un nom valide");break;}
+      if(ELEVES[acl].indexOf(nom)!==-1){alert("Cet élève est déjà dans la liste");break;}
+      ELEVES[acl]=ELEVES[acl].concat([nom]).sort();go({regSaved:false});break;
+    case"set-cheque":
+      var ck2=el.dataset.ck,ckv=parseInt(el.value||"0");
+      CHEQUES_MAP[ck2]=ckv;
+      fbSaveCheques().then(function(){
+        el.style.background="#E8F5EE";
+        setTimeout(function(){el.style.background="";},1200);
+      }).catch(function(e){go({err:"Erreur chèque: "+e.message});});
+      reattach();break;
+    case"save-eleves":doSaveEleves();break;
+    case"do-promote":doPromotion();break;
+    case"save-annee":
+      var riEl=document.getElementById("rentree-inp");
+      var aiEl=document.getElementById("annee-inp");
+      var newRentree=riEl?riEl.value.trim():"";
+      var newAnnee=aiEl?aiEl.value.trim():"";
+      if(!newRentree||!newAnnee){alert("Renseignez la date de rentrée et le libellé de l\'année");break;}
+      // Validation date
+      var testD=new Date(newRentree);
+      if(isNaN(testD)){alert("Date de rentrée invalide");break;}
+      go({anneeSaving:true,anneeSaved:false});
+      RENTREE=newRentree;
+      ANNEE=newAnnee;
+      TRI=buildTRI(RENTREE,ANNEE);
+      document.title="Clardeluna "+ANNEE;
+      fbSaveAnnee().then(function(){
+        go({anneeSaving:false,anneeSaved:true});
+        setTimeout(function(){go({anneeSaved:false});},3000);
+      }).catch(function(e){go({anneeSaving:false,err:"Erreur année : "+e.message});});
+      break;
+    case"save-pin":
+      var npEl=document.getElementById("np"),npv=npEl?npEl.value.trim():"";
+      if(npv.length<4){alert("Code PIN trop court");break;}
+      PIN=npv;go({pinSaved:true});setTimeout(function(){go({pinSaved:false});},3000);break;
+  }
+  reattach();
+}
+// ── ASYNC ─────────────────────────────────────
+function loadSubs(){
+  if(S.subs!==null||S.loading)return;
+  sil({loading:true,err:""});
+  fbLoad().then(function(subs){go({subs:subs,loading:false});})
+          .catch(function(e){go({loading:false,err:"Erreur Firebase : "+e.message});});
+}
+function doSearch(){
+  var pqEl=document.getElementById("pq");
+  if(pqEl)sil({portalQ:pqEl.value});
+  if(S.subs!==null){
+    // Data already loaded - just update results div
+    var res=document.getElementById("portal-results");
+    if(res){res.innerHTML=portalResults();reattach();return;}
+  }
+  // Need to load data first
+  if(S.loading)return;
+  sil({loading:true,err:""});
+  // Show spinner in results
+  var res=document.getElementById("portal-results");
+  if(res)res.innerHTML='<div class="loader"><div class="spin"></div>Recherche en cours…</div>';
+  fbLoad().then(function(subs){
+    sil({subs:subs,loading:false});
+    var r=document.getElementById("portal-results");
+    if(r){r.innerHTML=portalResults();reattach();}
+    // Also hide loading indicator if any
+  }).catch(function(e2){
+    sil({loading:false,err:"Erreur : "+e2.message});
+    var r=document.getElementById("portal-results");
+    if(r){r.innerHTML='<div class="al ae">'+esc(S.err)+'</div>';reattach();}
+  });
+}
+function checkPin(){
+  var pi=document.getElementById("pi");
+  if((pi?pi.value:S.pinInput)===PIN){go({page:"admin",adminTab:"overview",err:""});loadSubs();}
+  else go({pinErr:true});
+}
+function doSubmit(){
+  var f=S.form;go({sending:true,sendErr:""});
+  var pl={classe:f.cl,eleve:f.eleve,nbParents:f.nbParents,parents:f.nbParents===2?(f.p1+" & "+f.p2):f.p1,activiteType:f.typeAct,sousActivite:f.sousAct,heures:parseFloat(f.heures)};
+  fbAdd(pl).then(function(ref){
+    var ns=Object.assign({id:ref.id,ts:new Date().toISOString()},pl);
+    go({sending:false,done:true,subs:(S.subs||[]).concat([ns])});
+  }).catch(function(e){go({sending:false,sendErr:"Erreur : "+e.message});});
+}
+function doDel(id){
+  if(!confirm("Supprimer cette saisie ?"))return;
+  sil({deleting:id});render();
+  fbDel(id).then(function(){go({deleting:null,subs:(S.subs||[]).filter(function(s){return s.id!==id;})});})
+           .catch(function(e){go({deleting:null,err:"Erreur : "+e.message});});
+}
+function doSaveEleves(){
+  go({regSaving:true,regSaved:false});
+  fbSaveEl(ELEVES).then(function(){go({regSaving:false,regSaved:true,elevesOpen:null});setTimeout(function(){go({regSaved:false});},3000);})
+                  .catch(function(e){go({regSaving:false,err:"Erreur : "+e.message});});
+}
+function loadElevesConfig(){
+  fbLoadEl().then(function(doc){
+    if(doc.exists){
+      var data=doc.data();
+      if(data.eleves){var sv=data.eleves;Object.keys(sv).forEach(function(cl){if(ELEVES[cl]!==undefined)ELEVES[cl]=sv[cl];});}
+      if(data.parents){Object.assign(PARENTS_MAP,data.parents);}
+    }
+  }).catch(function(){});
+  fbLoadCheques().then(function(doc){
+    if(doc.exists){var data=doc.data();if(data.cheques)Object.assign(CHEQUES_MAP,data.cheques);}
+  }).catch(function(){});
+  fbLoadAnnee().then(function(doc){
+    if(doc.exists){
+      var data=doc.data();
+      if(data.rentree)RENTREE=data.rentree;
+      if(data.annee)ANNEE=data.annee;
+      TRI=buildTRI(RENTREE,ANNEE);
+      // Mettre à jour le titre de la page
+      document.title="Clardeluna "+ANNEE;
+    }
+  }).catch(function(){});
+}
+function doPromotion(){
+  // Étape 1 : avertissement fort
+  var msg="⚠️ PROMOTION ANNUELLE\n\n"+
+    "Cette action va :\n"+
+    "• Faire monter tous les élèves d'une classe\n"+
+    "• SUPPRIMER toutes les heures saisies de l annee en cours\n\n"+
+    "IMPORTANT : Avant de continuer, exportez le rapport PDF\n"+
+    "(onglet Rapport - Imprimer / PDF) pour conserver une trace.\n\n"+
+    "Avez-vous bien sauvegardé le rapport de l annee en cours ?";
+  if(!confirm(msg))return;
+  // Étape 2 : double confirmation
+  if(!confirm("CONFIRMATION FINALE\n\nToutes les heures de l annee en cours seront EFFACÉES.\nCette action est irréversible.\n\nContinuer ?"))return;
+  // Export CSV automatique avant suppression
+  exportCsv();
+  go({promoSaved:false,err:""});
+  // Supprimer toutes les saisies Firebase
+  db.collection("submissions").get().then(function(snap){
+    var batch=db.batch();
+    var count=0;
+    snap.docs.forEach(function(doc){
+      batch.delete(doc.ref);
+      count++;
+      // Firestore batch max 500
+      if(count===499){batch.commit();batch=db.batch();count=0;}
+    });
+    return batch.commit();
+  }).then(function(){
+    // Promotion des classes
+    var old={};Object.keys(ELEVES).forEach(function(cl){old[cl]=ELEVES[cl].slice();});
+    // ── Avant de supprimer les 3ème : propager leurs parents aux fratries ──
+    // Si un 3ème a un frère/sœur dans une autre classe, on s'assure que
+    // les parents sont bien enregistrés sous le nom du frère/sœur aussi.
+    var autresEleves=["6ème","5ème","4ème"].reduce(function(a,cl){return a.concat(old[cl]);},[]); 
+    old["3ème"].forEach(function(e3){
+      var parents3=PARENTS_MAP[e3];
+      if(!parents3||!parents3.length)return;
+      var fk3=familyKey(e3);
+      // Chercher les frères/sœurs dans les autres classes
+      autresEleves.forEach(function(e2){
+        if(familyKey(e2)===fk3){
+          // Même famille → copier les parents manquants
+          if(!PARENTS_MAP[e2])PARENTS_MAP[e2]=[];
+          parents3.forEach(function(p){
+            if(PARENTS_MAP[e2].indexOf(p)===-1)PARENTS_MAP[e2].push(p);
+          });
+        }
+      });
+      delete PARENTS_MAP[e3];
+    });
+    // Décaler les listes d'élèves
+    ELEVES["3ème"]=old["4ème"].slice();
+    ELEVES["4ème"]=old["5ème"].slice();
+    ELEVES["5ème"]=old["6ème"].slice();
+    ELEVES["6ème"]=[];
+    // Reconstruire PARENTS_MAP avec les élèves restants
+    var newMap={};
+    old["4ème"].forEach(function(e){if(PARENTS_MAP[e])newMap[e]=PARENTS_MAP[e];});
+    old["5ème"].forEach(function(e){if(PARENTS_MAP[e])newMap[e]=PARENTS_MAP[e];});
+    old["6ème"].forEach(function(e){if(PARENTS_MAP[e])newMap[e]=PARENTS_MAP[e];});
+    PARENTS_MAP=newMap;
+    // Remettre les chèques à zéro (ils sont annuels)
+    CHEQUES_MAP={};
+    return fbSaveEl(ELEVES).then(function(){return fbSaveCheques();});
+  }).then(function(){
+    // Remettre les compteurs à zéro dans l'état
+    go({subs:[],promoSaved:true,aFilter:"all",aCls:"all"});
+    setTimeout(function(){go({promoSaved:false});},6000);
+  }).catch(function(e){
+    go({err:"Erreur promotion : "+e.message});
+  });
+}
+function exportCsv(){
+  var subs=S.subs||[];
+  var hd=["Horodatage","Classe","Élève","Parent(s)","Nb parents","Type","Sous-activité","Heures","Trimestre"];
+  var rows=subs.map(function(s){return[new Date(s.ts).toLocaleString("fr-FR"),s.classe,s.eleve,s.parents,s.nbParents,s.activiteType,s.sousActivite,s.heures,"T"+(getTri(s.ts)||"?")];});
+  var csv="\uFEFF"+[hd].concat(rows).map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="clardeluna-heures-"+new Date().toLocaleDateString("fr-FR").replace(/\//g,"-")+".csv";a.click();
+}
+// ── DÉMARRAGE ─────────────────────────────────
+function showErr(msg){
+  var el=document.getElementById("app");
+  el.style.cssText="max-width:460px;margin:40px auto;padding:20px;font-family:-apple-system,sans-serif";
+  el.innerHTML='<div style="text-align:center;margin-bottom:20px"><div style="font-size:44px;margin-bottom:12px">⚠️</div>'+
+    '<h2 style="font-size:17px;font-weight:700;margin-bottom:6px">Connexion Firebase impossible</h2>'+
+    '<code style="font-size:12px;color:#C0472A;word-break:break-all">'+msg+'</code></div>'+
+    '<div style="background:#FFF8E1;border:1px solid #F0D060;border-radius:8px;padding:14px;font-size:13px;color:#7A5800;margin-bottom:16px">'+
+      '<p style="font-weight:700;margin-bottom:8px">Solutions :</p>'+
+      '<p style="margin-bottom:6px">1. Activer Firestore (Firebase Console → Build → Firestore Database)</p>'+
+      '<p style="margin-bottom:6px">2. Firestore → Règles → allow read, write: if true;</p>'+
+      '<p>3. Vérifier la config Firebase dans index.html</p>'+
+    '</div>'+
+    '<button onclick="location.reload()" style="width:100%;padding:12px;background:#C0472A;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:700">Réessayer</button>';
+}
+(function(){
+  try{
+    firebase.initializeApp(FB_CFG);
+    db=firebase.firestore();
+    var done=false;
+    var timer=setTimeout(function(){if(!done)showErr("Timeout — Firebase ne répond pas.");},8000);
+    db.collection("_ping").limit(1).get()
+      .then(function(){done=true;clearTimeout(timer);go({page:"home"});loadElevesConfig();})
+      .catch(function(e){done=true;clearTimeout(timer);showErr(e.message);});
+  }catch(e){showErr(e.message);}
+})();
+</script>
+</body>
+</html>
