@@ -131,7 +131,7 @@ var PARENTS_MAP={
   "ALONSO Célia":["Paméla", "Sylvain"],
   "ALONSO Rayan":["Paméla", "Sylvain"],
   "ALVES Axel":["Paul", "Virginie"],
-  "ARTAL TAULIER Sacha":["William", "Géraldine"],
+  "ARTAL TAULIER Sacha":["Géraldine", "William"],
   "BERT LECHAT Eva":["Sophie", "François"],
   "BLAIN Lucas":["Eric", "Anne-Laure"],
   "BONNADIER Dario":["Philippine", "Steve"],
@@ -190,26 +190,34 @@ var CHEQUES_MAP={};// clé: "FAMILLE_prenomNorm" → nbChèques (0-4). 1 chèque
 // Aliases de prénoms : forme saisie → prénom canonique (PARENTS_MAP)
 // Clé normalisée (nrm) → valeur normalisée du prénom canonique
 var PRENOM_ALIASES={
-  "beengere":"berengere",   // Béengère → Bérengère
-  "beerngere":"berengere",  // Béerngère → Bérengère
-  "berengere":"berengere",
-  "joanda":"jean-dani",     // Joanda = Jean-Daniel (ESTEVE ROSALES)
-  "jean-dan":"jean-dani",
-  "jeandani":"jean-dani",
-  "jean yve":"emmanuell",   // Jean-Yves = Emmanuelle (MARTIN Jade)
-  "jeanyves":"emmanuell",
-  "jean-yve":"emmanuell",
-  "hude emm":"emmanuell",   // Hude emmanuelle = Emmanuelle (GUIRAL HUDE)
-  "emmanuell":"emmanuell"
+  // Berengere variantes
+  "beengere":"berengere","beerngere":"berengere","berengere":"berengere",
+  // Joanda = Jean-Daniel (ESTEVE ROSALES)
+  "joanda":"jeandanie","jean-dan":"jeandanie","jeandani":"jeandanie","jeandanie":"jeandanie",
+  // Jean-Yves → cotise pour Emmanuelle (MARTIN Jade)
+  "jean yve":"emmanuell","jeanyves":"emmanuell","jean-yve":"emmanuell",
+  "houles je":"emmanuell","houlesje":"emmanuell",
+  // Hude emmanuelle = Emmanuelle (GUIRAL HUDE)
+  "hude emm":"emmanuell","hudeemman":"emmanuell","emmanuell":"emmanuell","emmanuelle":"emmanuell",
+  // Laetitia variants
+  "laetitia":"laetiti","laetiti":"laetiti","letitia":"laetiti",
+  // Jerome variants
+  "jerome":"jerom","jerom":"jerom",
+  // Cyrille Bessonne = Cyrille (PASTOR BESSONNE)
+  "cyrille b":"cyrille","cyrillebes":"cyrille",
+  // Julie Pastor = Julie (PASTOR BESSONNE)
+  "julie pas":"julie","juliepasto":"julie",
+  // Siham+Benoit tag = Siham (ROUSSEAU)
+  "siham, b":"siham","sihambeno":"siham","benoitsiha":"benoit","benoit sia":"benoit"
 };
 function canonPrenom(s){
-  var n=nrm(String(s||"")).replace(/[\s-]/g,"").slice(0,8);
-  // Try progressive prefixes 4-8 chars
-  for(var l=8;l>=4;l--){
+  var raw=nrm(String(s||""));
+  var n=raw.replace(/[\s-]/g,"").slice(0,10);
+  // Try progressive prefixes 10→4 chars (avec et sans espaces/tirets)
+  for(var l=10;l>=4;l--){
     var k=n.slice(0,l);
     if(PRENOM_ALIASES[k])return PRENOM_ALIASES[k];
-    // Also try with hyphens preserved
-    var k2=nrm(String(s||"")).slice(0,l);
+    var k2=raw.slice(0,l);
     if(PRENOM_ALIASES[k2])return PRENOM_ALIASES[k2];
   }
   return n.slice(0,6);
@@ -230,7 +238,7 @@ function fbLoadCheques(){return db.collection("config").doc("cheques").get();}
 function fbSaveAnnee(){return db.collection("config").doc("annee").set({rentree:RENTREE,annee:ANNEE});}
 function fbLoadAnnee(){return db.collection("config").doc("annee").get();}
 // ── UTILITAIRES ───────────────────────────────
-function nrm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
+function nrm(s){return String(s||"").replace(/æ/gi,"ae").replace(/œ/gi,"oe").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function rnd(v){return Math.round(v*2)/2;}
 function pct(v,m){return Math.min(100,Math.round(v/m*100));}
@@ -249,10 +257,18 @@ function familyKey(eleve){
 function chequeKey(fk,prenom){return fk+"_"+nrm(prenom).replace(/\s+/g,"").slice(0,8);}
 function chequesH(fk,prenom){return (CHEQUES_MAP[chequeKey(fk,prenom)]||0)*10;}
 function normPrenom(s){
-  var p=nrm((String(s||"").split(/\s*[&\+]\s*|\s+et\s+/)[0]||"").trim());
-  // Prend le 1er mot de plus de 2 lettres (ignore titres courts)
-  var words=p.split(/\s+/).filter(function(w){return w.length>2;});
-  return (words[0]||p.slice(0,6)).slice(0,6);
+  var raw=String(s||"").split(/\s*[&\+]\s*|\s+et\s+/)[0].trim();
+  var words=raw.split(/\s+/);
+  // Sauter les mots tout en MAJUSCULES en début (= NOM de famille)
+  // Ex: "ARSICAUD Marion" → skip ARSICAUD → "Marion"
+  // Ex: "Charlène Ferrer" → "Charlène" n'est pas tout en caps → on la garde
+  var i=0;
+  while(i<words.length-1){
+    var wc=words[i].replace(/[-\']/g,"");
+    if(wc.length>1&&wc===wc.toUpperCase()&&/[A-Z]/.test(wc))i++;
+    else break;
+  }
+  return nrm(words[i]||words[words.length-1]||"").replace(/[,;]/g,"").slice(0,6);
 }
 // Deux chaînes partagent-elles le même prénom principal ?
 function prenomMatch(a,b){
@@ -262,16 +278,17 @@ function prenomMatch(a,b){
   // Résolution via table d'alias (Joanda=Jean-Daniel, Jean-Yves=Emmanuelle, etc.)
   var ca=canonPrenom(a), cb=canonPrenom(b);
   if(ca&&cb&&ca===cb)return true;
-  // Tolérance 1 caractère (faute de frappe): Bérengère/Béerngère
+  // Tolérance 1 car (faute de frappe) — uniquement si longueurs égales
+  // (évite Laurent ≈ Laure, Sophie ≈ Sophiane)
   var min=Math.min(na.length,nb.length);
+  var lenDiff=Math.abs(na.length-nb.length);
   var diff=0;
   for(var i=0;i<min;i++){if(na[i]!==nb[i])diff++;}
-  diff+=Math.abs(na.length-nb.length);
-  if(diff<=1&&min>=4)return true;
-  // Préfixe commun 4 chars
-  if(min>=4&&na.slice(0,4)===nb.slice(0,4))return true;
-  // Tolérance 2 caractères pour prénoms longs (≥7 chars)
-  if(diff<=2&&min>=7)return true;
+  if(lenDiff===0&&diff<=1&&min>=4)return true;
+  // Préfixe commun 5 chars UNIQUEMENT si longueurs égales (évite Laurent≠Laure)
+  if(lenDiff===0&&min>=5&&na.slice(0,5)===nb.slice(0,5))return true;
+  // Tolérance 2 car pour prénoms longs de même longueur
+  if(lenDiff===0&&diff<=2&&min>=7)return true;
   return false;
 }
 // ── EXTRACTION DES PRÉNOMS depuis une saisie ──
@@ -305,13 +322,22 @@ function computeFamilies(subs){
     var hpp=(parseFloat(s.heures)||0)/prenoms.length;
     prenoms.forEach(function(prenom){
       if(!prenom)return;
-      // Chercher un parent existant avec prénom similaire (+ alias)
+      // Chercher un parent existant avec prénom similaire (+ alias + NOM Prénom)
       var found=null;
+      var npPrenom=normPrenom(prenom); // Extrait le prénom de "NOM Prénom"
+      var cpPrenom=canonPrenom(prenom);
       for(var i=0;i<fam.parents.length;i++){
-        if(prenomMatch(prenom,fam.parents[i].prenoms[0])){found=fam.parents[i];break;}
-        // Vérifier aussi tous les prénoms enregistrés pour ce parent
-        var matched2=fam.parents[i].prenoms.some(function(ep){return prenomMatch(prenom,ep);});
-        if(matched2){found=fam.parents[i];break;}
+        var par=fam.parents[i];
+        // Tester tous les prénoms connus pour ce parent
+        var isMatch=par.prenoms.some(function(ep){
+          if(prenomMatch(prenom,ep))return true;
+          // Comparer aussi les prénoms extraits normalisés
+          var npEp=normPrenom(ep),cpEp=canonPrenom(ep);
+          if(npPrenom&&npEp&&npPrenom===npEp)return true;
+          if(cpPrenom&&cpEp&&cpPrenom===cpEp)return true;
+          return false;
+        });
+        if(isMatch){found=par;break;}
       }
       if(!found){
         found={prenoms:[],totalH:0,byAct:{},byTri:{1:0,2:0,3:0,4:0},subs:[]};
@@ -350,7 +376,12 @@ function computeFamilies(subs){
 }
 // Affichage du prénom principal (le plus long = le plus complet)
 function displayPrenom(prenoms){
-  return prenoms.slice().sort(function(a,b){return b.length-a.length;})[0]||"";
+  if(!prenoms||!prenoms.length)return "";
+  // Préférer le prénom le plus court (= prénom seul sans NOM de famille)
+  // mais pas moins de 3 chars
+  var sorted=prenoms.slice().sort(function(a,b){return a.length-b.length;});
+  var best=sorted.find(function(p){return p.trim().length>=3;})||sorted[0];
+  return best||"";
 }
 // Status basé sur le total famille
 function status(h){if(h>=OBJ)return"complete";var a=hAtt();if(a<=0||h>=a)return"ok";if(h>=a*.7)return"warn";return"late";}
@@ -371,10 +402,20 @@ function buildFullFamilies(subs){
       var fk=familyKey(e);
       if(!idx[fk])idx[fk]={key:fk,children:{},parents:[],totalH:0,byAct:{},subs:[],ghost:true};
       var fam=idx[fk];
-      if(!fam.children[e])fam.children[e]=cl;
+      // Ajouter l'enfant uniquement si son nom normalisé n'existe pas déjà
+      var eNrm=nrm(e);
+      var childExists=Object.keys(fam.children).some(function(k){return nrm(k)===eNrm;});
+      if(!childExists)fam.children[e]=cl;
       (PARENTS_MAP[e]||[]).forEach(function(p){
         var already=fam.parents.some(function(par){
-          return par.prenoms.some(function(pr){return nrm(pr)===nrm(p);});
+          return par.prenoms.some(function(pr){
+            if(nrm(pr)===nrm(p))return true;
+            if(prenomMatch(pr,p))return true;
+            // Comparer prénoms extraits (ignore NOM de famille)
+            var na=normPrenom(pr),nb=normPrenom(p);
+            if(na&&nb&&(na===nb||canonPrenom(pr)===canonPrenom(p)))return true;
+            return false;
+          });
         });
         if(!already){
           var ch=chequesH(fk,p);
@@ -922,8 +963,12 @@ function rSaisies(subs){
     '<div id="saisies-list">'+listH+'</div>';
 }
 function rRapport(fs,tot){
-  // Inclure TOUTES les familles (même sans heures)
-  var fsAll=buildFullFamilies(S.subs||[]);
+  // Filtrer les subs aux élèves présents dans ELEVES (exclure anciens élèves supprimés)
+  var elevesActuels=[];
+  Object.keys(ELEVES).forEach(function(cl){elevesActuels=elevesActuels.concat(ELEVES[cl]);});
+  var subsActuels=(S.subs||[]).filter(function(s){return elevesActuels.indexOf(s.eleve)!==-1;});
+  // Inclure TOUTES les familles actuelles (même sans heures)
+  var fsAll=buildFullFamilies(subsActuels);
   var OBJ=40;
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
   var allParents=[];
