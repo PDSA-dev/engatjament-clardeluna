@@ -166,7 +166,7 @@ var PARENTS_MAP={
   "LEGUET AMADOR Livia":["Candy", "Christophe"],
   "LLAO Marie":["Florent", "Melanie"],
   "LUGAGNE Louis":["Bérengère"],
-  "MARTIN Jade":["Fabrice", "Emmanuelle"],
+  "MARTIN Jade":["Fabrice", "Emmanuelle", "Jean-Yves"],
   "MARTINEZ LEE Elie":["Franck", "Jeong-Mi"],
   "MENEAU RUF Titouan":["Guilhem", "Caroline"],
   "MORERA Ema":["Jean-Christophe"],
@@ -187,6 +187,33 @@ var PARENTS_MAP={
 };
 
 var CHEQUES_MAP={};// clé: "FAMILLE_prenomNorm" → nbChèques (0-4). 1 chèque=25%=10h
+// Aliases de prénoms : forme saisie → prénom canonique (PARENTS_MAP)
+// Clé normalisée (nrm) → valeur normalisée du prénom canonique
+var PRENOM_ALIASES={
+  "beengere":"berengere",   // Béengère → Bérengère
+  "beerngere":"berengere",  // Béerngère → Bérengère
+  "berengere":"berengere",
+  "joanda":"jean-dani",     // Joanda = Jean-Daniel (ESTEVE ROSALES)
+  "jean-dan":"jean-dani",
+  "jeandani":"jean-dani",
+  "jean yve":"emmanuell",   // Jean-Yves = Emmanuelle (MARTIN Jade)
+  "jeanyves":"emmanuell",
+  "jean-yve":"emmanuell",
+  "hude emm":"emmanuell",   // Hude emmanuelle = Emmanuelle (GUIRAL HUDE)
+  "emmanuell":"emmanuell"
+};
+function canonPrenom(s){
+  var n=nrm(String(s||"")).replace(/[\s-]/g,"").slice(0,8);
+  // Try progressive prefixes 4-8 chars
+  for(var l=8;l>=4;l--){
+    var k=n.slice(0,l);
+    if(PRENOM_ALIASES[k])return PRENOM_ALIASES[k];
+    // Also try with hyphens preserved
+    var k2=nrm(String(s||"")).slice(0,l);
+    if(PRENOM_ALIASES[k2])return PRENOM_ALIASES[k2];
+  }
+  return n.slice(0,6);
+}
 
 var ACTS={"Festivités":["Feria 2025 nouveaux parents","Fête du jeu","Dintrada Sept. 2025","Portes ouvertes","Martror (Halloween)","Vide-grenier","Loto","Prima bela","FAUM Maraussan","Guinguette","Total festum","Course d'obstacle","Vente de chocolats, miel","Marchés divers","Feria 2026","Forfait festivités","Cap d'An","Maraussan musique","Journée des familles","Projet Fédé","Pasqueta"],"Commissions":["Remplacement journée","Ménage fin journée et vacances scolaires","Cantine gestion et relations prestataire","Ménage gestion et relations prestataires","Environnement","Dossier d'inscription","Mercat","Camel / référent feria 2026","Travaux","Sécurité","Informatique","Mécénat","Photos de classe","Communication","Ateliers / activités","Suivi des heures d'investissement","Festivités","CDI","Achats scolaires et péri-scolaire","Livret culturel","Soleth Cantadis","Mission coups de main","Forfait commissions"],"Administratif / CA":["Bureau","Conseil d'administration (2h/CA)","Contractualisation","Aide pédagogique"]};
 // ── FIREBASE ─────────────────────────────────
@@ -232,6 +259,9 @@ function prenomMatch(a,b){
   var na=normPrenom(a), nb=normPrenom(b);
   if(!na||!nb||na.length<3||nb.length<3)return false;
   if(na===nb)return true;
+  // Résolution via table d'alias (Joanda=Jean-Daniel, Jean-Yves=Emmanuelle, etc.)
+  var ca=canonPrenom(a), cb=canonPrenom(b);
+  if(ca&&cb&&ca===cb)return true;
   // Tolérance 1 caractère (faute de frappe): Bérengère/Béerngère
   var min=Math.min(na.length,nb.length);
   var diff=0;
@@ -240,6 +270,8 @@ function prenomMatch(a,b){
   if(diff<=1&&min>=4)return true;
   // Préfixe commun 4 chars
   if(min>=4&&na.slice(0,4)===nb.slice(0,4))return true;
+  // Tolérance 2 caractères pour prénoms longs (≥7 chars)
+  if(diff<=2&&min>=7)return true;
   return false;
 }
 // ── EXTRACTION DES PRÉNOMS depuis une saisie ──
@@ -273,18 +305,24 @@ function computeFamilies(subs){
     var hpp=(parseFloat(s.heures)||0)/prenoms.length;
     prenoms.forEach(function(prenom){
       if(!prenom)return;
-      // Chercher un parent existant avec prénom similaire
+      // Chercher un parent existant avec prénom similaire (+ alias)
       var found=null;
       for(var i=0;i<fam.parents.length;i++){
         if(prenomMatch(prenom,fam.parents[i].prenoms[0])){found=fam.parents[i];break;}
+        // Vérifier aussi tous les prénoms enregistrés pour ce parent
+        var matched2=fam.parents[i].prenoms.some(function(ep){return prenomMatch(prenom,ep);});
+        if(matched2){found=fam.parents[i];break;}
       }
       if(!found){
         found={prenoms:[],totalH:0,byAct:{},byTri:{1:0,2:0,3:0,4:0},subs:[]};
         fam.parents.push(found);
       }
-      // Ajouter variation de prénom si nouvelle
+      // Ajouter variation de prénom si nouvelle (via alias aussi)
       var pnrm=nrm(prenom);
-      var dejavu=found.prenoms.some(function(x){return nrm(x)===pnrm;});
+      var canon=canonPrenom(prenom);
+      var dejavu=found.prenoms.some(function(x){
+        return nrm(x)===pnrm||canonPrenom(x)===canon;
+      });
       if(!dejavu)found.prenoms.push(prenom);
       // Cumuler heures
       found.totalH+=hpp;
