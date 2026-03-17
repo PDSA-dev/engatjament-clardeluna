@@ -394,7 +394,7 @@ var S={
   anneeSaved:false,anneeSaving:false,
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
   manSaving:false,manSaved:false,manErr:"",
-  editSaisieId:null,editSaisieErr:""
+  editSaisieId:null,editSaisieErr:"",pinErr2:""
 };
 // ── RENDU ─────────────────────────────────────
 function go(p){saveInputs();Object.assign(S,typeof p==="function"?p(S):p);render();}
@@ -1316,12 +1316,31 @@ function rReglages(){
       '</div>'+inner+'</div>';
   }).join("");
   var pinSec='<div class="card" style="margin-top:8px">'+
-    '<h3 style="font-size:15px;font-weight:700;margin-bottom:8px">🔒 Code PIN</h3>'+
-    '<div style="display:flex;gap:8px">'+
-      '<input class="inp" id="np" type="password" placeholder="Nouveau code (min 4 car.)" style="flex:1;font-size:14px">'+
-      '<button class="btn bp bsm" data-a="save-pin" style="flex-shrink:0">Modifier</button>'+
+    '<h3 style="font-size:15px;font-weight:700;margin-bottom:8px">🔒 Changer le code PIN</h3>'+
+    '<div style="margin-bottom:8px">'+
+      '<label class="lbl">Code PIN actuel</label>'+
+      '<div style="display:flex;gap:6px">'+
+        '<input class="inp" id="cp" type="password" placeholder="Code actuel" style="flex:1;font-size:16px;letter-spacing:4px;text-align:center" autocomplete="current-password">'+
+        '<button type="button" style="background:none;border:1px solid var(--bd);border-radius:var(--r);padding:0 10px;cursor:pointer;font-size:14px;color:var(--mu)" data-a="tog-pw-vis" data-t="cp">👁</button>'+
+      '</div>'+
     '</div>'+
-    (S.pinSaved?'<div class="al aok mt8">Code PIN modifié ✓</div>':"")+
+    '<div style="margin-bottom:8px">'+
+      '<label class="lbl">Nouveau code PIN (min 4 chiffres)</label>'+
+      '<div style="display:flex;gap:6px">'+
+        '<input class="inp" id="np" type="password" placeholder="Nouveau code" style="flex:1;font-size:16px;letter-spacing:4px;text-align:center" autocomplete="new-password">'+
+        '<button type="button" style="background:none;border:1px solid var(--bd);border-radius:var(--r);padding:0 10px;cursor:pointer;font-size:14px;color:var(--mu)" data-a="tog-pw-vis" data-t="np">👁</button>'+
+      '</div>'+
+    '</div>'+
+    '<div style="margin-bottom:10px">'+
+      '<label class="lbl">Confirmer le nouveau code</label>'+
+      '<div style="display:flex;gap:6px">'+
+        '<input class="inp" id="np2" type="password" placeholder="Confirmation" style="flex:1;font-size:16px;letter-spacing:4px;text-align:center" autocomplete="new-password">'+
+        '<button type="button" style="background:none;border:1px solid var(--bd);border-radius:var(--r);padding:0 10px;cursor:pointer;font-size:14px;color:var(--mu)" data-a="tog-pw-vis" data-t="np2">👁</button>'+
+      '</div>'+
+    '</div>'+
+    '<button class="btn bp bsm" data-a="save-pin">Changer le code PIN</button>'+
+    (S.pinSaved?'<div class="al aok mt8">✓ Code PIN modifié avec succès</div>':"")+
+    (S.pinErr2?'<div class="al ae mt8">'+esc(S.pinErr2)+'</div>':"")+
   '</div>';
   return'<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">Réglages</h2>'+
     anneeSec+promo+
@@ -1668,6 +1687,7 @@ function onClick(e){
         .then(function(){go({editSaisieId:null,editSaisieErr:""});})
         .catch(function(e){go({editSaisieErr:"Erreur: "+e.message});});
       break;
+        case"tog-pw-vis":var tEl=document.getElementById(el.dataset.t);if(tEl)tEl.type=tEl.type==="password"?"text":"password";reattach();break;
         case"check-pin":checkPin();break;
     case"tab":go({adminTab:v});break;
     case"fcls":go({aCls:v});break;
@@ -1734,9 +1754,15 @@ function onClick(e){
       }).catch(function(e){go({anneeSaving:false,err:"Erreur année : "+e.message});});
       break;
     case"save-pin":
+      var cpEl=document.getElementById("cp"),cpv=cpEl?cpEl.value:"";
       var npEl=document.getElementById("np"),npv=npEl?npEl.value.trim():"";
-      if(npv.length<4){alert("Code PIN trop court");break;}
-      PIN=npv;go({pinSaved:true});setTimeout(function(){go({pinSaved:false});},3000);break;
+      var np2El=document.getElementById("np2"),np2v=np2El?np2El.value.trim():"";
+      if(cpv!==PIN){go({pinErr2:"Code PIN actuel incorrect"});break;}
+      if(npv.length<4){go({pinErr2:"Nouveau code trop court (min 4 caractères)"});break;}
+      if(npv!==np2v){go({pinErr2:"Les deux codes ne correspondent pas"});break;}
+      PIN=npv;
+      go({pinSaved:true,pinErr2:""});
+      setTimeout(function(){go({pinSaved:false});},3000);break;
   }
   reattach();
 }
