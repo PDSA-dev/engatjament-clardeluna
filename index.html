@@ -42,7 +42,7 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:14px;text-align:center}
 .sv{font-size:24px;font-weight:700;color:var(--red)}.slbl{font-size:11px;color:var(--mu);margin-top:2px}
 .si{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px}
-.tabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto}
+.tabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto;position:sticky;top:42px;z-index:8}
 .tab{flex:1;min-width:70px;padding:11px 8px;border:none;background:none;font-size:12px;cursor:pointer;color:var(--mu);border-bottom:2px solid transparent;font-family:inherit;white-space:nowrap;font-weight:600}
 .tab.on{color:var(--red);border-bottom-color:var(--red)}
 .fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
@@ -442,6 +442,8 @@ var S={
   pinInput:"",pinErr:false,deleting:null,
   anneeSaved:false,anneeSaving:false,
   saisiesEleve:"",saisiesParents:[],  // filtres onglet Saisies
+  saisiesTableOpen:false,  // tableau totaux déroulable
+  editEleveKey:null,  // "CL|idx" de l'élève en cours d'édition
   actsCatOpen:null,actsSaved:false,actsSaving:false,actsErr:"",
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
   manSaving:false,manSaved:false,manErr:""
@@ -988,18 +990,28 @@ function rSaisies(subs){
   // ── Total par activité HTML ──────────────────────────────────
   var totActH='';
   if(filtered.length>0){
+    var isOpen=S.saisiesTableOpen;
     var actRows=Object.keys(actTotals).sort().map(function(k){
-      return'<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--bd)">'+
+      return'<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--bd)">'+
         '<span style="color:var(--mu)">'+esc(k)+'</span>'+
         '<span style="font-weight:700;color:var(--red)">'+rnd(actTotals[k])+'h</span>'+
       '</div>';
     }).join('');
-    totActH='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:10px;margin-bottom:12px">'+
-      '<div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Total par activité</div>'+
-      actRows+
-      '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-top:6px;padding-top:6px;border-top:2px solid var(--bd)">'+
-        '<span>Total filtré</span><span style="color:var(--red)">'+rnd(totalH)+'h</span>'+
+    totActH='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);margin-bottom:12px;overflow:hidden">'+
+      // En-tête cliquable
+      '<div data-a="tog-acts-table" style="display:flex;justify-content:space-between;align-items:center;padding:10px;cursor:pointer">'+
+        '<div>'+
+          '<span style="font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em">Total par activité</span>'+
+          '<span style="font-size:13px;font-weight:700;color:var(--red);margin-left:10px">'+rnd(totalH)+'h</span>'+
+          '<span style="font-size:11px;color:var(--mu);margin-left:6px">('+Object.keys(actTotals).length+' activités)</span>'+
+        '</div>'+
+        '<span style="font-size:14px;color:var(--mu)">'+(isOpen?'▲':'▼')+'</span>'+
       '</div>'+
+      // Corps déroulable
+      (isOpen?
+        '<div style="padding:0 10px 10px">'+
+          actRows+
+        '</div>':'')+
     '</div>';
   }
   // ── Chips parents ─────────────────────────────────────────────
@@ -1263,10 +1275,22 @@ function rReglages(){
             }).join('')+
           '</div>':'';
         return'<div style="padding:8px 0;border-bottom:1px solid var(--bd)">'+
-          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
-            '<span style="flex:1;font-size:13px;font-weight:600">'+esc(e)+'</span>'+
-            '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;color:var(--red);font-size:11px;padding:2px 6px;font-family:inherit" data-a="del-eleve" data-cl="'+esc(cl)+'" data-idx="'+i+'">Supprimer</button>'+
-          '</div>'+
+          (function(){
+            var ekey=cl+'|'+i;
+            var isEditing=S.editEleveKey===ekey;
+            if(isEditing){
+              return'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'+
+                '<input class="inp" id="edit-eleve-inp" value="'+esc(e)+'" style="flex:1;font-size:13px;padding:6px 10px" autofocus>'+
+                '<button class="btn bp bsm" data-a="save-eleve-name" data-cl="'+esc(cl)+'" data-idx="'+i+'" style="font-size:11px;padding:4px 10px">✓</button>'+
+                '<button class="btn bo bsm" data-a="cancel-edit-eleve" style="font-size:11px;padding:4px 10px">✕</button>'+
+              '</div>';
+            }
+            return'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+              '<span style="flex:1;font-size:13px;font-weight:600">'+esc(e)+'</span>'+
+              '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;color:var(--mu);font-size:11px;padding:2px 6px;font-family:inherit" data-a="edit-eleve-name" data-cl="'+esc(cl)+'" data-idx="'+i+'" data-ekey="'+ekey+'">✏️</button>'+
+              '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;color:var(--red);font-size:11px;padding:2px 6px;font-family:inherit" data-a="del-eleve" data-cl="'+esc(cl)+'" data-idx="'+i+'">Supprimer</button>'+
+            '</div>';
+          })()+
           '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:4px">'+
             (parentTags||'<span style="font-size:11px;color:var(--hi)">Aucun parent enregistré</span>')+
           '</div>'+
@@ -1510,13 +1534,19 @@ function bindAll(){
 }
   // Saisie manuelle admin — listener heures libre
   var manHInp=document.getElementById('man-h-inp');
-  if(manHInp)manHInp.addEventListener('input',function(){
-    // go() re-renders → canSubmit recalculé proprement
-    go({manHeures:manHInp.value});
-    // Restaurer le focus sur le champ (perdu après re-render)
-    var newInp=document.getElementById('man-h-inp');
-    if(newInp){newInp.focus();newInp.setSelectionRange(newInp.value.length,newInp.value.length);}
-  });
+  if(manHInp){
+    // Pas de go() → pas de re-render → le champ garde le focus naturellement
+    manHInp.addEventListener('input',function(){
+      sil({manHeures:manHInp.value});
+      var btn=document.querySelector('[data-a="man-submit"]');
+      if(btn)btn.disabled=!(S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct&&parseFloat(manHInp.value)>0);
+    });
+    // Activer le bouton si toutes les conditions sont déjà remplies au montage
+    if(S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct){
+      var btnNow=document.querySelector('[data-a="man-submit"]');
+      if(btnNow)btnNow.disabled=!(parseFloat(manHInp.value)>0);
+    }
+  }
 function bindChequeSelects(){
   document.querySelectorAll('[data-a="set-cheque"]').forEach(function(sel){
     sel.onchange=function(){
@@ -1633,7 +1663,8 @@ function onClick(e){
         setTimeout(function(){go({actsSaved:false});},3000);
       }).catch(function(e){go({actsSaving:false,actsErr:"Erreur : "+e.message});});
       break;
-        case"tog-par-filter":
+        case"tog-acts-table":go({saisiesTableOpen:!S.saisiesTableOpen});break;
+    case"tog-par-filter":
       var tp=el.dataset.p;
       var cur=S.saisiesParents.slice();
       var ti=cur.indexOf(tp);
@@ -1653,6 +1684,30 @@ function onClick(e){
     case"csv":exportCsv();break;
     case"toggle-classe":go({elevesOpen:S.elevesOpen===el.dataset.cl?null:el.dataset.cl,regSaved:false});break;
     case"close-classe":go({elevesOpen:null});break;
+    case"edit-eleve-name":go({editEleveKey:el.dataset.ekey,regSaved:false});break;
+    case"cancel-edit-eleve":go({editEleveKey:null});break;
+    case"save-eleve-name":
+      var seCl=el.dataset.cl,seIdx=parseInt(el.dataset.idx);
+      var seInp=document.getElementById("edit-eleve-inp");
+      var seNom=seInp?seInp.value.trim():"";
+      if(seNom.length<2){alert("Nom trop court");break;}
+      var oldNom=ELEVES[seCl][seIdx];
+      if(seNom===oldNom){go({editEleveKey:null});break;}
+      if(ELEVES[seCl].indexOf(seNom)!==-1){alert("Cet élève existe déjà");break;}
+      // Mettre à jour ELEVES
+      ELEVES[seCl][seIdx]=seNom;
+      // Migrer PARENTS_MAP
+      if(PARENTS_MAP[oldNom]){PARENTS_MAP[seNom]=PARENTS_MAP[oldNom];delete PARENTS_MAP[oldNom];}
+      // Migrer CHEQUES_MAP
+      var oldFk=familyKey(oldNom),newFk=familyKey(seNom);
+      Object.keys(CHEQUES_MAP).forEach(function(k){
+        if(k.startsWith(oldFk+"_")){
+          var newKey=newFk+k.slice(oldFk.length);
+          CHEQUES_MAP[newKey]=CHEQUES_MAP[k];
+          delete CHEQUES_MAP[k];
+        }
+      });
+      go({editEleveKey:null,regSaved:false});break;
     case"del-eleve":
       var dcl=el.dataset.cl,didx=parseInt(el.dataset.idx);
       if(confirm("Supprimer cet élève et ses parents enregistrés ?")){
