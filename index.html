@@ -42,7 +42,7 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:14px;text-align:center}
 .sv{font-size:24px;font-weight:700;color:var(--red)}.slbl{font-size:11px;color:var(--mu);margin-top:2px}
 .si{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px}
-.tabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto}
+.tabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto;position:sticky;top:42px;z-index:8}
 .tab{flex:1;min-width:70px;padding:11px 8px;border:none;background:none;font-size:12px;cursor:pointer;color:var(--mu);border-bottom:2px solid transparent;font-family:inherit;white-space:nowrap;font-weight:600}
 .tab.on{color:var(--red);border-bottom-color:var(--red)}
 .fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
@@ -82,20 +82,10 @@ p.pss{font-size:14px;color:var(--mu);margin-bottom:16px}
 .parent-hours{font-size:22px;font-weight:700;color:var(--red);text-align:right}
 .parent-total-lbl{font-size:10px;color:var(--mu);text-align:right}
 @media(max-width:380px){.srow{grid-template-columns:repeat(2,1fr)}}
-#print-overlay{display:none}
-@media print{
-  body>*{display:none!important}
-  #print-overlay{display:block!important;font-family:-apple-system,sans-serif;font-size:13px;color:#1C1814;padding:20px}
-  #print-overlay table{width:100%;border-collapse:collapse}
-  #print-overlay th{padding:8px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1}
-  #print-overlay td{padding:7px 10px;border-bottom:1px solid #E0D9D3}
-  #print-overlay .no-print{display:none}
-}
 </style>
 </head>
 <body>
 <div id="app"><div class="loader"><div class="spin"></div>Connexion…</div></div>
-<div id="print-overlay"></div>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
@@ -134,59 +124,112 @@ function buildTRI(rentreeISO, anneeLabel){
   ];
 }
 var TRI=buildTRI(RENTREE,ANNEE);
-var ELEVES={"6ème":["ARTAL TAULIER Sacha","BONNADIER Dario","DERAMAUDT Paul","DE SWARTE Orphée","FRANCO GARCIA Enoc","GRAMIEN Madi","HAM Salomé","HOULES Clara","MARTIN Jade","OTERO Eden","PLAZA BLASCO Lenny","RIQUELME LEGRAND Louis","RIBEIRO NOLET Shanna","RODRIGUEZ Hermine"],"5ème":["BERT LECHAT Eva","BONNADIER Roxane","CADILHAC Jules","ESTEVE ROSALES Roman","ESCALIER Marius","EVANO Lisa","FERRER Santino","GUIRAL HUDE Lilian","ICHE Dominique Antoine","JALLAN Leeloo","LLAO Marie","MORERA Ema","RIPALTI Elina"],"4ème":["ALONSO Rayan","BLAIN Lucas","COSSIA COLLYN Liam","CRASSOUS Inaya","DERAMAUDT Inès","ESCALIER TOBENA Jeanne","ESTEVE ROSALES Lissandre","FOURNIER Selona","GOSSENT Thomas","HUET Romane","JULIA Raphaël","LECAILLE Eloi","LEGUET AMADOR Livia","LOUVET Louis","LUGAGNE Louis","OUALI Souhayl","PASTOR BESSONNE Artémis","PIETRZAK Maëlyne","POUCIN Anna","RICOUL Phoebe","RIELLO LOPEZ Louka","SIMONIAN Ibrahim","ZAMITH Giulian"],"3ème":["ALONSO Célia","ALVES Axel","CAVANNA Angète","EYMARD Raphael","HAM Roméo","MARTINEZ LEE Elie","MENEAU RUF Titouan","ROUSSEAU Noël","SCHLEIFER Paul"]};
+var ELEVES={"6ème":["ARTAL TAULIER Sacha","BONNADIER Dario","DERAMAUDT Paul","DE SWARTE Orphée","FRANCO GARCIA Enoc","GRAMIEN Madi","HAM Salomé","HOULES Clara","MARTIN Jade","OTERO Eden","PLAZA BLASCO Lenny","RIQUELME LEGRAND Louis","RIBEIRO NOLET Shanna","RODRIGUEZ Hermine"],"5ème":["BERT LECHAT Eva","BONNADIER Roxane","CADILHAC Jules","ESTEVE ROSALES Roman","ESCALIER Marius","EVANO Lisa","FERRER Santino","GUIRAL HUDE Lilian","ICHE Dominique Antoine","JALLAN Leeloo","LLAO Marie","MORERA Ema","RIPALTI Elina"],"4ème":["ALONSO Rayan","BLAIN Lucas","COSSIA COLLYN Liam","CRASSOUS Inaya","DERAMAUDT Inès","ESCALIER TOBENA Jeanne","ESTEVE ROSALES Lissandre","FOURNIER Selona","GOSSENT Thomas","HUET Romane","JULIA Raphaël","LECAILLE Eloi","LEGUET AMADOR Livia","LUGAGNE Louis","OUALI Souhayl","PASTOR BESSONNE Artémis","PIETRZAK Maëlyne","RICOUL Phoebe","RIELLO LOPEZ Louka","SIMONIAN Ibrahim"],"3ème":["ALONSO Célia","ALVES Axel","CAVANNA Angète","EYMARD Raphael","HAM Roméo","MARTINEZ LEE Elie","MENEAU RUF Titouan","ROUSSEAU Noël","SCHLEIFER Paul"]};
 // Noms des parents par enfant — pré-remplis depuis le fichier Google Forms 2025-2026
 // Modifiable dans Admin → Réglages, sauvegardé dans Firebase
 var PARENTS_MAP={
+  "ALONSO Célia":["Paméla", "Sylvain"],
+  "ALONSO Rayan":["Paméla", "Sylvain"],
   "ALVES Axel":["Paul", "Virginie"],
-  "ARTAL TAULIER Sacha":["Géraldine"],
-  "BERT LECHAT Eva":["François", "Sophie"],
-  "BLAIN Lucas":["Anne-Laure"],
+  "ARTAL TAULIER Sacha":["Géraldine", "William"],
+  "BERT LECHAT Eva":["Sophie", "François"],
+  "BLAIN Lucas":["Eric", "Anne-Laure"],
   "BONNADIER Dario":["Philippine", "Steve"],
   "BONNADIER Roxane":["Philippine", "Steve"],
   "CADILHAC Jules":["Christel", "Vincent"],
-  "CAVANNA Angèle":["Stéphane"],
-  "COSSIA COLLYN Liam":["Laure", "Laurent"],
+  "CAVANNA Angète":["Gabrielle", "Stéphane"],
+  "COSSIA COLLYN Liam":["Laurent", "Laure"],
+  "CRASSOUS Inaya":["Claire"],
   "DE SWARTE Orphée":["Juliette"],
-  "DERAMAUDT Paul":["Alexandra"],
-  "ESCALIER Marius":["Gaëlle", "Sébastien"],
-  "ESCALIER TOBENA Jeanne":["Gaëlle", "Sébastien"],
-  "ESTEVE ROSALES Lissandre":["Sophie", "Joanda"],
-  "ESTEVE ROSALES Roman":["Sophie", "Joanda"],
-  "EVANO Lisa":["Jérôme", "Laetitia"],
-  "FERRER Santino":["Charlène", "Mickaël"],
-  "FOURNIER Selona":["Elisa", "Steve"],
+  "DERAMAUDT Inès":["Matthieu", "Alexandra"],
+  "DERAMAUDT Paul":["Matthieu", "Alexandra"],
+  "ESCALIER Marius":["Sebastien", "Gaelle"],
+  "ESCALIER TOBENA Jeanne":["Sebastien", "Gaelle"],
+  "ESTEVE ROSALES Lissandre":["Jean-Daniel", "Sophie"],
+  "ESTEVE ROSALES Roman":["Jean-Daniel", "Sophie"],
+  "EVANO Lisa":["Jérôme", "Lætitia"],
+  "EYMARD Raphael":["Philippe", "Laurence"],
+  "FERRER Santino":["Charlène", "Mickael"],
+  "FOURNIER Selona":["Steeve", "Elisa"],
   "FRANCO GARCIA Enoc":["Laurie"],
-  "GOSSENT Thomas":["Agnès", "Sébastien"],
-  "GRAMIEN Madi":["Mina"],
+  "GOSSENT Thomas":["Sébastien", "Agnès"],
+  "GRAMIEN Madi":["Aria", "Mina"],
   "GUIRAL HUDE Lilian":["Guillaume", "Emmanuelle"],
-  "HAM Roméo":["Cathy", "Lionel"],
-  "HAM Salomé":["Cathy", "Lionel"],
-  "HUET Romane":["Marion"],
-  "JALLAN Leeloo":["Bastien"],
-  "JULIA Raphaël":["Claire", "Jérôme"],
-  "LECAILLE Éloi":["Bruno", "Charlotte"],
+  "HAM Roméo":["Lionel", "Cathy"],
+  "HAM Salomé":["Lionel", "Cathy"],
+  "HOULES Clara":["Benjamin", "Aurélie"],
+  "HUET Romane":["Nicolas", "Marion"],
+  "ICHE Dominique Antoine":["Marcel", "Véronique"],
+  "JALLAN Leeloo":["Bastien", "Fiona"],
+  "JULIA Raphaël":["Jérome", "Claire"],
+  "LECAILLE Eloi":["Bruno", "Charlotte"],
+  "LEGUET AMADOR Livia":["Candy", "Christophe"],
+  "LLAO Marie":["Florent", "Melanie"],
   "LUGAGNE Louis":["Bérengère"],
   "MARTIN Jade":["Fabrice", "Emmanuelle", "Jean-Yves"],
-  "MARTINEZ LEE Elie":["Franck", "Jeong-mi"],
-  "OTERO eden":["Sandra"],
+  "MARTINEZ LEE Elie":["Franck", "Jeong-Mi"],
+  "MENEAU RUF Titouan":["Guilhem", "Caroline"],
+  "MORERA Ema":["Jean-Christophe"],
+  "OTERO Eden":["Sandra"],
+  "OUALI Souhayl":["Nabil", "Nadia"],
   "PASTOR BESSONNE Artémis":["Julie", "Cyrille"],
-  "PIETRZAK Maélyne":["Carine"],
-  "PLAZA BLASCO Lenny":["Ketsia", "Nicolas"],
-  "RICOUL Phœbe":["Heidi"],
-  "RIELLO LOPEZ Louka":["Virginie"],
+  "PIETRZAK Maëlyne":["Ronnie", "Carine"],
+  "PLAZA BLASCO Lenny":["Nicolas", "Ketsia"],
+  "RIBEIRO NOLET Shanna":["Maïron", "Aurélie"],
+  "RICOUL Phoebe":["Teddy", "Heidi"],
+  "RIELLO LOPEZ Louka":["Diego", "Virginie"],
   "RIPALTI Elina":["Frédéric", "Véronique"],
-  "RIQUELME LEGRAND Louis":["Florent"],
-  "ROUSSEAU Naël":["Siham", "Benoît"]
+  "RIQUELME LEGRAND Louis":["Florent", "Natacha"],
+  "RODRIGUEZ Hermine":["Julien", "Julie"],
+  "ROUSSEAU Noël":["Siham"],
+  "SCHLEIFER Paul":["Olivier", "Colette"],
+  "SIMONIAN Ibrahim":["Jess", "Nadia"]
 };
 
 var CHEQUES_MAP={};// clé: "FAMILLE_prenomNorm" → nbChèques (0-4). 1 chèque=25%=10h
+// Aliases de prénoms : forme saisie → prénom canonique (PARENTS_MAP)
+// Clé normalisée (nrm) → valeur normalisée du prénom canonique
+var PRENOM_ALIASES={
+  // Berengere variantes
+  "beengere":"berengere","beerngere":"berengere","berengere":"berengere",
+  // Joanda = Jean-Daniel (ESTEVE ROSALES)
+  "joanda":"jeandanie","jean-dan":"jeandanie","jeandani":"jeandanie","jeandanie":"jeandanie",
+  // Jean-Yves → cotise pour Emmanuelle (MARTIN Jade)
+  "jean yve":"emmanuell","jeanyves":"emmanuell","jean-yve":"emmanuell",
+  "houles je":"emmanuell","houlesje":"emmanuell",
+  // Hude emmanuelle = Emmanuelle (GUIRAL HUDE)
+  "hude emm":"emmanuell","hudeemman":"emmanuell","emmanuell":"emmanuell","emmanuelle":"emmanuell",
+  // Laetitia variants
+  "laetitia":"laetiti","laetiti":"laetiti","letitia":"laetiti",
+  // Jerome variants
+  "jerome":"jerom","jerom":"jerom",
+  // Cyrille Bessonne = Cyrille (PASTOR BESSONNE)
+  "cyrille b":"cyrille","cyrillebes":"cyrille",
+  // Julie Pastor = Julie (PASTOR BESSONNE)
+  "julie pas":"julie","juliepasto":"julie",
+  // Siham+Benoit tag = Siham (ROUSSEAU)
+  "siham, b":"siham","sihambeno":"siham","benoitsiha":"benoit","benoit sia":"benoit",
+  // Paulo = Paul (ALVES)
+  "paulo":"paul","paul":"paul"
+};
+function canonPrenom(s){
+  var raw=nrm(String(s||""));
+  var n=raw.replace(/[\s-]/g,"").slice(0,10);
+  // Try progressive prefixes 10→4 chars (avec et sans espaces/tirets)
+  for(var l=10;l>=4;l--){
+    var k=n.slice(0,l);
+    if(PRENOM_ALIASES[k])return PRENOM_ALIASES[k];
+    var k2=raw.slice(0,l);
+    if(PRENOM_ALIASES[k2])return PRENOM_ALIASES[k2];
+  }
+  return n.slice(0,6);
+}
 
 var ACTS={"Festivités":["Feria 2025 nouveaux parents","Fête du jeu","Dintrada Sept. 2025","Portes ouvertes","Martror (Halloween)","Vide-grenier","Loto","Prima bela","FAUM Maraussan","Guinguette","Total festum","Course d'obstacle","Vente de chocolats, miel","Marchés divers","Feria 2026","Forfait festivités","Cap d'An","Maraussan musique","Journée des familles","Projet Fédé","Pasqueta"],"Commissions":["Remplacement journée","Ménage fin journée et vacances scolaires","Cantine gestion et relations prestataire","Ménage gestion et relations prestataires","Environnement","Dossier d'inscription","Mercat","Camel / référent feria 2026","Travaux","Sécurité","Informatique","Mécénat","Photos de classe","Communication","Ateliers / activités","Suivi des heures d'investissement","Festivités","CDI","Achats scolaires et péri-scolaire","Livret culturel","Soleth Cantadis","Mission coups de main","Forfait commissions"],"Administratif / CA":["Bureau","Conseil d'administration (2h/CA)","Contractualisation","Aide pédagogique"]};
 // ── FIREBASE ─────────────────────────────────
 var db=null;
 function fbLoad(){return db.collection("submissions").orderBy("ts","desc").get().then(function(s){return s.docs.map(function(d){return Object.assign({id:d.id},d.data());});});}
-function fbAdd(d){return db.collection("submissions").add(Object.assign({ts:new Date().toISOString()},d));}
+function fbAdd(d){var data=Object.assign({},d);if(!data.ts)data.ts=new Date().toISOString();return db.collection("submissions").add(data);}
 function fbDel(id){return db.collection("submissions").doc(id).delete();}
 function fbDeleteAll(){return db.collection("submissions").get().then(function(snap){var b=db.batch();snap.docs.forEach(function(d){b.delete(d.ref);});return b.commit();});}
 function fbSaveEl(el){return db.collection("config").doc("eleves").set({eleves:el,parents:PARENTS_MAP});}
@@ -196,8 +239,10 @@ function fbSaveCheques(){return db.collection("config").doc("cheques").set({cheq
 function fbLoadCheques(){return db.collection("config").doc("cheques").get();}
 function fbSaveAnnee(){return db.collection("config").doc("annee").set({rentree:RENTREE,annee:ANNEE});}
 function fbLoadAnnee(){return db.collection("config").doc("annee").get();}
+function fbSaveActs(){return db.collection("config").doc("activites").set({acts:ACTS});}
+function fbLoadActs(){return db.collection("config").doc("activites").get();}
 // ── UTILITAIRES ───────────────────────────────
-function nrm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
+function nrm(s){return String(s||"").replace(/æ/gi,"ae").replace(/œ/gi,"oe").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function rnd(v){return Math.round(v*2)/2;}
 function pct(v,m){return Math.min(100,Math.round(v/m*100));}
@@ -216,24 +261,38 @@ function familyKey(eleve){
 function chequeKey(fk,prenom){return fk+"_"+nrm(prenom).replace(/\s+/g,"").slice(0,8);}
 function chequesH(fk,prenom){return (CHEQUES_MAP[chequeKey(fk,prenom)]||0)*10;}
 function normPrenom(s){
-  var p=nrm((String(s||"").split(/\s*[&\+]\s*|\s+et\s+/)[0]||"").trim());
-  // Prend le 1er mot de plus de 2 lettres (ignore titres courts)
-  var words=p.split(/\s+/).filter(function(w){return w.length>2;});
-  return (words[0]||p.slice(0,6)).slice(0,6);
+  var raw=String(s||"").split(/\s*[&\+]\s*|\s+et\s+/)[0].trim();
+  var words=raw.split(/\s+/);
+  // Sauter les mots tout en MAJUSCULES en début (= NOM de famille)
+  // Ex: "ARSICAUD Marion" → skip ARSICAUD → "Marion"
+  // Ex: "Charlène Ferrer" → "Charlène" n'est pas tout en caps → on la garde
+  var i=0;
+  while(i<words.length-1){
+    var wc=words[i].replace(/[-\']/g,"");
+    if(wc.length>1&&wc===wc.toUpperCase()&&/[A-Z]/.test(wc))i++;
+    else break;
+  }
+  return nrm(words[i]||words[words.length-1]||"").replace(/[,;]/g,"").slice(0,6);
 }
 // Deux chaînes partagent-elles le même prénom principal ?
 function prenomMatch(a,b){
   var na=normPrenom(a), nb=normPrenom(b);
   if(!na||!nb||na.length<3||nb.length<3)return false;
   if(na===nb)return true;
-  // Tolérance 1 caractère (faute de frappe): Bérengère/Béerngère
+  // Résolution via table d'alias (Joanda=Jean-Daniel, Jean-Yves=Emmanuelle, etc.)
+  var ca=canonPrenom(a), cb=canonPrenom(b);
+  if(ca&&cb&&ca===cb)return true;
+  // Tolérance 1 car (faute de frappe) — uniquement si longueurs égales
+  // (évite Laurent ≈ Laure, Sophie ≈ Sophiane)
   var min=Math.min(na.length,nb.length);
+  var lenDiff=Math.abs(na.length-nb.length);
   var diff=0;
   for(var i=0;i<min;i++){if(na[i]!==nb[i])diff++;}
-  diff+=Math.abs(na.length-nb.length);
-  if(diff<=1&&min>=4)return true;
-  // Préfixe commun 4 chars
-  if(min>=4&&na.slice(0,4)===nb.slice(0,4))return true;
+  if(lenDiff===0&&diff<=1&&min>=4)return true;
+  // Préfixe commun 5 chars UNIQUEMENT si longueurs égales (évite Laurent≠Laure)
+  if(lenDiff===0&&min>=5&&na.slice(0,5)===nb.slice(0,5))return true;
+  // Tolérance 2 car pour prénoms longs de même longueur
+  if(lenDiff===0&&diff<=2&&min>=7)return true;
   return false;
 }
 // ── EXTRACTION DES PRÉNOMS depuis une saisie ──
@@ -267,18 +326,33 @@ function computeFamilies(subs){
     var hpp=(parseFloat(s.heures)||0)/prenoms.length;
     prenoms.forEach(function(prenom){
       if(!prenom)return;
-      // Chercher un parent existant avec prénom similaire
+      // Chercher un parent existant avec prénom similaire (+ alias + NOM Prénom)
       var found=null;
+      var npPrenom=normPrenom(prenom); // Extrait le prénom de "NOM Prénom"
+      var cpPrenom=canonPrenom(prenom);
       for(var i=0;i<fam.parents.length;i++){
-        if(prenomMatch(prenom,fam.parents[i].prenoms[0])){found=fam.parents[i];break;}
+        var par=fam.parents[i];
+        // Tester tous les prénoms connus pour ce parent
+        var isMatch=par.prenoms.some(function(ep){
+          if(prenomMatch(prenom,ep))return true;
+          // Comparer aussi les prénoms extraits normalisés
+          var npEp=normPrenom(ep),cpEp=canonPrenom(ep);
+          if(npPrenom&&npEp&&npPrenom===npEp)return true;
+          if(cpPrenom&&cpEp&&cpPrenom===cpEp)return true;
+          return false;
+        });
+        if(isMatch){found=par;break;}
       }
       if(!found){
         found={prenoms:[],totalH:0,byAct:{},byTri:{1:0,2:0,3:0,4:0},subs:[]};
         fam.parents.push(found);
       }
-      // Ajouter variation de prénom si nouvelle
+      // Ajouter variation de prénom si nouvelle (via alias aussi)
       var pnrm=nrm(prenom);
-      var dejavu=found.prenoms.some(function(x){return nrm(x)===pnrm;});
+      var canon=canonPrenom(prenom);
+      var dejavu=found.prenoms.some(function(x){
+        return nrm(x)===pnrm||canonPrenom(x)===canon;
+      });
       if(!dejavu)found.prenoms.push(prenom);
       // Cumuler heures
       found.totalH+=hpp;
@@ -306,7 +380,12 @@ function computeFamilies(subs){
 }
 // Affichage du prénom principal (le plus long = le plus complet)
 function displayPrenom(prenoms){
-  return prenoms.slice().sort(function(a,b){return b.length-a.length;})[0]||"";
+  if(!prenoms||!prenoms.length)return "";
+  // Préférer le prénom le plus court (= prénom seul sans NOM de famille)
+  // mais pas moins de 3 chars
+  var sorted=prenoms.slice().sort(function(a,b){return a.length-b.length;});
+  var best=sorted.find(function(p){return p.trim().length>=3;})||sorted[0];
+  return best||"";
 }
 // Status basé sur le total famille
 function status(h){if(h>=OBJ)return"complete";var a=hAtt();if(a<=0||h>=a)return"ok";if(h>=a*.7)return"warn";return"late";}
@@ -316,6 +395,41 @@ function catPills(byAct){
   return'<div class="cat-bar">'+Object.keys(byAct).map(function(k){
     return'<span class="cat-pill">'+esc(k)+' <span>'+rnd(byAct[k])+'h</span></span>';
   }).join("")+'</div>';
+}
+// ── INDEX COMPLET (saisies + ELEVES sans heures) ────────────
+function buildFullFamilies(subs){
+  var base=computeFamilies(subs||[]);
+  var idx={};
+  base.forEach(function(f){idx[f.key]=f;});
+  Object.keys(ELEVES).forEach(function(cl){
+    ELEVES[cl].forEach(function(e){
+      var fk=familyKey(e);
+      if(!idx[fk])idx[fk]={key:fk,children:{},parents:[],totalH:0,byAct:{},subs:[],ghost:true};
+      var fam=idx[fk];
+      // Ajouter l'enfant uniquement si son nom normalisé n'existe pas déjà
+      var eNrm=nrm(e);
+      var childExists=Object.keys(fam.children).some(function(k){return nrm(k)===eNrm;});
+      if(!childExists)fam.children[e]=cl;
+      (PARENTS_MAP[e]||[]).forEach(function(p){
+        var already=fam.parents.some(function(par){
+          return par.prenoms.some(function(pr){
+            if(nrm(pr)===nrm(p))return true;
+            if(prenomMatch(pr,p))return true;
+            // Comparer prénoms extraits (ignore NOM de famille)
+            var na=normPrenom(pr),nb=normPrenom(p);
+            if(na&&nb&&(na===nb||canonPrenom(pr)===canonPrenom(p)))return true;
+            return false;
+          });
+        });
+        if(!already){
+          var ch=chequesH(fk,p);
+          fam.parents.push({prenoms:[p],totalH:ch,chequeH:ch,realH:0,byAct:{},byTri:{1:0,2:0,3:0,4:0},subs:[]});
+          fam.totalH+=ch;
+        }
+      });
+    });
+  });
+  return Object.values(idx).sort(function(a,b){return a.key.localeCompare(b.key);});
 }
 // ── ÉTAT ──────────────────────────────────────
 var S={
@@ -327,6 +441,10 @@ var S={
   elevesOpen:null,regSaving:false,regSaved:false,promoSaved:false,pinSaved:false,
   pinInput:"",pinErr:false,deleting:null,
   anneeSaved:false,anneeSaving:false,
+  saisiesEleve:"",saisiesParents:[],  // filtres onglet Saisies
+  saisiesTableOpen:false,  // tableau totaux déroulable
+  editEleveKey:null,  // "CL|idx" de l'élève en cours d'édition
+  actsCatOpen:null,actsSaved:false,actsSaving:false,actsErr:"",
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
   manSaving:false,manSaved:false,manErr:""
 };
@@ -392,39 +510,78 @@ function rPortal(){
 }
 function portalResults(){
   var q=S.portalQ;
-  if(!q||q.length<2)return q.length===1?'<p style="font-size:13px;color:var(--mu);text-align:center;margin-top:16px">Saisissez au moins 2 caractères…</p>':"";
+  if(!q||q.length<2)return q.length===1?'<p style="font-size:13px;color:var(--mu);text-align:center;margin-top:16px">Saisissez au moins 2 caract\u00e8res\u2026</p>':"";
   if(S.loading)return'<div class="loader"><div class="spin"></div></div>';
   if(S.err)return'<div class="al ae">'+esc(S.err)+'</div>';
-  if(!S.subs)return'<div class="loader"><div class="spin"></div>Chargement…</div>';
+  if(!S.subs)return'<div class="loader"><div class="spin"></div>Chargement\u2026</div>';
   var qn=nrm(q);
-  var allFams=computeFamilies(S.subs);
-  var found=allFams.filter(function(f){
-    // Recherche par nom de famille
+
+  // Index complet via helper partagé
+  var allFamsComplete=buildFullFamilies(S.subs);
+
+  // ── Filtre de recherche ──────────────────────────────────────────────────
+  var found=allFamsComplete.filter(function(f){
+    // 1. Nom de famille
     if(nrm(f.key).includes(qn))return true;
-    // Recherche par prénom d'un parent
-    return f.parents.some(function(p){
-      return p.prenoms.some(function(pr){return nrm(pr).includes(qn);});
+    // 2. N'importe quel mot du nom complet d'un enfant (prénom ou NOM)
+    if(Object.keys(f.children).some(function(ch){
+      return nrm(ch).split(' ').some(function(w){return w.length>1&&w.startsWith(qn)||nrm(ch).includes(qn);});
+    }))return true;
+    // 3. Prénom d'un parent (toutes sources)
+    var allParNames=[];
+    f.parents.forEach(function(par){par.prenoms.forEach(function(pr){allParNames.push(nrm(pr));});});
+    // Ajouter aussi parents PARENTS_MAP non encore dans f.parents
+    Object.keys(PARENTS_MAP).forEach(function(e){
+      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){
+        if(allParNames.indexOf(nrm(p))===-1)allParNames.push(nrm(p));
+      });
     });
-    // Recherche par nom d'enfant complet
-    return Object.keys(f.children).some(function(ch){return nrm(ch).includes(qn);});
+    if(allParNames.some(function(pn){return pn.includes(qn);}))return true;
+    return false;
   });
-  if(!found.length)return'<p class="empty">Aucun résultat pour <strong>'+esc(q)+'</strong></p>';
-  return found.map(function(f){
-    var s=status(f.totalH),p=pct(f.totalH,OBJ);
+
+  if(!found.length)return'<p class="empty">Aucun résultat pour <strong>'+esc(q)+'</strong><br><span style="font-size:12px;color:var(--mu)">Essayez le nom de famille, le prénom de l\'éève ou d\'un parent</span></p>';
+
+  return found.sort(function(a,b){return a.key.localeCompare(b.key);}).map(function(f){
+    // Recalcul propre des chèques (les parents fantômes ont déjà chequeH)
+    var totCheqR=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
+    var nbPar=f.parents.length||1;
+    var famObj2=nbPar*OBJ;
+    var s=f.totalH>=famObj2?"complete":status(f.totalH);
+    var p2=pct(f.totalH,famObj2);
     var enfants=Object.keys(f.children).map(function(ch){return ch+" ("+f.children[ch]+")";}).join(", ");
-    var parentsDisp=f.parents.map(function(p2){return displayPrenom(p2.prenoms);}).join(" · ");
+    // Liste des parents (PARENTS_MAP en priorité pour l'affichage)
+    var dispPars=[];
+    Object.keys(PARENTS_MAP).forEach(function(e){
+      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){
+        if(dispPars.indexOf(p)===-1)dispPars.push(p);
+      });
+    });
+    if(!dispPars.length)dispPars=f.parents.map(function(par){return displayPrenom(par.prenoms);});
+    var parentsDisp=dispPars.join(' \u00b7 ');
+    // Affichage des heures
+    var hoursDisplay;
+    if(f.totalH===0){
+      hoursDisplay='<div style="font-size:12px;color:var(--mu);font-style:italic;margin-top:2px">Aucune heure d\u00e9clar\u00e9e</div>';
+    }else if(f.subs&&f.subs.length===0&&totCheqR>0){
+      hoursDisplay='<div style="font-size:20px;font-weight:700;color:var(--am)">'+rnd(totCheqR)+'h</div>'+
+        '<div style="font-size:10px;color:var(--am)">\uD83D\uDCB3 ch\u00e8que(s)</div>';
+    }else{
+      hoursDisplay='<div style="font-size:22px;font-weight:700;color:var(--red)">'+rnd(f.totalH)+'h</div>'+
+        (totCheqR>0?'<div style="font-size:10px;color:var(--am)">dont '+rnd(totCheqR)+'h \uD83D\uDCB3</div>':'')+
+        '<div style="font-size:10px;color:var(--mu)">/ '+famObj2+'h</div>';
+    }
     return'<button class="li" style="margin-bottom:10px" data-a="portal-sel" data-key="'+esc(f.key)+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'+
         '<div style="flex:1;min-width:0">'+
           '<div style="font-weight:700;font-size:15px">Famille '+esc(f.key)+'</div>'+
           '<div style="font-size:12px;color:var(--mu);margin-top:2px">'+esc(enfants)+'</div>'+
-          '<div style="font-size:12px;color:var(--mu)">Parents : '+esc(parentsDisp)+'</div>'+
-          '<div style="margin-top:6px"><div class="pt2"><div class="pf '+fcls(s)+'" style="width:'+p+'%"></div></div></div>'+
+          '<div style="font-size:12px;color:var(--mu)">Parents\u00a0: '+esc(parentsDisp)+'</div>'+
+          (f.totalH>0?'<div style="margin-top:6px"><div class="pt2"><div class="pf '+fcls(s)+'" style="width:'+p2+'%"></div></div></div>':'')+
         '</div>'+
         '<div style="text-align:right;flex-shrink:0">'+
-          '<div style="font-size:22px;font-weight:700;color:var(--red)">'+rnd(f.totalH)+'h</div>'+
-          '<div style="font-size:10px;color:var(--mu)">/ '+OBJ+'h</div>'+
-          badge(s)+
+          hoursDisplay+
+          (f.totalH>0?badge(s):'')+
         '</div>'+
       '</div>'+
     '</button>';
@@ -453,7 +610,16 @@ function rView(){
     return'<span style="display:inline-block;margin:2px 4px 2px 0;padding:3px 10px;background:var(--bg);border:1px solid var(--bd);border-radius:20px;font-size:12px">'+esc(ch)+' <span style="color:var(--mu)">'+f.children[ch]+'</span></span>';
   }).join("");
   // Répartition globale par catégorie
+  var totCheqFam=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
+  var realHFam=f.totalH-totCheqFam;
   var catH=catPills(f.byAct);
+  // Message si aucune heure réelle
+  var noHoursMsg="";
+  if(f.subs.length===0&&totCheqFam===0){
+    noHoursMsg='<div class="al aw" style="margin-top:10px">⏳ Vous n\'avez encore enregistré aucune heure cette année.</div>';
+  }else if(f.subs.length===0&&totCheqFam>0){
+    noHoursMsg='<div class="al aw" style="margin-top:10px">💳 Aucune heure saisie — uniquement des chèques encaissés ('+rnd(totCheqFam)+'h comptabilisées).</div>';
+  }
   // Détail par parent
   var parentsH=f.parents.map(function(par){
     var pname=displayPrenom(par.prenoms);
@@ -518,7 +684,7 @@ function rView(){
       '</div>'+
       '<div class="mt8"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:4px"><span>Progression famille (obj. '+famObj+'h)</span><span>'+p+'%</span></div>'+
       '<div class="pt2"><div class="pf '+fcls(s)+'" style="width:'+p+'%"></div></div></div>'+
-      alH+
+      alH+noHoursMsg+
       '<div style="margin-top:14px">'+enfantsH+'</div>'+
       '<h3 style="font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-top:20px;margin-bottom:4px">Total par catégorie</h3>'+
       catH+
@@ -694,11 +860,12 @@ function rAdmin(){
   if(S.adminTab==="saisies")c=rSaisies(subs);
   if(S.adminTab==="rapport")c=rRapport(fs,tot);
   if(S.adminTab==="reglages")c=rReglages();
+  if(S.adminTab==="activites")c=rActivites();
   if(S.adminTab==="saisie-admin")c=rManSaisie();
   return tb("Tableau de bord","home",subs.length+" saisies · "+rnd(tot)+"h total")+
     (S.err?'<div class="al ae" style="margin:8px 16px">'+esc(S.err)+'</div>':"")+
     '<div class="tabs">'+
-      [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["reglages","⚙ Réglages"]].map(function(t){
+      [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["activites","📋 Activités"],["reglages","⚙ Réglages"]].map(function(t){
         return'<button class="tab'+(S.adminTab===t[0]?" on":"")+'" data-a="tab" data-v="'+t[0]+'">'+t[1]+'</button>';
       }).join("")+
     '</div>'+
@@ -706,6 +873,7 @@ function rAdmin(){
 }
 function rOverview(fs,tot){
   var att=rnd(hAtt()),ct=curTri();
+  // Inclure familles sans heures dans le décompte (buildFullFamilies)
   var fsAll=buildFullFamilies(S.subs||[]);
   var nLate=fsAll.filter(function(f){var s=status(f.totalH);return s==="late"||f.totalH===0;}).length;
   var nOk=fsAll.filter(function(f){var s=status(f.totalH);return s==="ok"||s==="complete";}).length;
@@ -740,7 +908,7 @@ function rOverview(fs,tot){
   }).join(""):
     '<p class="empty" style="padding:14px">Toutes les familles sont à jour ✓</p>';
   var lateCard=lates.length?'<div class="card mt12"><h3 style="font-size:14px;font-weight:700;margin-bottom:4px">Familles en retard ('+lates.length+')</h3>'+lateH+'</div>':"";
-  return stats+info+lateCard+'<div class="mt16"><button class="btn bo" data-a="print-overview">🖨️ Exporter PDF</button></div>';
+  return stats+info+lateCard+'<div class="mt16"><button class="btn bo" data-a="csv">⬇ Exporter CSV</button></div>';
 }
 function rHeures(fs){
   var cls=["all"].concat(Object.keys(ELEVES));
@@ -780,17 +948,97 @@ function rHeures(fs){
     '<p style="font-size:11px;color:var(--mu);margin-top:8px">'+filtered.length+' famille(s) · Objectif : '+OBJ+'h par famille</p>';
 }
 function rSaisies(subs){
+  // ── Étape 1 : filtrer par texte libre ────────────────────────
   var q=nrm(S.aSubQ||"");
-  var filtered=subs.filter(function(s){return!q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);});
+  var step1=subs.filter(function(s){
+    return !q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);
+  });
+  // ── Étape 2 : suggestions parents pour l'élève recherché ──────
+  var parentSuggestions=[];
+  if(q.length>=2){
+    // Collecter tous les parents uniques des saisies filtrées
+    var pSet={};
+    step1.forEach(function(s){
+      (s.parents||"").split(/\s*[&]\s*|\s+et\s+/).forEach(function(p){
+        var pn=p.trim();
+        if(pn&&!pSet[nrm(pn)]){pSet[nrm(pn)]=pn;}
+      });
+    });
+    // Ajouter aussi les parents de PARENTS_MAP pour les élèves trouvés
+    step1.forEach(function(s){
+      var fk=familyKey(s.eleve);
+      Object.keys(PARENTS_MAP).forEach(function(e){
+        if(familyKey(e)===fk)(PARENTS_MAP[e]||[]).forEach(function(p){
+          if(!pSet[nrm(p)])pSet[nrm(p)]=p;
+        });
+      });
+    });
+    parentSuggestions=Object.values(pSet).sort();
+  }
+  // ── Étape 3 : filtre par parents sélectionnés ────────────────
+  var selPars=S.saisiesParents||[];
+  var filtered=selPars.length===0?step1:step1.filter(function(s){
+    return selPars.some(function(sp){
+      return prenomMatch(sp,s.parents)||nrm(s.parents).includes(nrm(sp));
+    });
+  });
+  // ── Total par activité ────────────────────────────────────────
+  var actTotals={};
+  filtered.forEach(function(s){
+    var k=s.activiteType+" · "+s.sousActivite;
+    actTotals[k]=(actTotals[k]||0)+(parseFloat(s.heures)||0);
+  });
+  var totalH=filtered.reduce(function(a,s){return a+(parseFloat(s.heures)||0);},0);
+  // ── Total par activité HTML ──────────────────────────────────
+  var totActH='';
+  if(filtered.length>0){
+    var isOpen=S.saisiesTableOpen;
+    var actRows=Object.keys(actTotals).sort().map(function(k){
+      return'<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--bd)">'+
+        '<span style="color:var(--mu)">'+esc(k)+'</span>'+
+        '<span style="font-weight:700;color:var(--red)">'+rnd(actTotals[k])+'h</span>'+
+      '</div>';
+    }).join('');
+    totActH='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);margin-bottom:12px;overflow:hidden">'+
+      // En-tête cliquable
+      '<div data-a="tog-acts-table" style="display:flex;justify-content:space-between;align-items:center;padding:10px;cursor:pointer">'+
+        '<div>'+
+          '<span style="font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em">Total par activité</span>'+
+          '<span style="font-size:13px;font-weight:700;color:var(--red);margin-left:10px">'+rnd(totalH)+'h</span>'+
+          '<span style="font-size:11px;color:var(--mu);margin-left:6px">('+Object.keys(actTotals).length+' activités)</span>'+
+        '</div>'+
+        '<span style="font-size:14px;color:var(--mu)">'+(isOpen?'▲':'▼')+'</span>'+
+      '</div>'+
+      // Corps déroulable
+      (isOpen?
+        '<div style="padding:0 10px 10px">'+
+          actRows+
+        '</div>':'')+
+    '</div>';
+  }
+  // ── Chips parents ─────────────────────────────────────────────
+  var parentChips='';
+  if(parentSuggestions.length>0){
+    parentChips='<div style="margin-bottom:10px">'+
+      '<div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:5px">Filtrer par parent :</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
+      parentSuggestions.map(function(p){
+        var on=selPars.indexOf(p)!==-1;
+        return'<button class="fc2'+(on?' on':'')+'" data-a="tog-par-filter" data-p="'+esc(p)+'">'+esc(p)+'</button>';
+      }).join('')+
+      (selPars.length>0?'<button class="fc2" data-a="clear-par-filter" style="color:var(--red)">✕ Tout</button>':'')+
+      '</div></div>';
+  }
+  // ── Liste ──────────────────────────────────────────────────────
   var listH=filtered.length?filtered.map(function(s){
     var d=new Date(s.ts),t=getTri(s.ts);
-    return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'">'+
+    return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'" >'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
         '<div style="flex:1;margin-right:10px">'+
           '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" · "+esc(s.classe)+'</div>'+
           '<div style="font-size:12px;color:var(--mu)">'+esc(s.parents)+'</div>'+
           '<div style="font-size:12px">'+esc(s.activiteType)+" → "+esc(s.sousActivite)+'</div>'+
-          '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+'</div>'+
+          '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+(s.manualEntry?'<span style="font-size:10px;background:#E8F5EE;color:#2E7D4F;border-radius:8px;padding:1px 5px;margin-left:4px">✏️ admin</span>':'')+'</div>'+
         '</div>'+
         '<div style="text-align:right;flex-shrink:0">'+
           '<div style="font-size:18px;font-weight:700;color:var(--red)">'+s.heures+'h</div>'+
@@ -798,56 +1046,103 @@ function rSaisies(subs){
         '</div>'+
       '</div></div>';
   }).join(""):'<p class="empty">Aucune saisie</p>';
+
   return'<div class="sbar">'+
-    '<input class="inp" id="sq" placeholder="Rechercher…" value="'+esc(S.aSubQ||"")+'">'+
-    '<button class="btn bo bsm" data-a="csv" style="flex-shrink:0">CSV</button>'+
+      '<input class="inp" id="sq" placeholder="Rechercher élève, parent, activité…" value="'+esc(S.aSubQ||"")+'" autocomplete="off">'+
+      '<button class="btn bo bsm" data-a="csv" style="flex-shrink:0">CSV</button>'+
     '</div>'+
-    '<p style="font-size:12px;color:var(--mu);margin-bottom:10px">'+filtered.length+' saisie'+(filtered.length>1?"s":"")+" / "+subs.length+' total</p>'+
+    parentChips+
+    '<p style="font-size:12px;color:var(--mu);margin-bottom:10px">'+filtered.length+' saisie'+(filtered.length>1?"s":"")+" / "+subs.length+' total · '+rnd(totalH)+'h</p>'+
+    totActH+
     '<div id="saisies-list">'+listH+'</div>';
 }
+
 function rRapport(fs,tot){
-  var OBJ=40; // objectif par PARENT
+  // Filtrer les subs aux élèves présents dans ELEVES (exclure anciens élèves supprimés)
+  var elevesActuels=[];
+  Object.keys(ELEVES).forEach(function(cl){elevesActuels=elevesActuels.concat(ELEVES[cl]);});
+  var subsActuels=(S.subs||[]).filter(function(s){
+    var eNrm=nrm(s.eleve);
+    return elevesActuels.some(function(e){return nrm(e)===eNrm;});
+  });
+  // Inclure TOUTES les familles actuelles (même sans heures)
+  var fsAll=buildFullFamilies(subsActuels);
+  var OBJ=40;
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
-  // Compter les parents
   var allParents=[];
-  fs.forEach(function(f){f.parents.forEach(function(p){allParents.push(p);});});
+  fsAll.forEach(function(f){f.parents.forEach(function(p){allParents.push(p);});});
   var nOk=allParents.filter(function(p){return p.totalH>=OBJ;}).length;
-  var nLate=allParents.filter(function(p){return p.totalH<20;}).length;
-  function slabel(h){if(h>=OBJ)return["Objectif atteint","#2E7D4F","#E8F5EE"];if(h>=30)return["Bon avancement","#2E7D4F","#E8F5EE"];if(h>=20)return["En cours","#8B6000","#FFF8E1"];if(h>=10)return["À renforcer","#C0472A","#F5EAE7"];return["Insuffisant","#C0472A","#FDECEA"];}
-  var rows=fs.slice().sort(function(a,b){return a.key.localeCompare(b.key);}).map(function(f){
+  var nZero=allParents.filter(function(p){return p.totalH===0;}).length;
+  function slabel(h,isCheque){
+    if(isCheque&&h>0)return["Chèque(s)","#8B6000","#FFF8E1"];
+    if(h>=OBJ)return["Objectif atteint","#2E7D4F","#E8F5EE"];
+    if(h>=30)return["Bon avancement","#2E7D4F","#E8F5EE"];
+    if(h>=20)return["En cours","#8B6000","#FFF8E1"];
+    if(h>=10)return["À renforcer","#C0472A","#F5EAE7"];
+    if(h>0)return["Insuffisant","#C0472A","#FDECEA"];
+    return["Aucune heure","#999","#F5F5F5"];
+  }
+  var rows=fsAll.map(function(f){
     var enfants=Object.keys(f.children).join(" + ");
     var classes=Object.values(f.children).filter(function(v,i,a){return a.indexOf(v)===i;}).join(" / ");
+    var famTot=rnd(f.totalH||0);
+    var famCheqTot=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
     var parRows=f.parents.map(function(par){
       var ph=par.totalH||0;
-      var lbl=slabel(ph),pp=Math.min(100,Math.round(ph/OBJ*100));
+      var ch=par.chequeH||0;
+      var realH=ph-ch;
+      var onlyCheque=(realH===0&&ch>0);
+      var lbl=slabel(ph,onlyCheque),pp=Math.min(100,Math.round(ph/OBJ*100));
       var pname=displayPrenom(par.prenoms);
       var cats=Object.keys(par.byAct).map(function(k){return esc(k)+": "+rnd(par.byAct[k])+"h";}).join(" · ");
+      // Détail heures
+      var heureDetail='';
+      if(onlyCheque){
+        heureDetail='<span style="font-size:10px;background:#FFF8E1;color:#8B6000;border-radius:8px;padding:1px 5px;margin-left:4px">'+
+          Math.round(ch/10)+' chèque'+(ch>=20?'s':'')+'</span>';
+      }else if(ch>0){
+        heureDetail='<span style="font-size:10px;color:#8B6000;margin-left:4px">dont '+rnd(ch)+'h 💳</span>';
+      }
+      var noHoursNote=ph===0?'<div style="font-size:11px;color:#999;font-style:italic">Aucune heure déclarée</div>':'';
       return'<tr style="background:#FAFAF8;border-bottom:1px solid #EEE">'+
         '<td style="padding:7px 10px 7px 22px;font-size:12px;color:#444;vertical-align:middle">'+
           '<span style="color:#999;margin-right:4px">↳</span><strong>'+esc(pname)+'</strong>'+
           (par.prenoms.length>1?'<span style="font-size:10px;color:#aaa;margin-left:6px">(aussi: '+esc(par.prenoms.filter(function(x){return x!==pname;}).join(", "))+')</span>':"")+
-          '<div style="font-size:11px;color:#888;margin-top:2px">'+cats+'</div>'+
+          heureDetail+
+          (cats?'<div style="font-size:11px;color:#888;margin-top:2px">'+cats+'</div>':"")+
+          noHoursNote+
         '</td>'+
-        '<td style="padding:7px 10px;font-weight:700;font-size:14px;color:'+lbl[1]+';text-align:right;vertical-align:middle;white-space:nowrap">'+rnd(ph)+'h</td>'+
+        '<td style="padding:7px 10px;font-weight:700;font-size:14px;color:'+lbl[1]+';text-align:right;vertical-align:middle;white-space:nowrap">'+
+          (ph===0?'<span style="color:#bbb">—</span>':rnd(ph)+'h')+
+        '</td>'+
         '<td style="padding:7px 10px;vertical-align:middle;min-width:150px">'+
-          '<div style="height:6px;background:#E0D9D3;border-radius:3px;overflow:hidden;margin-bottom:3px">'+
-            '<div style="height:100%;width:'+pp+'%;background:'+lbl[1]+';border-radius:3px"></div>'+
-          '</div>'+
+          (ph>0?
+            '<div style="height:6px;background:#E0D9D3;border-radius:3px;overflow:hidden;margin-bottom:3px">'+
+              '<div style="height:100%;width:'+pp+'%;background:'+lbl[1]+';border-radius:3px"></div>'+
+            '</div>':
+            '<div style="height:6px;background:#E0D9D3;border-radius:3px;margin-bottom:3px"></div>'
+          )+
           '<span style="font-size:10px;background:'+lbl[2]+';color:'+lbl[1]+';padding:2px 7px;border-radius:10px;font-weight:700">'+pp+'% — '+lbl[0]+'</span>'+
         '</td>'+
       '</tr>';
     }).join("");
+    // Ligne famille
+    var famBg=f.totalH===0?"#FFF5F5":"#F7F4F1";
+    var famExtra=famCheqTot>0&&f.subs&&f.subs.length===0?
+      '<span style="font-size:11px;background:#FFF8E1;color:#8B6000;padding:1px 6px;border-radius:8px;margin-left:8px">💳 chèques uniquement</span>':"";
     return'<tr style="border-top:2px solid #C0472A">'+
-      '<td colspan="3" style="padding:10px;background:#F7F4F1">'+
+      '<td colspan="3" style="padding:10px;background:'+famBg+'">'+
         '<span style="font-weight:700;font-size:14px">'+esc(enfants)+'</span>'+
         '<span style="font-size:11px;color:#888;margin-left:8px">'+esc(classes)+'</span>'+
-        '<span style="font-size:12px;color:#7A7268;margin-left:12px">Total famille : <strong>'+rnd(f.totalH||0)+'h</strong></span>'+
+        '<span style="font-size:12px;color:#7A7268;margin-left:12px">Total famille : <strong style="color:'+(f.totalH>0?"#C0472A":"#bbb")+'">'+
+          (f.totalH===0?"—":famTot+"h")+
+        '</strong></span>'+famExtra+
       '</td>'+
     '</tr>'+parRows;
   }).join("");
   var legendH='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;font-size:11px">'+
     '<span style="font-weight:700;color:var(--mu);margin-right:4px">Objectif : 40h / parent —</span>'+
-    [["≥40h Objectif atteint","#2E7D4F","#E8F5EE"],["≥30h Bon avancement","#2E7D4F","#E8F5EE"],["≥20h En cours","#8B6000","#FFF8E1"],["≥10h À renforcer","#C0472A","#F5EAE7"],["<10h Insuffisant","#C0472A","#FDECEA"]].map(function(l){
+    [["≥40h Objectif atteint","#2E7D4F","#E8F5EE"],["≥30h Bon avancement","#2E7D4F","#E8F5EE"],["≥20h En cours","#8B6000","#FFF8E1"],["≥10h À renforcer","#C0472A","#F5EAE7"],["<10h Insuffisant","#C0472A","#FDECEA"],["Chèque(s)","#8B6000","#FFF8E1"],["Aucune heure","#999","#F5F5F5"]].map(function(l){
       return'<span style="background:'+l[2]+';color:'+l[1]+';padding:2px 8px;border-radius:10px;font-weight:600">'+l[0]+'</span>';
     }).join("")+
   '</div>';
@@ -862,7 +1157,7 @@ function rRapport(fs,tot){
     '</table>'+
   '</div>';
   var statsH='<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px">'+
-    [["Familles",fs.length,"var(--red)"],["Parents suivis",allParents.length,"var(--red)"],["Objectif atteint ✓",nOk+" parents","var(--gn)"],["< 40h",nLate+" parents","var(--red)"]].map(function(s){
+    [["Familles",fsAll.length,"var(--red)"],["Parents recensés",allParents.length,"var(--red)"],["Objectif atteint ✓",nOk+" parents","var(--gn)"],["Sans heures",nZero+" parents","var(--mu)"]].map(function(s){
       return'<div class="sc"><div class="sv" style="font-size:18px;color:'+s[2]+'">'+s[1]+'</div><div class="slbl">'+s[0]+'</div></div>';
     }).join("")+
   '</div>';
@@ -870,90 +1165,21 @@ function rRapport(fs,tot){
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'+
       '<div>'+
         '<h2 style="font-size:17px;font-weight:700">Rapport d\'investissement</h2>'+
-        '<p style="font-size:12px;color:var(--mu)">Édition du '+dt+' · Objectif : 40h par famille</p>'+
+        '<p style="font-size:12px;color:var(--mu)">Édition du '+dt+' · '+ANNEE+' · Objectif : 40h / parent</p>'+
       '</div>'+
       '<button class="btn bp bsm" onclick="printRapport()">🖨️ Imprimer / PDF</button>'+
     '</div>'+
     statsH+legendH+table+
-    '<p style="font-size:11px;color:var(--mu);margin-top:10px;text-align:right">Clardeluna 2025-2026 · Généré le '+dt+'</p>'+
+    '<p style="font-size:11px;color:var(--mu);margin-top:10px;text-align:right">Clardeluna '+ANNEE+' · Généré le '+dt+'</p>'+
   '</div>';
-}
-
-function printOverview(){
-  var fsAll=buildFullFamilies(S.subs||[]);
-  var att=rnd(hAtt()),ct=curTri();
-  var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
-  var nLate=fsAll.filter(function(f){return status(f.totalH)==="late"||f.totalH===0;}).length;
-  var nOk=fsAll.filter(function(f){var s=status(f.totalH);return s==="ok"||s==="complete";}).length;
-  var nWarn=fsAll.filter(function(f){return status(f.totalH)==="warn";}).length;
-  var sorted=fsAll.slice().sort(function(a,b){
-    function rank(f){var s=status(f.totalH);if(f.totalH===0||s==="late")return 0;if(s==="warn")return 1;return 2;}
-    return rank(a)-rank(b)||a.key.localeCompare(b.key);
-  });
-  function sLbl(f){
-    var s=status(f.totalH);
-    if(f.totalH===0)return["Aucune heure","#C0472A","#FDECEA"];
-    if(s==="complete")return["Objectif atteint","#2E7D4F","#E8F5EE"];
-    if(s==="ok")return["À jour","#2E7D4F","#E8F5EE"];
-    if(s==="warn")return["Vigilance","#8B6000","#FFF8E1"];
-    return["En retard","#C0472A","#F5EAE7"];
-  }
-  var rows=sorted.map(function(f){
-    var lbl=sLbl(f),nbPar=f.parents.length||1,famObj=nbPar*OBJ;
-    var p=Math.min(100,Math.round(f.totalH/famObj*100));
-    var pars=f.parents.map(function(par){return displayPrenom(par.prenoms);}).join(", ");
-    var kids=Object.keys(f.children).map(function(ch){return ch+" ("+f.children[ch]+")";}).join(", ");
-    var chH=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
-    var barW=p;
-    return'<tr>'+
-      '<td style="padding:7px 10px;font-size:12px">'+
-        '<div style="font-weight:700">Famille '+esc(f.key)+'</div>'+
-        '<div style="font-size:11px;color:#888">'+esc(kids)+'</div>'+
-        '<div style="font-size:11px;color:#666">'+esc(pars)+'</div>'+
-      '</td>'+
-      '<td style="padding:7px 10px;text-align:right;font-weight:700;font-size:13px;white-space:nowrap">'+
-        (f.totalH===0?'<span style="color:#bbb">&mdash;</span>':rnd(f.totalH)+'h')+
-        (chH>0?'<div style="font-size:10px;color:#8B6000">dont '+rnd(chH)+'h chèques</div>':'')+
-        '<div style="font-size:10px;color:#999">/ '+famObj+'h</div>'+
-      '</td>'+
-      '<td style="padding:7px 10px;min-width:120px">'+
-        '<div style="height:6px;background:#E0D9D3;border-radius:3px;overflow:hidden;margin-bottom:3px">'+
-          '<div style="height:100%;width:'+barW+'%;background:'+lbl[1]+';border-radius:3px"></div>'+
-        '</div>'+
-        '<span style="font-size:10px;background:'+lbl[2]+';color:'+lbl[1]+';padding:2px 7px;border-radius:10px;font-weight:700">'+p+'% - '+lbl[0]+'</span>'+
-      '</td>'+
-    '</tr>';
-  }).join("");
-  var statsLine=fsAll.length+" familles | "+nOk+" à jour | "+nWarn+" vigilance | "+nLate+" en retard/sans heure | Attendu : "+att+"h (T"+ct+")";
-  var html=
-    '<div style="margin-bottom:16px">'+
-      '<h1 style="font-size:18px;font-weight:700;color:#C0472A;margin-bottom:4px">Clardeluna — Vue d\'ensemble</h1>'+
-      '<div style="font-size:12px;color:#666;margin-bottom:4px">'+dt+' · '+ANNEE+' · Objectif : '+OBJ+'h / parent</div>'+
-      '<div style="font-size:12px;padding:8px 12px;background:#F7F4F1;border-radius:6px">'+statsLine+'</div>'+
-    '</div>'+
-    '<table style="width:100%;border-collapse:collapse">'+
-      '<thead><tr>'+
-        '<th style="padding:8px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Famille / Enfant(s)</th>'+
-        '<th style="padding:8px 10px;text-align:right;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Heures</th>'+
-        '<th style="padding:8px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Progression</th>'+
-      '</tr></thead>'+
-      '<tbody>'+rows+'</tbody>'+
-    '</table>'+
-    '<p style="font-size:11px;color:#aaa;margin-top:12px;text-align:right">Clardeluna '+ANNEE+' · Généré le '+dt+'</p>';
-  var overlay=document.getElementById("print-overlay");
-  if(overlay){
-    overlay.innerHTML=html;
-    window.print();
-    // Nettoyer après impression
-    setTimeout(function(){overlay.innerHTML="";},2000);
-  }
 }
 
 function printRapport(){
   var content=document.getElementById("rapport-content");
   if(!content){alert("Ouvrez d'abord l'onglet Rapport");return;}
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
-  var htmlR='<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'+
+  var w=window.open("","_blank","width=900,height=700");
+  w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'+
     '<title>Rapport Clardeluna '+dt+'</title>'+
     '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;font-size:13px;padding:20px;color:#1C1814}'+
     'table{width:100%;border-collapse:collapse}th,td{padding:8px 10px;border-bottom:1px solid #E0D9D3}'+
@@ -964,13 +1190,9 @@ function printRapport(){
     '<h1>Clardeluna — Rapport d\'investissement familial 2025-2026</h1>'+
     '<div class="meta"><span>Date d\'édition : '+dt+'</span><span>Objectif : 40h par famille</span></div>'+
     content.outerHTML+
-    '<scr'+'ipt>window.print();<\/scr'+'ipt>'+
-    '</body></html>';
-  var blobR=new Blob([htmlR],{type:'text/html;charset=utf-8'});
-  var urlR=URL.createObjectURL(blobR);
-  var aR=document.createElement('a');aR.href=urlR;aR.target='_blank';aR.rel='noopener';
-  document.body.appendChild(aR);aR.click();
-  setTimeout(function(){document.body.removeChild(aR);URL.revokeObjectURL(urlR);},1000);
+    '<script>window.print();<\/script>'+
+    '</body></html>');
+  w.document.close();
 }
 
 function rReglages(){
@@ -1055,10 +1277,22 @@ function rReglages(){
             }).join('')+
           '</div>':'';
         return'<div style="padding:8px 0;border-bottom:1px solid var(--bd)">'+
-          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
-            '<span style="flex:1;font-size:13px;font-weight:600">'+esc(e)+'</span>'+
-            '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;color:var(--red);font-size:11px;padding:2px 6px;font-family:inherit" data-a="del-eleve" data-cl="'+esc(cl)+'" data-idx="'+i+'">Supprimer</button>'+
-          '</div>'+
+          (function(){
+            var ekey=cl+'|'+i;
+            var isEditing=S.editEleveKey===ekey;
+            if(isEditing){
+              return'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'+
+                '<input class="inp" id="edit-eleve-inp" value="'+esc(e)+'" style="flex:1;font-size:13px;padding:6px 10px" autofocus>'+
+                '<button class="btn bp bsm" data-a="save-eleve-name" data-cl="'+esc(cl)+'" data-idx="'+i+'" style="font-size:11px;padding:4px 10px">✓</button>'+
+                '<button class="btn bo bsm" data-a="cancel-edit-eleve" style="font-size:11px;padding:4px 10px">✕</button>'+
+              '</div>';
+            }
+            return'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+              '<span style="flex:1;font-size:13px;font-weight:600">'+esc(e)+'</span>'+
+              '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;color:var(--mu);font-size:11px;padding:2px 6px;font-family:inherit" data-a="edit-eleve-name" data-cl="'+esc(cl)+'" data-idx="'+i+'" data-ekey="'+ekey+'">✏️</button>'+
+              '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;color:var(--red);font-size:11px;padding:2px 6px;font-family:inherit" data-a="del-eleve" data-cl="'+esc(cl)+'" data-idx="'+i+'">Supprimer</button>'+
+            '</div>';
+          })()+
           '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:4px">'+
             (parentTags||'<span style="font-size:11px;color:var(--hi)">Aucun parent enregistré</span>')+
           '</div>'+
@@ -1148,7 +1382,7 @@ function rManSaisie(){
     '<div class="chips">'+[0.5,1,1.5,2,3,4,5,6,8].map(function(n){
       return'<div class="chip'+(String(n)===String(S.manHeures)?' on':'')+'" data-a="man-h" data-v="'+n+'">'+n+'h</div>';
     }).join('')+'</div>'+
-    '<input class="inp" id="man-h-inp" type="number" min="0.5" step="0.5" placeholder="Ou saisir une valeur précise" value="'+esc(String(S.manHeures||''))+'" style="margin-top:8px"></div>';
+    '<input class="inp" id="man-h-inp" type="number" min="0" step="any" placeholder="Valeur libre (ex: 42)" value="'+esc(String(S.manHeures||''))+'" style="margin-top:8px;font-size:18px;text-align:center" autofocus></div>';
   var today=new Date().toISOString().slice(0,10);
   var dateSec='<div class="field mt8"><label class="lbl">Date (aujourd\'hui par défaut)</label>'+
     '<input class="inp" id="man-date" type="date" value="'+esc(S.manDate||today)+'"></div>';
@@ -1173,9 +1407,74 @@ function doManSaisie(){
   go({manSaving:true,manErr:''});
   fbAdd(pl).then(function(ref){
     var ns=Object.assign({id:ref.id},pl);
-    go({manSaving:false,manSaved:true,manSousAct:'',manHeures:'',manDate:'',subs:(S.subs||[]).concat([ns])});
+    // Ajouter en tête de liste (ordre anti-chron.) + passer sur l'onglet Saisies
+    var newSubs=[ns].concat(S.subs||[]);
+    go({manSaving:false,manSaved:true,manSousAct:'',manHeures:'',manDate:'',
+        subs:newSubs,adminTab:'saisies'});
     setTimeout(function(){go({manSaved:false});},3000);
   }).catch(function(e){go({manSaving:false,manErr:'Erreur Firebase : '+e.message});});
+}
+
+// ── GESTION DES ACTIVITÉS ─────────────────────────────────────
+function rActivites(){
+  var cats=Object.keys(ACTS);
+  var saved=S.actsSaved?'<div class="al aok mt8">\u2713 Activit\u00e9s enregistr\u00e9es !</div>':"";
+  var saving=S.actsSaving?'<div class="al aw mt8">Enregistrement\u2026</div>':"";
+  var err=S.actsErr?'<div class="al ae mt8">'+esc(S.actsErr)+'</div>':"";
+
+  // Section ajout d'une nouvelle catégorie
+  var newCatSec='<div class="card mt8">'+
+    '<h3 style="font-size:14px;font-weight:700;margin-bottom:8px">\u2795 Nouvelle cat\u00e9gorie</h3>'+
+    '<div style="display:flex;gap:8px">'+
+      '<input class="inp" id="new-cat-inp" placeholder="Nom de la cat\u00e9gorie" style="flex:1;font-size:14px">'+
+      '<button class="btn bp bsm" data-a="add-cat" style="flex-shrink:0">Ajouter</button>'+
+    '</div>'+
+  '</div>';
+
+  var catSecs=cats.map(function(cat){
+    var isOpen=S.actsCatOpen===cat;
+    var acts=ACTS[cat]||[];
+    var inner='';
+    if(isOpen){
+      var actRows=acts.map(function(act,i){
+        return'<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--bd)">'+
+          '<span style="flex:1;font-size:13px">'+esc(act)+'</span>'+
+          '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;font-size:11px;padding:2px 8px;color:var(--am);font-family:inherit" data-a="move-act-up" data-cat="'+esc(cat)+'" data-idx="'+i+'" '+(i===0?'disabled':'')+'>↑</button>'+
+          '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;font-size:11px;padding:2px 8px;color:var(--am);font-family:inherit" data-a="move-act-dn" data-cat="'+esc(cat)+'" data-idx="'+i+'" '+(i===acts.length-1?'disabled':'')+'>↓</button>'+
+          '<button style="background:none;border:1px solid var(--bd);border-radius:4px;cursor:pointer;color:var(--red);font-size:11px;padding:2px 8px;font-family:inherit" data-a="del-act" data-cat="'+esc(cat)+'" data-idx="'+i+'">Supprimer</button>'+
+        '</div>';
+      }).join('');
+      inner='<div style="margin-top:10px">'+
+        (acts.length?actRows:'<p style="font-size:12px;color:var(--mu);padding:8px 0">Aucune activit\u00e9 dans cette cat\u00e9gorie.</p>')+
+        '<div style="background:var(--bg);border-radius:var(--rs);padding:10px;margin-top:10px">'+
+          '<div style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--mu)">\u2795 Ajouter une activit\u00e9</div>'+
+          '<div style="display:flex;gap:8px">'+
+            '<input class="inp" id="new-act-'+esc(cat).replace(/[^a-z0-9]/gi,'')+'" placeholder="Nom de l\'activit\u00e9" style="flex:1;font-size:13px;padding:8px 11px">'+
+            '<button class="btn bp bsm" data-a="add-act" data-cat="'+esc(cat)+'" style="flex-shrink:0">+ Activit\u00e9</button>'+
+          '</div>'+
+        '</div>'+
+        '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+
+          '<button class="btn bp bsm" data-a="save-acts">'+(S.actsSaving?'Enregistrement…':'💾 Enregistrer')+' ('+acts.length+' activités)</button>'+
+          '<button class="btn bo bsm" data-a="close-cat">Fermer</button>'+
+          '<button style="background:none;border:1px solid var(--red);border-radius:var(--r);color:var(--red);font-size:12px;padding:6px 12px;cursor:pointer;font-family:inherit;font-weight:600" data-a="del-cat" data-cat="'+esc(cat)+'">Supprimer la cat\u00e9gorie</button>'+
+        '</div>'+
+      '</div>';
+    }
+    return'<div class="card" style="margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" data-a="toggle-cat" data-cat="'+esc(cat)+'">'+
+        '<div>'+
+          '<span style="font-size:15px;font-weight:700">'+esc(cat)+'</span>'+
+          '<span style="font-size:12px;color:var(--mu);margin-left:8px">'+acts.length+' activit\u00e9'+(acts.length>1?'s':'')+'</span>'+
+        '</div>'+
+        '<span style="font-size:16px;color:var(--mu)">'+(isOpen?'\u25b2':'\u25bc')+'</span>'+
+      '</div>'+inner+
+    '</div>';
+  }).join('');
+
+  return'<h2 style="font-size:17px;font-weight:700;margin-bottom:4px">\U0001f4cb Gestion des activit\u00e9s</h2>'+
+    '<p style="font-size:13px;color:var(--mu);margin-bottom:14px">G\u00e9rez les cat\u00e9gories et activit\u00e9s propos\u00e9es dans le formulaire de d\u00e9claration.</p>'+
+    saved+saving+err+
+    catSecs+newCatSec;
 }
 // ── ÉVÉNEMENTS ────────────────────────────────
 function bindAll(){
@@ -1229,44 +1528,40 @@ function bindAll(){
   var sq=document.getElementById("sq");
   if(sq){
     sq.addEventListener("input",function(){
-      sil({aSubQ:sq.value});
-      // Re-render just the list without losing focus
-      var subs=S.subs||[];
-      var q=nrm(sq.value||"");
-      var filtered=subs.filter(function(s){return!q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);});
-      var countEl=sq.closest(".wlg")?sq.closest(".wlg").querySelector("p"):null;
-      if(countEl)countEl.textContent=filtered.length+" saisie"+(filtered.length>1?"s":"")+" / "+subs.length+" total";
-      var listEl=document.getElementById("saisies-list");
-      if(listEl){
-        listEl.innerHTML=filtered.length?filtered.map(function(s){
-          var d=new Date(s.ts),t=getTri(s.ts);
-          return'<div class="si" style="'+(S.deleting===s.id?"opacity:.4":"")+'">'+
-            '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
-              '<div style="flex:1;margin-right:10px">'+
-                '<div style="font-size:13px;font-weight:700">'+esc(s.eleve)+" · "+esc(s.classe)+'</div>'+
-                '<div style="font-size:12px;color:var(--mu)">'+esc(s.parents)+'</div>'+
-                '<div style="font-size:12px">'+esc(s.activiteType)+" → "+esc(s.sousActivite)+'</div>'+
-                '<div style="font-size:11px;color:var(--mu)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+'</div>'+
-              '</div>'+
-              '<div style="text-align:right;flex-shrink:0">'+
-                '<div style="font-size:18px;font-weight:700;color:var(--red)">'+s.heures+'h</div>'+
-                '<button style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit" data-a="del" data-id="'+esc(s.id)+'">'+( S.deleting===s.id?"…":"Supprimer")+'</button>'+
-              '</div>'+
-            '</div></div>';
-        }).join(""):'<p class="empty">Aucune saisie correspondante</p>';
-        reattach();
-      }
+      go({aSubQ:sq.value,saisiesParents:[]});
+      var newSq=document.getElementById("sq");
+      if(newSq){newSq.focus();newSq.setSelectionRange(newSq.value.length,newSq.value.length);}
     });
   }
 }
   // Saisie manuelle admin — listener heures libre
   var manHInp=document.getElementById('man-h-inp');
-  if(manHInp)manHInp.addEventListener('input',function(){
-    sil({manHeures:manHInp.value});
-    var btn=document.querySelector('[data-a="man-submit"]');
-    if(btn)btn.disabled=!(S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct&&parseFloat(manHInp.value)>0);
+  if(manHInp){
+    // Pas de go() → pas de re-render → le champ garde le focus naturellement
+    manHInp.addEventListener('input',function(){
+      sil({manHeures:manHInp.value});
+      var btn=document.querySelector('[data-a="man-submit"]');
+      if(btn)btn.disabled=!(S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct&&parseFloat(manHInp.value)>0);
+    });
+    // Activer le bouton si toutes les conditions sont déjà remplies au montage
+    if(S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct){
+      var btnNow=document.querySelector('[data-a="man-submit"]');
+      if(btnNow)btnNow.disabled=!(parseFloat(manHInp.value)>0);
+    }
+  }
+function bindChequeSelects(){
+  document.querySelectorAll('[data-a="set-cheque"]').forEach(function(sel){
+    sel.onchange=function(){
+      var ck=sel.dataset.ck,v=parseInt(sel.value);
+      CHEQUES_MAP[ck]=v;
+      fbSaveCheques().then(function(){
+        sel.style.background="#E8F5EE";
+        setTimeout(function(){sel.style.background="";},1200);
+      }).catch(function(e){alert("Erreur Firebase chèque: "+e.message);});
+    };
   });
-function reattach(){document.addEventListener("click",onClick,{once:true});}
+}
+function reattach(){document.addEventListener("click",onClick,{once:true});bindChequeSelects();}
 function onClick(e){
   var el=e.target.closest("[data-a]");if(!el){reattach();return;}
   var a=el.dataset.a,v=el.dataset.v;
@@ -1325,8 +1620,61 @@ function onClick(e){
       var mhS=document.getElementById('man-h-inp');if(mhS&&mhS.value)sil({manHeures:mhS.value});
       var mdS=document.getElementById('man-date');if(mdS&&mdS.value)sil({manDate:mdS.value});
       doManSaisie();break;
+        case"toggle-cat":
+      go({actsCatOpen:S.actsCatOpen===el.dataset.cat?null:el.dataset.cat,actsSaved:false});break;
+    case"close-cat":go({actsCatOpen:null});break;
+    case"add-cat":
+      var ncEl=document.getElementById("new-cat-inp"),ncv=ncEl?ncEl.value.trim():"";
+      if(!ncv){alert("Saisissez un nom de catégorie");break;}
+      if(ACTS[ncv]){alert("Cette catégorie existe déjà");break;}
+      ACTS[ncv]=[];
+      go({actsCatOpen:ncv,actsSaved:false});break;
+    case"del-cat":
+      var dc=el.dataset.cat;
+      if(!confirm("Supprimer la catégorie \""+dc+"\" et toutes ses activités ?"))break;
+      delete ACTS[dc];
+      go({actsCatOpen:null,actsSaved:false});break;
+    case"add-act":
+      var aCat=el.dataset.cat;
+      var naId="new-act-"+aCat.replace(/[^a-z0-9]/gi,"");
+      var naEl=document.getElementById(naId),nav=naEl?naEl.value.trim():"";
+      if(!nav){alert("Saisissez un nom d\'activité");break;}
+      if((ACTS[aCat]||[]).indexOf(nav)!==-1){alert("Cette activité existe déjà");break;}
+      if(!ACTS[aCat])ACTS[aCat]=[];
+      ACTS[aCat]=ACTS[aCat].concat([nav]);
+      go({actsSaved:false});break;
+    case"del-act":
+      var daCat=el.dataset.cat,daIdx=parseInt(el.dataset.idx);
+      var daAct=ACTS[daCat]&&ACTS[daCat][daIdx];
+      if(!daAct)break;
+      if(!confirm("Supprimer l\'activité \""+daAct+"\" ?"))break;
+      ACTS[daCat]=ACTS[daCat].filter(function(_,i){return i!==daIdx;});
+      go({actsSaved:false});break;
+    case"move-act-up":
+      var muCat=el.dataset.cat,muIdx=parseInt(el.dataset.idx);
+      if(muIdx>0){var arr=ACTS[muCat].slice();var t2=arr[muIdx-1];arr[muIdx-1]=arr[muIdx];arr[muIdx]=t2;ACTS[muCat]=arr;}
+      go({actsSaved:false});break;
+    case"move-act-dn":
+      var mdCat=el.dataset.cat,mdIdx=parseInt(el.dataset.idx);
+      if(mdIdx<ACTS[mdCat].length-1){var arr2=ACTS[mdCat].slice();var t3=arr2[mdIdx+1];arr2[mdIdx+1]=arr2[mdIdx];arr2[mdIdx]=t3;ACTS[mdCat]=arr2;}
+      go({actsSaved:false});break;
+    case"save-acts":
+      go({actsSaving:true,actsSaved:false,actsErr:""});
+      fbSaveActs().then(function(){
+        go({actsSaving:false,actsSaved:true});
+        setTimeout(function(){go({actsSaved:false});},3000);
+      }).catch(function(e){go({actsSaving:false,actsErr:"Erreur : "+e.message});});
+      break;
+        case"tog-acts-table":go({saisiesTableOpen:!S.saisiesTableOpen});break;
+    case"tog-par-filter":
+      var tp=el.dataset.p;
+      var cur=S.saisiesParents.slice();
+      var ti=cur.indexOf(tp);
+      if(ti===-1)cur.push(tp);else cur.splice(ti,1);
+      go({saisiesParents:cur});break;
+    case"clear-par-filter":go({saisiesParents:[]});break;
         case"check-pin":checkPin();break;
-    case"tab":go({adminTab:v});break;
+    case"tab":go({adminTab:v,saisiesParents:[],aSubQ:""});break;
     case"fcls":go({aCls:v});break;
     case"fst":go({aFilter:v});break;
     case"do-search":
@@ -1335,10 +1683,33 @@ function onClick(e){
       doSearch();
       break;
     case"del":doDel(el.dataset.id);break;
-    case"print-overview":printOverview();break;
     case"csv":exportCsv();break;
     case"toggle-classe":go({elevesOpen:S.elevesOpen===el.dataset.cl?null:el.dataset.cl,regSaved:false});break;
     case"close-classe":go({elevesOpen:null});break;
+    case"edit-eleve-name":go({editEleveKey:el.dataset.ekey,regSaved:false});break;
+    case"cancel-edit-eleve":go({editEleveKey:null});break;
+    case"save-eleve-name":
+      var seCl=el.dataset.cl,seIdx=parseInt(el.dataset.idx);
+      var seInp=document.getElementById("edit-eleve-inp");
+      var seNom=seInp?seInp.value.trim():"";
+      if(seNom.length<2){alert("Nom trop court");break;}
+      var oldNom=ELEVES[seCl][seIdx];
+      if(seNom===oldNom){go({editEleveKey:null});break;}
+      if(ELEVES[seCl].indexOf(seNom)!==-1){alert("Cet élève existe déjà");break;}
+      // Mettre à jour ELEVES
+      ELEVES[seCl][seIdx]=seNom;
+      // Migrer PARENTS_MAP
+      if(PARENTS_MAP[oldNom]){PARENTS_MAP[seNom]=PARENTS_MAP[oldNom];delete PARENTS_MAP[oldNom];}
+      // Migrer CHEQUES_MAP
+      var oldFk=familyKey(oldNom),newFk=familyKey(seNom);
+      Object.keys(CHEQUES_MAP).forEach(function(k){
+        if(k.startsWith(oldFk+"_")){
+          var newKey=newFk+k.slice(oldFk.length);
+          CHEQUES_MAP[newKey]=CHEQUES_MAP[k];
+          delete CHEQUES_MAP[k];
+        }
+      });
+      go({editEleveKey:null,regSaved:false});break;
     case"del-eleve":
       var dcl=el.dataset.cl,didx=parseInt(el.dataset.idx);
       if(confirm("Supprimer cet élève et ses parents enregistrés ?")){
@@ -1369,6 +1740,14 @@ function onClick(e){
       if(nom.length<2){alert("Saisissez un nom valide");break;}
       if(ELEVES[acl].indexOf(nom)!==-1){alert("Cet élève est déjà dans la liste");break;}
       ELEVES[acl]=ELEVES[acl].concat([nom]).sort();go({regSaved:false});break;
+    case"set-cheque":
+      var ck2=el.dataset.ck,ckv=parseInt(el.value||"0");
+      CHEQUES_MAP[ck2]=ckv;
+      fbSaveCheques().then(function(){
+        el.style.background="#E8F5EE";
+        setTimeout(function(){el.style.background="";},1200);
+      }).catch(function(e){go({err:"Erreur chèque: "+e.message});});
+      reattach();break;
     case"save-eleves":doSaveEleves();break;
     case"do-promote":doPromotion();break;
     case"save-annee":
@@ -1470,9 +1849,11 @@ function loadElevesConfig(){
       if(data.rentree)RENTREE=data.rentree;
       if(data.annee)ANNEE=data.annee;
       TRI=buildTRI(RENTREE,ANNEE);
-      // Mettre à jour le titre de la page
       document.title="Clardeluna "+ANNEE;
     }
+  }).catch(function(){});
+  fbLoadActs().then(function(doc){
+    if(doc.exists){var data=doc.data();if(data.acts)Object.assign(ACTS,data.acts);}
   }).catch(function(){});
 }
 function doPromotion(){
@@ -1504,20 +1885,40 @@ function doPromotion(){
   }).then(function(){
     // Promotion des classes
     var old={};Object.keys(ELEVES).forEach(function(cl){old[cl]=ELEVES[cl].slice();});
-    // Supprimer parents des 3ème (diplômés)
-    old["3ème"].forEach(function(e){delete PARENTS_MAP[e];});
-    // Décaler les listes d'élèves ET leurs parents
+    // ── Avant de supprimer les 3ème : propager leurs parents aux fratries ──
+    // Si un 3ème a un frère/sœur dans une autre classe, on s'assure que
+    // les parents sont bien enregistrés sous le nom du frère/sœur aussi.
+    var autresEleves=["6ème","5ème","4ème"].reduce(function(a,cl){return a.concat(old[cl]);},[]); 
+    old["3ème"].forEach(function(e3){
+      var parents3=PARENTS_MAP[e3];
+      if(!parents3||!parents3.length)return;
+      var fk3=familyKey(e3);
+      // Chercher les frères/sœurs dans les autres classes
+      autresEleves.forEach(function(e2){
+        if(familyKey(e2)===fk3){
+          // Même famille → copier les parents manquants
+          if(!PARENTS_MAP[e2])PARENTS_MAP[e2]=[];
+          parents3.forEach(function(p){
+            if(PARENTS_MAP[e2].indexOf(p)===-1)PARENTS_MAP[e2].push(p);
+          });
+        }
+      });
+      delete PARENTS_MAP[e3];
+    });
+    // Décaler les listes d'élèves
     ELEVES["3ème"]=old["4ème"].slice();
     ELEVES["4ème"]=old["5ème"].slice();
     ELEVES["5ème"]=old["6ème"].slice();
     ELEVES["6ème"]=[];
-    // Décaler les parents aussi
+    // Reconstruire PARENTS_MAP avec les élèves restants
     var newMap={};
     old["4ème"].forEach(function(e){if(PARENTS_MAP[e])newMap[e]=PARENTS_MAP[e];});
     old["5ème"].forEach(function(e){if(PARENTS_MAP[e])newMap[e]=PARENTS_MAP[e];});
     old["6ème"].forEach(function(e){if(PARENTS_MAP[e])newMap[e]=PARENTS_MAP[e];});
     PARENTS_MAP=newMap;
-    return fbSaveEl(ELEVES);
+    // Remettre les chèques à zéro (ils sont annuels)
+    CHEQUES_MAP={};
+    return fbSaveEl(ELEVES).then(function(){return fbSaveCheques();});
   }).then(function(){
     // Remettre les compteurs à zéro dans l'état
     go({subs:[],promoSaved:true,aFilter:"all",aCls:"all"});
