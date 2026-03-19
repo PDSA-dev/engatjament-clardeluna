@@ -103,6 +103,9 @@ p.pss{font-size:14px;color:var(--mu);margin-bottom:16px}
 // ── CONFIG ───────────────────────────────────
 var FB_CFG={apiKey:"AIzaSyB-wIHxxQKYKlss2byJiN26d4VPc5dozlc",authDomain:"clardeluna-2026.firebaseapp.com",projectId:"clardeluna-2026",storageBucket:"clardeluna-2026.firebasestorage.app",messagingSenderId:"65241322899",appId:"1:65241322899:web:0c94d1ab9c178f030f0466"};
 var PIN="2026", OBJ=40;
+// ── MOT DE PASSE PARENTS ─────────────────────
+var ACCESS_PASS="clardeluna2026"; // modifiable dans Réglages
+var ACCESS_ENABLED=true;          // false = pas d'écran de connexion
 // ── ANNÉE SCOLAIRE — modifiable dans Réglages ────────────────
 var RENTREE="2025-09-02"; // date de rentrée ISO
 var ANNEE="2025-2026";    // libellé affiché
@@ -220,6 +223,8 @@ function fbSaveAnnee(){return db.collection("config").doc("annee").set({rentree:
 function fbLoadAnnee(){return db.collection("config").doc("annee").get();}
 function fbSaveActs(){return db.collection("config").doc("activites").set({acts:ACTS});}
 function fbLoadActs(){return db.collection("config").doc("activites").get();}
+function fbSaveAccess(){return db.collection("config").doc("access").set({pass:ACCESS_PASS,enabled:ACCESS_ENABLED});}
+function fbLoadAccess(){return db.collection("config").doc("access").get();}
 // ── UTILITAIRES ───────────────────────────────
 function nrm(s){return String(s||"").replace(/æ/gi,"ae").replace(/œ/gi,"oe").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
@@ -402,7 +407,10 @@ var S={
   anneeSaved:false,anneeSaving:false,
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
   manSaving:false,manSaved:false,manErr:"",
-  editSaisieId:null,editSaisieErr:"",pinErr2:""
+  editSaisieId:null,editSaisieErr:"",pinErr2:"",
+  saisiesFamille:[],saisiesTableOpen:false,
+  accessInput:"",accessErr:false,
+  accessPassSaved:false,accessPassErr:""
 };
 // ── RENDU ─────────────────────────────────────
 function go(p){saveInputs();Object.assign(S,typeof p==="function"?p(S):p);render();}
@@ -422,7 +430,8 @@ function saveInputs(){
 }
 function render(){
   var h="";
-  if(S.page==="home")h=rHome();
+  if(S.page==="access")h=rAccess();
+  else if(S.page==="home")h=rHome();
   else if(S.page==="portal")h=rPortal();
   else if(S.page==="portal-view")h=rView();
   else if(S.page==="form")h=rForm();
@@ -439,6 +448,31 @@ function tb(title,back,sub){
   return'<div class="topbar"><button class="tb-back" data-a="back" data-v="'+back+'">←</button>'+
     '<div><div class="tb-t">'+esc(title)+'</div>'+(sub?'<div class="tb-s">'+esc(sub)+'</div>':"")+
   "</div></div>";
+}
+// ── ÉCRAN D'ACCÈS PARENTS ─────────────────────
+function rAccess(){
+  return'<div class="wrap">'+
+    '<div class="hlogo" style="margin-top:60px">CL</div>'+
+    '<h1 style="font-size:26px;font-weight:700;text-align:center">Clardeluna</h1>'+
+    '<p style="text-align:center;color:var(--mu);font-size:14px;margin-top:4px;margin-bottom:36px">Heures d\'investissement '+ANNEE+'</p>'+
+    '<div class="card">'+
+      '<div style="text-align:center;margin-bottom:20px">'+
+        '<div style="font-size:36px;margin-bottom:8px">🔑</div>'+
+        '<h2 style="font-size:17px;font-weight:700;margin-bottom:4px">Espace familles</h2>'+
+        '<p style="font-size:13px;color:var(--mu)">Saisissez le mot de passe communiqué en début d\'année</p>'+
+      '</div>'+
+      '<div class="field">'+
+        '<label class="lbl">Mot de passe</label>'+
+        '<input class="inp" id="ai" type="password" placeholder="Mot de passe…" value="'+esc(S.accessInput||"")+'" autocomplete="off" autofocus'+
+          (S.accessErr?' style="border-color:var(--red)"':'')+'>'+
+      '</div>'+
+      (S.accessErr?'<div class="al ae mt8">❌ Mot de passe incorrect</div>':'')+
+      '<div class="mt16"><button class="btn bp" data-a="check-access">Accéder →</button></div>'+
+    '</div>'+
+    '<div style="margin-top:20px;text-align:center">'+
+      '<button class="btn bgh" style="font-size:12px;color:var(--hi)" data-a="go-login">Administration</button>'+
+    '</div>'+
+  '</div>';
 }
 // ── HOME ──────────────────────────────────────
 function rHome(){
@@ -1444,9 +1478,35 @@ function rReglages(){
   return'<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">Réglages</h2>'+
     anneeSec+promo+
     '<h3 style="font-size:13px;font-weight:700;margin:16px 0 10px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em">Listes des élèves</h3>'+
-    clsSecs+saved+saving+pinSec;
+    clsSecs+saved+saving+pinSec+
+    rAccessSec();
 }
 
+// ── SECTION RÉGLAGES : MOT DE PASSE PARENTS ───
+function rAccessSec(){
+  var statusLabel=ACCESS_ENABLED
+    ?'<span style="color:var(--gn);font-weight:700">Activé</span>'
+    :'<span style="color:var(--mu)">Désactivé</span>';
+  return'<div class="card" style="margin-top:16px">'+
+    '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px">🔑 Mot de passe parents</h3>'+
+    '<p style="font-size:12px;color:var(--mu);margin-bottom:14px">'+
+      'Statut : '+statusLabel+
+      (ACCESS_ENABLED?' · Mot de passe actuel : <code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px">'+esc(ACCESS_PASS)+'</code>':'')+
+    '</p>'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px">'+
+      '<button class="btn bsm" style="border:1px solid var(--bd);background:'+(ACCESS_ENABLED?"var(--redl)":"var(--gnl)")+';color:'+(ACCESS_ENABLED?"var(--red)":"var(--gn)")+'" data-a="toggle-access">'+
+        (ACCESS_ENABLED?"⏸ Désactiver":"▶ Activer")+
+      '</button>'+
+    '</div>'+
+    '<label class="lbl">Changer le mot de passe</label>'+
+    '<div style="display:flex;gap:8px">'+
+      '<input class="inp" id="new-ap" type="text" placeholder="Nouveau mot de passe (min 4 car.)" style="flex:1;font-size:14px">'+
+      '<button class="btn bp bsm" data-a="save-access-pass" style="flex-shrink:0">Enregistrer</button>'+
+    '</div>'+
+    (S.accessPassSaved?'<div class="al aok mt8">✓ Paramètre sauvegardé</div>':'')+
+    (S.accessPassErr?'<div class="al ae mt8">'+esc(S.accessPassErr)+'</div>':'')+
+  '</div>';
+}
 // ── SAISIE MANUELLE ADMIN ─────────────────────
 function rManSaisie(){
   var sousActs=S.manTypeAct&&ACTS[S.manTypeAct]?ACTS[S.manTypeAct]:[];
@@ -1571,6 +1631,22 @@ function rActivites(){
 // ── ÉVÉNEMENTS ────────────────────────────────
 function bindAll(){
   document.addEventListener("click",onClick,{once:true});
+  // Touche Entrée sur l'écran d'accès parents
+  var ai=document.getElementById("ai");
+  if(ai){
+    ai.addEventListener("input",function(){sil({accessInput:ai.value,accessErr:false});});
+    ai.addEventListener("keydown",function(e){
+      if(e.key==="Enter"){
+        var v=ai.value.trim();
+        if(v===ACCESS_PASS){
+          try{sessionStorage.setItem("cl_unlocked","1");}catch(err){}
+          go({page:"home",accessErr:false,accessInput:""});
+        }else{
+          go({accessErr:true,accessInput:v});
+        }
+      }
+    });
+  }
   var pi=document.getElementById("pi");
   if(pi)pi.addEventListener("keydown",function(e){if(e.key==="Enter")checkPin();});
   // Validation dynamique step 2
@@ -1788,6 +1864,15 @@ function onClick(e){
       break;
         case"tog-pw-vis":var tEl=document.getElementById(el.dataset.t);if(tEl)tEl.type=tEl.type==="password"?"text":"password";reattach();break;
         case"print-heures":printHeures();break;
+        case"check-access":
+      var aiEl=document.getElementById("ai");
+      var aiVal=aiEl?aiEl.value.trim():"";
+      if(aiVal===ACCESS_PASS){
+        try{sessionStorage.setItem("cl_unlocked","1");}catch(e){}
+        go({page:"home",accessErr:false,accessInput:""});
+      }else{
+        go({accessErr:true,accessInput:aiVal});
+      }break;
         case"check-pin":checkPin();break;
     case"tab":go({adminTab:v});break;
     case"fcls":go({aCls:v});break;
@@ -1863,6 +1948,19 @@ function onClick(e){
       PIN=npv;
       go({pinSaved:true,pinErr2:""});
       setTimeout(function(){go({pinSaved:false});},3000);break;
+    case"save-access-pass":
+      var napEl=document.getElementById("new-ap"),napv=napEl?napEl.value.trim():"";
+      if(napv.length<4){go({accessPassErr:"Mot de passe trop court (min 4 caractères)"});break;}
+      ACCESS_PASS=napv;ACCESS_ENABLED=true;
+      go({accessPassSaved:true,accessPassErr:""});
+      fbSaveAccess().catch(function(){});
+      setTimeout(function(){go({accessPassSaved:false});},3000);break;
+    case"toggle-access":
+      ACCESS_ENABLED=!ACCESS_ENABLED;
+      if(!ACCESS_ENABLED){try{sessionStorage.removeItem("cl_unlocked");}catch(e){}}
+      go({accessPassSaved:true,accessPassErr:""});
+      fbSaveAccess().catch(function(){});
+      setTimeout(function(){go({accessPassSaved:false});},3000);break;
   }
   reattach();
 }
@@ -1942,8 +2040,16 @@ function loadElevesConfig(){
       if(data.rentree)RENTREE=data.rentree;
       if(data.annee)ANNEE=data.annee;
       TRI=buildTRI(RENTREE,ANNEE);
-      // Mettre à jour le titre de la page
       document.title="Clardeluna "+ANNEE;
+    }
+  }).catch(function(){});
+  fbLoadAccess().then(function(doc){
+    if(doc.exists){
+      var data=doc.data();
+      if(typeof data.pass==="string"&&data.pass)ACCESS_PASS=data.pass;
+      if(typeof data.enabled==="boolean")ACCESS_ENABLED=data.enabled;
+      // Si le mot de passe vient d'être chargé et qu'on est sur la page access, re-rendre
+      if(S.page==="access")render();
     }
   }).catch(function(){});
 }
@@ -2038,7 +2144,18 @@ function showErr(msg){
     var done=false;
     var timer=setTimeout(function(){if(!done)showErr("Timeout — Firebase ne répond pas.");},8000);
     db.collection("_ping").limit(1).get()
-      .then(function(){done=true;clearTimeout(timer);go({page:"home"});loadElevesConfig();})
+      .then(function(){
+        done=true;clearTimeout(timer);
+        loadElevesConfig();
+        // Déterminer la page initiale selon mot de passe
+        var alreadyUnlocked=false;
+        try{alreadyUnlocked=sessionStorage.getItem("cl_unlocked")==="1";}catch(e){}
+        if(ACCESS_ENABLED&&!alreadyUnlocked){
+          go({page:"access"});
+        }else{
+          go({page:"home"});
+        }
+      })
       .catch(function(e){done=true;clearTimeout(timer);showErr(e.message);});
   }catch(e){showErr(e.message);}
 })();
