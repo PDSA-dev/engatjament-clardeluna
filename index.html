@@ -961,23 +961,29 @@ function rSaisies(subs){
   var step1=subs.filter(function(s){
     return !q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);
   });
-  // Suggestions parents
+  // ── Filtre par famille ──
+  var famKeys=[];var famSet={};
+  step1.forEach(function(s){var fk=familyKey(s.eleve);if(!famSet[fk]){famSet[fk]=true;famKeys.push(fk);}});
+  famKeys.sort();
+  var selFams=S.saisiesFamille||[];
+  var step2=selFams.length===0?step1:step1.filter(function(s){return selFams.indexOf(familyKey(s.eleve))!==-1;});
+  // ── Suggestions parents (basées sur step2) ──
   var parentSugg=[];
-  if(q.length>=2){
+  if(q.length>=2||selFams.length>0){
     var pSet={};
-    step1.forEach(function(s){
+    step2.forEach(function(s){
       (s.parents||"").split(/\s*&\s*|\s+et\s+/).forEach(function(p){
         var pn=p.trim();if(pn&&!pSet[nrm(pn)])pSet[nrm(pn)]=pn;
       });
     });
     Object.keys(PARENTS_MAP).forEach(function(e){
-      if(step1.some(function(s){return nrm(s.eleve)===nrm(e)||familyKey(s.eleve)===familyKey(e);}))
+      if(step2.some(function(s){return nrm(s.eleve)===nrm(e)||familyKey(s.eleve)===familyKey(e);}))
         (PARENTS_MAP[e]||[]).forEach(function(p){if(!pSet[nrm(p)])pSet[nrm(p)]=p;});
     });
     parentSugg=Object.values(pSet).sort();
   }
   var selPars=S.saisiesParents||[];
-  var filtered=selPars.length===0?step1:step1.filter(function(s){
+  var filtered=selPars.length===0?step2:step2.filter(function(s){
     return selPars.some(function(sp){return prenomMatch(sp,s.parents)||nrm(s.parents).includes(nrm(sp));});
   });
   // Totaux par activite
@@ -1003,6 +1009,18 @@ function rSaisies(subs){
       (isOpen?'<div style="padding:0 10px 10px">'+actRows+'</div>':'')+
     '</div>';
   }
+  var famChips='';
+  if(famKeys.length>1){
+    famChips='<div style="margin-bottom:10px">'+
+      '<div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Filtrer par famille :</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
+      famKeys.map(function(fk){
+        var on=selFams.indexOf(fk)!==-1;
+        return'<button class="fc2'+(on?' on':'')+'" data-a="tog-fam-filter" data-fk="'+esc(fk)+'">'+esc(fk)+'</button>';
+      }).join('')+
+      (selFams.length>0?'<button class="fc2" data-a="clear-fam-filter" style="color:var(--red)">✕ Tout</button>':'')+
+      '</div></div>';
+  }
   var parentChips='';
   if(parentSugg.length>0){
     parentChips='<div style="margin-bottom:10px">'+
@@ -1012,7 +1030,7 @@ function rSaisies(subs){
         var on=selPars.indexOf(p)!==-1;
         return'<button class="fc2'+(on?' on':'')+'" data-a="tog-par-filter" data-p="'+esc(p)+'">'+esc(p)+'</button>';
       }).join('')+
-      (selPars.length>0?'<button class="fc2" data-a="clear-par-filter" style="color:var(--red)">x Tout</button>':'')+
+      (selPars.length>0?'<button class="fc2" data-a="clear-par-filter" style="color:var(--red)">✕ Tout</button>':'')+
       '</div></div>';
   }
   var listH=filtered.length?filtered.map(function(s){
@@ -1062,8 +1080,9 @@ function rSaisies(subs){
   }).join(""):'<p class="empty">Aucune saisie</p>';
   return'<div class="sbar">'+
     '<input class="inp" id="sq" placeholder="Rechercher..." value="'+esc(S.aSubQ||"")+'" autocomplete="off">'+
-    '<button class="btn bo bsm" data-a="csv" style="flex-shrink:0">CSV</button>'+
+    '<button class="btn bp bsm" data-a="print-saisies" style="flex-shrink:0;white-space:nowrap">🖨 Relevé PDF</button>'+
     '</div>'+
+    famChips+
     parentChips+
     '<p style="font-size:12px;color:var(--mu);margin-bottom:10px">'+filtered.length+' saisie'+(filtered.length>1?"s":"")+" / "+subs.length+' total - '+rnd(totalH)+'h</p>'+
     totActH+
@@ -1781,9 +1800,15 @@ function onClick(e){
       var mdS=document.getElementById('man-date');if(mdS&&mdS.value)sil({manDate:mdS.value});
       doManSaisie();break;
         case"tog-par-filter":
-      var tpx=el.dataset.p,curx=S.saisiesParents.slice(),tix=curx.indexOf(tpx);
+      var tpx=el.dataset.p,curx=(S.saisiesParents||[]).slice(),tix=curx.indexOf(tpx);
       if(tix===-1)curx.push(tpx);else curx.splice(tix,1);go({saisiesParents:curx});break;
     case"clear-par-filter":go({saisiesParents:[]});break;
+    case"tog-fam-filter":
+      var tfk=el.dataset.fk,curFams=(S.saisiesFamille||[]).slice(),tfIdx=curFams.indexOf(tfk);
+      if(tfIdx===-1)curFams.push(tfk);else curFams.splice(tfIdx,1);
+      go({saisiesFamille:curFams,saisiesParents:[]});break;
+    case"clear-fam-filter":go({saisiesFamille:[],saisiesParents:[]});break;
+    case"print-saisies":printSaisies();break;
     case"tog-acts-table":go({saisiesTableOpen:!S.saisiesTableOpen});break;
     case"save-acts":
       go({actsSaving:true,actsSaved:false});
@@ -2114,6 +2139,75 @@ function doPromotion(){
   }).catch(function(e){
     go({err:"Erreur promotion : "+e.message});
   });
+}
+function printSaisies(){
+  var subs=S.subs||[];
+  var q=nrm(S.aSubQ||"");
+  var selFams=S.saisiesFamille||[];
+  var selPars=S.saisiesParents||[];
+  var filtered=subs.filter(function(s){
+    var matchQ=!q||nrm(s.eleve+" "+s.parents+" "+s.sousActivite+" "+s.activiteType).includes(q);
+    var matchFam=selFams.length===0||selFams.indexOf(familyKey(s.eleve))!==-1;
+    var matchPar=selPars.length===0||selPars.some(function(sp){return prenomMatch(sp,s.parents)||nrm(s.parents).includes(nrm(sp));});
+    return matchQ&&matchFam&&matchPar;
+  }).sort(function(a,b){return familyKey(a.eleve).localeCompare(familyKey(b.eleve))||a.eleve.localeCompare(b.eleve)||(a.ts>b.ts?1:-1);});
+  var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
+  var titre="Relevé des saisies";
+  if(selFams.length===1)titre+=" — Famille "+selFams[0];
+  else if(selFams.length>1)titre+=" — "+selFams.join(", ");
+  if(selPars.length>0)titre+=" — "+selPars.join(", ");
+  var totalH=filtered.reduce(function(a,s){return a+(parseFloat(s.heures)||0);},0);
+  var famGroups={};
+  filtered.forEach(function(s){var fk=familyKey(s.eleve);if(!famGroups[fk])famGroups[fk]=[];famGroups[fk].push(s);});
+  var rows=Object.keys(famGroups).sort().map(function(fk){
+    var famSubs=famGroups[fk];
+    var famH=famSubs.reduce(function(a,s){return a+(parseFloat(s.heures)||0);},0);
+    var famRows=famSubs.map(function(s){
+      var d=new Date(s.ts),t=getTri(s.ts);
+      return"<tr>"+
+        "<td>"+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(t?" · T"+t:"")+"</td>"+
+        "<td>"+esc(s.eleve)+"<br><small>"+esc(s.classe)+"</small></td>"+
+        "<td>"+esc(s.parents)+"</td>"+
+        "<td>"+esc(s.activiteType)+"<br><small>"+esc(s.sousActivite)+"</small></td>"+
+        "<td style='text-align:right;font-weight:700;color:#C0472A'>"+s.heures+"h</td>"+
+      "</tr>";
+    }).join("");
+    return"<tr class='fam-hd'><td colspan='5'><strong>Famille "+esc(fk)+"</strong>"+
+      " <span style='font-size:11px;color:#fff;opacity:.8'>("+famSubs.length+" saisie"+(famSubs.length>1?"s":"")+" · "+rnd(famH)+"h)</span></td></tr>"+famRows;
+  }).join("");
+  var w=window.open("","_blank","width=920,height=720");
+  w.document.write("<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'>"+
+    "<title>"+esc(titre)+"</title>"+
+    "<style>*{box-sizing:border-box;margin:0;padding:0}"+
+    "body{font-family:-apple-system,Arial,sans-serif;font-size:13px;color:#1C1814;padding:24px}"+
+    "h1{font-size:18px;font-weight:700;color:#C0472A;margin-bottom:4px}"+
+    ".meta{font-size:12px;color:#7A7268;margin-bottom:20px;display:flex;gap:20px;flex-wrap:wrap}"+
+    "table{width:100%;border-collapse:collapse}"+
+    "th{padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#7A7268;border-bottom:2px solid #E0D9D3;background:#F7F4F1}"+
+    "th:last-child{text-align:right}"+
+    "td{padding:8px 10px;border-bottom:1px solid #E0D9D3;vertical-align:top}"+
+    "small{color:#7A7268;font-size:11px}"+
+    "tr.fam-hd td{background:#C0472A;color:#fff;font-size:12px;padding:6px 10px;border-bottom:none}"+
+    "tfoot td{font-weight:700;background:#F7F4F1;border-top:2px solid #C0472A}"+
+    ".pbtn{margin-bottom:16px;background:#C0472A;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer}"+
+    "@media print{.pbtn{display:none!important}body{padding:12px}}</style></head><body>"+
+    "<button class='pbtn' onclick='window.print()'>🖨️ Imprimer / Enregistrer PDF</button>"+
+    "<h1>Clardeluna "+ANNEE+" — "+esc(titre)+"</h1>"+
+    "<div class='meta'>"+
+      "<span>Édition : "+dt+"</span>"+
+      "<span>"+filtered.length+" saisie"+(filtered.length>1?"s":"")+"</span>"+
+      "<span>Total : "+rnd(totalH)+"h</span>"+
+      (selFams.length>0?"<span>Famille(s) : "+selFams.map(esc).join(", ")+"</span>":"")+
+      (selPars.length>0?"<span>Parent(s) : "+selPars.map(esc).join(", ")+"</span>":"")+
+    "</div>"+
+    "<table><thead><tr><th>Date</th><th>Élève</th><th>Parent(s)</th><th>Activité</th><th>Heures</th></tr></thead>"+
+    "<tbody>"+rows+"</tbody>"+
+    "<tfoot><tr><td colspan='4' style='text-align:right;font-size:12px;color:#7A7268'>Total</td>"+
+    "<td style='text-align:right;color:#C0472A'>"+rnd(totalH)+"h</td></tr></tfoot></table>"+
+    "<p style='font-size:11px;color:#aaa;margin-top:16px;text-align:right'>Clardeluna "+ANNEE+" — "+dt+"</p>"+
+    "<script>window.onload=function(){window.print();}<\/script>"+
+    "</body></html>");
+  w.document.close();
 }
 function exportCsv(){
   var subs=S.subs||[];
