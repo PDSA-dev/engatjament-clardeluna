@@ -414,7 +414,7 @@ var S={
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
   manSaving:false,manSaved:false,manErr:"",
   editSaisieId:null,editSaisieErr:"",pinErr2:"",
-  saisiesFamille:[],saisiesTableOpen:false,
+  saisiesFamille:[],saisiesFam:"all",saisiesPar:"all",saisiesTableOpen:false,
   accessInput:"",accessErr:false,
   accessPassSaved:false,accessPassErr:""
 };
@@ -974,26 +974,23 @@ function rSaisies(subs){
   var famKeys=[];var famSet={};
   step1.forEach(function(s){var fk=familyKey(s.eleve);if(!famSet[fk]){famSet[fk]=true;famKeys.push(fk);}});
   famKeys.sort();
-  var selFams=S.saisiesFamille||[];
-  var step2=selFams.length===0?step1:step1.filter(function(s){return selFams.indexOf(familyKey(s.eleve))!==-1;});
+  var selFam=S.saisiesFam||"all";
+  var step2=selFam==="all"?step1:step1.filter(function(s){return familyKey(s.eleve)===selFam;});
   // ── Suggestions parents (basées sur step2) ──
-  var parentSugg=[];
-  if(q.length>=2||selFams.length>0){
-    var pSet={};
-    step2.forEach(function(s){
-      (s.parents||"").split(/\s*&\s*|\s+et\s+/).forEach(function(p){
-        var pn=p.trim();if(pn&&!pSet[nrm(pn)])pSet[nrm(pn)]=pn;
-      });
+  var pSet={};
+  step2.forEach(function(s){
+    (s.parents||"").split(/\s*&\s*|\s+et\s+/).forEach(function(p){
+      var pn=p.trim();if(pn&&!pSet[nrm(pn)])pSet[nrm(pn)]=pn;
     });
-    Object.keys(PARENTS_MAP).forEach(function(e){
-      if(step2.some(function(s){return nrm(s.eleve)===nrm(e)||familyKey(s.eleve)===familyKey(e);}))
-        (PARENTS_MAP[e]||[]).forEach(function(p){if(!pSet[nrm(p)])pSet[nrm(p)]=p;});
-    });
-    parentSugg=Object.values(pSet).sort();
-  }
-  var selPars=S.saisiesParents||[];
-  var filtered=selPars.length===0?step2:step2.filter(function(s){
-    return selPars.some(function(sp){return prenomMatch(sp,s.parents)||nrm(s.parents).includes(nrm(sp));});
+  });
+  Object.keys(PARENTS_MAP).forEach(function(e){
+    if(step2.some(function(s){return nrm(s.eleve)===nrm(e)||familyKey(s.eleve)===familyKey(e);}))
+      (PARENTS_MAP[e]||[]).forEach(function(p){if(!pSet[nrm(p)])pSet[nrm(p)]=p;});
+  });
+  var parentSugg=Object.values(pSet).sort();
+  var selPar=S.saisiesPar||"all";
+  var filtered=selPar==="all"?step2:step2.filter(function(s){
+    return prenomMatch(selPar,s.parents)||nrm(s.parents).includes(nrm(selPar));
   });
   // Totaux par activite
   var actTotals={};
@@ -1018,30 +1015,13 @@ function rSaisies(subs){
       (isOpen?'<div style="padding:0 10px 10px">'+actRows+'</div>':'')+
     '</div>';
   }
-  var famChips='';
-  if(famKeys.length>1){
-    famChips='<div style="margin-bottom:10px">'+
-      '<div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Filtrer par famille :</div>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
-      famKeys.map(function(fk){
-        var on=selFams.indexOf(fk)!==-1;
-        return'<button class="fc2'+(on?' on':'')+'" data-a="tog-fam-filter" data-fk="'+esc(fk)+'">'+esc(fk)+'</button>';
-      }).join('')+
-      (selFams.length>0?'<button class="fc2" data-a="clear-fam-filter" style="color:var(--red)">✕ Tout</button>':'')+
-      '</div></div>';
-  }
-  var parentChips='';
-  if(parentSugg.length>0){
-    parentChips='<div style="margin-bottom:10px">'+
-      '<div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:5px">Filtrer par parent :</div>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
-      parentSugg.map(function(p){
-        var on=selPars.indexOf(p)!==-1;
-        return'<button class="fc2'+(on?' on':'')+'" data-a="tog-par-filter" data-p="'+esc(p)+'">'+esc(p)+'</button>';
-      }).join('')+
-      (selPars.length>0?'<button class="fc2" data-a="clear-par-filter" style="color:var(--red)">✕ Tout</button>':'')+
-      '</div></div>';
-  }
+  // ── Compact filter bar ──
+  var famOpts='<option value="all">👨‍👩‍👧 Toutes familles</option>'+famKeys.map(function(fk){
+    return'<option value="'+esc(fk)+'"'+(selFam===fk?' selected':'')+'>'+esc(fk)+'</option>';
+  }).join('');
+  var parOpts='<option value="all">👤 Tous parents</option>'+parentSugg.map(function(p){
+    return'<option value="'+esc(p)+'"'+(selPar===p?' selected':'')+'>'+esc(p)+'</option>';
+  }).join('');
   var listH=filtered.length?filtered.map(function(s){
     var d=new Date(s.ts),t=getTri(s.ts);
     // Inline edit form
@@ -1087,12 +1067,12 @@ function rSaisies(subs){
         '</div>'+
       '</div></div>';
   }).join(""):'<p class="empty">Aucune saisie</p>';
-  return'<div class="sbar">'+
-    '<input class="inp" id="sq" placeholder="Rechercher..." value="'+esc(S.aSubQ||"")+'" autocomplete="off">'+
-    '<button class="btn bp bsm" data-a="print-saisies" style="flex-shrink:0;white-space:nowrap">🖨 Relevé PDF</button>'+
+  return'<div class="fbar-compact">'+
+    '<input class="fbar-search" id="sq" placeholder="Rechercher..." value="'+esc(S.aSubQ||"")+'" autocomplete="off">'+
+    (famKeys.length>1?'<select class="fbar-sel'+(selFam!="all"?" active":"")+'" data-a="sel-fam">'+famOpts+'</select>':'')+
+    (parentSugg.length>1?'<select class="fbar-sel'+(selPar!="all"?" active":"")+'" data-a="sel-par">'+parOpts+'</select>':'')+
+    '<button class="btn bp bsm" data-a="print-saisies" style="flex-shrink:0;white-space:nowrap">🖨 PDF</button>'+
     '</div>'+
-    famChips+
-    parentChips+
     '<p style="font-size:12px;color:var(--mu);margin-bottom:10px">'+filtered.length+' saisie'+(filtered.length>1?"s":"")+" / "+subs.length+' total - '+rnd(totalH)+'h</p>'+
     totActH+
     '<div id="saisies-list">'+listH+'</div>';
@@ -1750,13 +1730,20 @@ function bindChequeSelects(){
         .catch(function(e){alert("Erreur cheque: "+e.message);});
     };
   });
-  // Filtres famille compacts
+  // Filtres famille compacts (onglet Heures)
   var fcls=document.querySelector('[data-a="fcls-sel"]');
   if(fcls)fcls.onchange=function(){go({aCls:fcls.value});};
   var fst=document.querySelector('[data-a="fst-sel"]');
   if(fst)fst.onchange=function(){go({aFilter:fst.value});};
   var hq=document.getElementById("heure-q");
   if(hq)hq.oninput=function(){sil({aHeureQ:hq.value});go({});};
+  // Filtres saisies compacts
+  var sfam=document.querySelector('[data-a="sel-fam"]');
+  if(sfam)sfam.onchange=function(){go({saisiesFam:sfam.value,saisiesPar:"all"});};
+  var spar=document.querySelector('[data-a="sel-par"]');
+  if(spar)spar.onchange=function(){go({saisiesPar:spar.value});};
+  var sq=document.getElementById("sq");
+  if(sq)sq.oninput=function(){sil({aSubQ:sq.value});go({});};
 }
 function reattach(){document.addEventListener("click",onClick,{once:true});bindChequeSelects();}
 function onClick(e){
@@ -1817,15 +1804,10 @@ function onClick(e){
       var mhS=document.getElementById('man-h-inp');if(mhS&&mhS.value)sil({manHeures:mhS.value});
       var mdS=document.getElementById('man-date');if(mdS&&mdS.value)sil({manDate:mdS.value});
       doManSaisie();break;
-        case"tog-par-filter":
-      var tpx=el.dataset.p,curx=(S.saisiesParents||[]).slice(),tix=curx.indexOf(tpx);
-      if(tix===-1)curx.push(tpx);else curx.splice(tix,1);go({saisiesParents:curx});break;
-    case"clear-par-filter":go({saisiesParents:[]});break;
-    case"tog-fam-filter":
-      var tfk=el.dataset.fk,curFams=(S.saisiesFamille||[]).slice(),tfIdx=curFams.indexOf(tfk);
-      if(tfIdx===-1)curFams.push(tfk);else curFams.splice(tfIdx,1);
-      go({saisiesFamille:curFams,saisiesParents:[]});break;
-    case"clear-fam-filter":go({saisiesFamille:[],saisiesParents:[]});break;
+        case"tog-par-filter":break;
+    case"clear-par-filter":break;
+    case"tog-fam-filter":break;
+    case"clear-fam-filter":break;
     case"print-saisies":printSaisies();break;
     case"tog-acts-table":go({saisiesTableOpen:!S.saisiesTableOpen});break;
     case"save-acts":
