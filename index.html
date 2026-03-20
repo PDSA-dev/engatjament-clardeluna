@@ -87,6 +87,8 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .cat-pill span{font-weight:700}
 .mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt24{margin-top:24px}
 .empty{text-align:center;padding:32px;color:var(--mu);font-size:14px}
+.btn-logout{background:none;border:none;cursor:pointer;font-size:12px;color:var(--hi);font-family:inherit;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;transition:background .15s,color .15s}
+.btn-logout:hover{background:var(--bg);color:var(--mu)}
 h2.ptt{font-size:20px;font-weight:700;margin-bottom:4px}
 p.pss{font-size:14px;color:var(--mu);margin-bottom:16px}
 /* Fiche parent */
@@ -489,6 +491,7 @@ function rHome(){
     '<button class="btn bo" data-a="go-form">Déclarer des heures</button></div>'+
     '<div style="margin-top:28px;text-align:center"><button class="btn bgh" data-a="go-login">Administration</button></div>'+
     '<p style="text-align:center;font-size:11px;color:var(--hi);margin-top:20px">Objectif : 40h par parent</p>'+
+    (ACCESS_ENABLED?'<div style="text-align:center;margin-top:24px"><button data-a="logout" class="btn-logout">🔒 Se déconnecter</button></div>':"")+ 
   '</div>';
 }
 // ── PORTAIL ───────────────────────────────────
@@ -630,7 +633,7 @@ function rView(){
             var isShared=prenoms.length>1;
             return'<div style="display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid var(--bd);font-size:12px">'+
               '<span style="color:var(--mu)">'+esc(sub.sousActivite)+(sub.manualEntry?'<span style="font-size:10px;background:#E8F5EE;color:#2E7D4F;border-radius:8px;padding:1px 5px;margin-left:4px">admin</span>':'')+
-              (isShared?'<span style="font-size:10px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:1px 5px;margin-left:4px;color:var(--mu)" title="Saisie partagée entre '+prenoms.length+' parents">÷'+prenoms.length+'</span>':'')+
+              (isShared?'<span style="display:inline-flex;align-items:center;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:1px 4px;margin-left:4px;gap:2px" title="Saisie partagée entre '+prenoms.length+' parents"><svg width=\'12\' height=\'10\' viewBox=\'0 0 20 14\' xmlns=\'http://www.w3.org/2000/svg\'><circle cx=\'6\' cy=\'4\' r=\'3.2\' fill=\'currentColor\'></circle><circle cx=\'14\' cy=\'3.5\' r=\'2.6\' fill=\'currentColor\'></circle><path d=\'M0 13 Q0 7.5 6 7.5 Q12 7.5 12 13\' fill=\'currentColor\'></path><path d=\'M12.5 13 Q12.5 9.5 15.5 8.8\' stroke=\'currentColor\' stroke-width=\'1.5\' fill=\'none\'></path></svg><span style=\'font-size:10px;color:var(--mu)\'>×'+prenoms.length+'</span></span>':'')+
               '<span style="margin-left:6px;color:var(--hi)">'+d.toLocaleDateString("fr-FR",{day:"numeric",month:"short"})+'</span></span>'+
               '<span style="font-weight:600;color:var(--red)">'+hDisplay+'h</span>'+
             '</div>';
@@ -1744,6 +1747,9 @@ function onClick(e){
   switch(a){
     case"go-home":go({page:"home"});break;
     case"go-portal":go({page:"portal",portalQ:""});break;
+    case"logout":
+      try{sessionStorage.removeItem("cl_unlocked");}catch(e){}
+      go({page:"access",accessInput:"",accessErr:false});break;
     case"go-form":go({page:"form",step:0,form:nf,done:false,sendErr:"",eleveQ:""});break;
     case"go-login":go({page:"login",pinInput:"",pinErr:false});break;
     case"back":
