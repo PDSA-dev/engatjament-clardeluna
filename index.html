@@ -807,6 +807,11 @@ function rAdmin(){
   if(S.adminTab==="saisie-admin")c=rManSaisie();
   return tb("Tableau de bord","home",subs.length+" saisies · "+rnd(tot)+"h total")+
     (S.err?'<div class="al ae" style="margin:8px 16px">'+esc(S.err)+'</div>':"")+
+    '<div style="display:flex;justify-content:flex-end;padding:6px 16px 0">'+
+      '<button class="btn bo" data-a="refresh-overview" style="display:flex;align-items:center;gap:5px;padding:6px 14px;font-size:13px">'+
+        '<span style="font-size:15px">↻</span> Rafraîchir'+
+      '</button>'+
+    '</div>'+
     '<div class="tabs">'+
       [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["reglages","⚙ Réglages"]].map(function(t){
         return'<button class="tab'+(S.adminTab===t[0]?" on":"")+'" data-a="tab" data-v="'+t[0]+'">'+t[1]+'</button>';
@@ -863,13 +868,9 @@ function rOverview(fs,tot){
       (lates.length>15?'<p style="font-size:11px;color:var(--mu);text-align:center;margin-top:6px">+ '+(lates.length-15)+' autres</p>':"")+
     '</div>'  :"";
   var loadingNote=S.subs===null?'<div class="al aw mt8">Chargement...</div>'  :"";
-  return stats+loadingNote+info+lateCard+
-    '<div class="mt16" style="display:flex;gap:8px">'+
-      '<button class="btn bo" data-a="print-overview">Exporter PDF</button>'+
-      '<button class="btn bo" data-a="refresh-overview" style="display:flex;align-items:center;gap:5px">'+
-        '<span style="font-size:16px">↻</span> Rafraîchir'+
-      '</button>'+
-    '</div>';
+  return stats+loadingNote+info+
+    '<div class="mt16"><button class="btn bo" data-a="print-overview">🖨 Exporter PDF</button></div>'+
+    lateCard;
 }
 
 function rHeures(fs){
@@ -1548,10 +1549,10 @@ function rManSaisie(){
     (S.manErr?'<div class="al ae" style="margin-bottom:8px">'+esc(S.manErr)+'</div>':'')+
     '<div class="card">'+clChips+eleveList+parentSec+catSec+sousActSec+heurSec+dateSec+
     '<div class="mt16" style="display:flex;gap:8px">'+
-      '<button class="btn bp" '+(canSubmit?'':'disabled')+' data-a="man-submit" style="flex:1">'+
+      '<button class="btn bp" '+(canSubmit?'':'disabled')+' data-a="man-submit" style="flex:3;min-width:0">'+
         (S.manSaving?'Enregistrement…':'✓ Enregistrer les heures')+
       '</button>'+
-      (S.manEleve||S.manCl?'<button class="btn bo" data-a="man-reset" style="flex-shrink:0">✕ Annuler</button>':"")+
+      (S.manEleve||S.manCl?'<button class="btn bo" data-a="man-reset" style="flex:1;min-width:0">✕ Annuler</button>':"")+
     '</div>'+
     '</div>';
 }
@@ -1724,9 +1725,8 @@ function bindChequeSelects(){
   if(sfam)sfam.onchange=function(){go({saisiesFam:sfam.value,saisiesPar:"all"});};
   var spar=document.querySelector('[data-a="sel-par"]');
   if(spar)spar.onchange=function(){go({saisiesPar:spar.value});};
-  var sq=document.getElementById("sq");
-  if(sq)sq.oninput=function(){sil({aSubQ:sq.value});go({});};
 }
+
 function reattach(){document.addEventListener("click",onClick,{once:true});bindChequeSelects();}
 function onClick(e){
   var el=e.target.closest("[data-a]");if(!el){reattach();return;}
