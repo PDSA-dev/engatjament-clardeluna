@@ -113,6 +113,7 @@ var FB_CFG={apiKey:"AIzaSyB-wIHxxQKYKlss2byJiN26d4VPc5dozlc",authDomain:"clardel
 var PIN_HASH="158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab", OBJ=40;
 // ── MOT DE PASSE PARENTS ─────────────────────
 var ACCESS_HASH="32c648ed8cb4f5d0bc6c5466231c04a3f749de269c30488bb78e82c7032619f8"; // mot de passe parents (hash SHA-256)
+var ACCESS_PLAIN=""; // mot de passe en clair — chargé depuis Firebase, jamais dans le code
 var ACCESS_ENABLED=true;          // false = pas d'écran de connexion
 // ── ANNÉE SCOLAIRE — modifiable dans Réglages ────────────────
 var RENTREE="2025-09-02"; // date de rentrée ISO
@@ -231,7 +232,7 @@ function fbSaveAnnee(){return db.collection("config").doc("annee").set({rentree:
 function fbLoadAnnee(){return db.collection("config").doc("annee").get();}
 function fbSaveActs(){return db.collection("config").doc("activites").set({acts:ACTS});}
 function fbLoadActs(){return db.collection("config").doc("activites").get();}
-function fbSaveAccess(){return db.collection("config").doc("access").set({hash:ACCESS_HASH,enabled:ACCESS_ENABLED});}
+function fbSaveAccess(){return db.collection("config").doc("access").set({hash:ACCESS_HASH,pass:ACCESS_PLAIN,enabled:ACCESS_ENABLED});}
 function fbLoadAccess(){return db.collection("config").doc("access").get();}
 // ── UTILITAIRES ───────────────────────────────
 function nrm(s){return String(s||"").replace(/æ/gi,"ae").replace(/œ/gi,"oe").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
@@ -416,7 +417,7 @@ var S={
   anneeSaved:false,anneeSaving:false,
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
   manSaving:false,manSaved:false,manErr:"",
-  editSaisieId:null,editSaisieErr:"",pinErr2:"",
+  editSaisieId:null,editSaisieErr:"",pinErr2:"",passVisible:false,
   saisiesFamille:[],saisiesFam:"all",saisiesPar:"all",saisiesTableOpen:false,
   accessInput:"",accessErr:false,
   accessPassSaved:false,accessPassErr:""
@@ -1487,11 +1488,19 @@ function rAccessSec(){
   var statusLabel=ACCESS_ENABLED
     ?'<span style="color:var(--gn);font-weight:700">Activé</span>'
     :'<span style="color:var(--mu)">Désactivé</span>';
+  var passDisplay=ACCESS_ENABLED?
+    ' · Mot de passe : '+
+    (S.passVisible&&ACCESS_PLAIN
+      ?'<code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px;color:var(--tx)">'+esc(ACCESS_PLAIN)+'</code>'
+      :'<code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px">••••••••</code>')+
+    '<button data-a="toggle-pass-visible" style="background:none;border:none;cursor:pointer;font-size:12px;margin-left:4px;padding:0 4px;color:var(--mu);font-family:inherit" title="'+(S.passVisible?'Masquer':'Afficher')+'">'+
+      (S.passVisible?'🙈':'👁')+
+    '</button>'
+    :'';
   return'<div class="card" style="margin-top:16px">'+
     '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px">🔑 Mot de passe parents</h3>'+
     '<p style="font-size:12px;color:var(--mu);margin-bottom:14px">'+
-      'Statut : '+statusLabel+
-      (ACCESS_ENABLED?' · Mot de passe actuel : <code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px">••••••••</code>':'')+
+      'Statut : '+statusLabel+passDisplay+
     '</p>'+
     '<div style="display:flex;gap:8px;margin-bottom:10px">'+
       '<button class="btn bsm" style="border:1px solid var(--bd);background:'+(ACCESS_ENABLED?"var(--redl)":"var(--gnl)")+';color:'+(ACCESS_ENABLED?"var(--red)":"var(--gn)")+'" data-a="toggle-access">'+
@@ -1988,11 +1997,13 @@ function onClick(e){
       var napEl=document.getElementById("new-ap"),napv=napEl?napEl.value.trim():"";
       if(napv.length<4){go({accessPassErr:"Mot de passe trop court (min 4 caractères)"});break;}
       sha256hex(napv).then(function(h){
-        ACCESS_HASH=h;ACCESS_ENABLED=true;
-        go({accessPassSaved:true,accessPassErr:""});
+        ACCESS_HASH=h;ACCESS_PLAIN=napv;ACCESS_ENABLED=true;
+        go({accessPassSaved:true,accessPassErr:"",passVisible:false});
         fbSaveAccess().catch(function(){});
         setTimeout(function(){go({accessPassSaved:false});},3000);
       });break;
+    case"toggle-pass-visible":
+      go({passVisible:!S.passVisible});break;
     case"toggle-access":
       ACCESS_ENABLED=!ACCESS_ENABLED;
       if(!ACCESS_ENABLED){try{sessionStorage.removeItem("cl_unlocked");}catch(e){}}
@@ -2093,8 +2104,8 @@ function loadElevesConfig(){
     if(doc.exists){
       var data=doc.data();
       if(typeof data.hash==="string"&&data.hash)ACCESS_HASH=data.hash;
+      if(typeof data.pass==="string"&&data.pass)ACCESS_PLAIN=data.pass;
       if(typeof data.enabled==="boolean")ACCESS_ENABLED=data.enabled;
-      // Si le mot de passe vient d'être chargé et qu'on est sur la page access, re-rendre
       if(S.page==="access")render();
     }
   }).catch(function(){});
