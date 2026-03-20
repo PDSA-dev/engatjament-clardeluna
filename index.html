@@ -1370,7 +1370,7 @@ function rReglages(){
     '</div>'+
     '<p style="font-size:12px;color:var(--mu);margin-bottom:12px">3ème → diplômés · 4ème → 3ème · 5ème → 4ème · 6ème → 5ème</p>'+
     (S.promoArchiving?'<div class="al" style="background:#E3F2FD;border:1px solid #90CAF9;color:#1565C0;border-radius:var(--rs);padding:10px;font-size:13px;margin-bottom:8px">⏳ Archivage Firebase en cours…</div>':"")+
-    '<button class="btn bo" data-a="do-promote" style="border-color:var(--red);color:var(--red);font-weight:700"'+(S.promoArchiving?" disabled":"")+'">🎓 Effectuer la promotion de fin d annee</button>'+
+    '<button class="btn bo" data-a="do-promote" style="border-color:var(--red);color:var(--red);font-weight:700"'+(S.promoArchiving?" disabled":"")+'>🎓 Effectuer la promotion de fin d annee</button>'+
     (S.promoSaved?'<div class="al aok mt8">✅ Promotion effectuée ! Archive Firebase créée + CSV téléchargé.</div>':"")+
   '</div>'+
   // ── Section Restauration ──
@@ -2177,6 +2177,7 @@ function doPromotion(){
       archivedAt:new Date().toISOString(),
       eleves:ELEVES,
       parents:PARENTS_MAP,
+      cheques:CHEQUES_MAP,
       nbSaisies:snap.size
     }).then(function(){
       // 2. Copier chaque saisie dans la sous-collection archives/{ANNEE}/submissions
@@ -2347,10 +2348,11 @@ function doRestore(annee){
     });
     return (c>0?b.commit():Promise.resolve()).then(function(){return cfg;});
   }).then(function(cfg){
-    // 5. Restaurer config élèves / parents
+    // 5. Restaurer config élèves / parents / chèques
     ELEVES=cfg.eleves||ELEVES;
     PARENTS_MAP=cfg.parents||PARENTS_MAP;
-    return fbSaveEl(ELEVES);
+    if(cfg.cheques)CHEQUES_MAP=cfg.cheques;
+    return fbSaveEl(ELEVES).then(function(){return fbSaveCheques();});
   }).then(function(){
     // 6. Recharger les saisies
     return fbLoad();
