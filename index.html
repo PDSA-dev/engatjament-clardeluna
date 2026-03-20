@@ -108,9 +108,9 @@ p.pss{font-size:14px;color:var(--mu);margin-bottom:16px}
 <script>
 // ── CONFIG ───────────────────────────────────
 var FB_CFG={apiKey:"AIzaSyB-wIHxxQKYKlss2byJiN26d4VPc5dozlc",authDomain:"clardeluna-2026.firebaseapp.com",projectId:"clardeluna-2026",storageBucket:"clardeluna-2026.firebasestorage.app",messagingSenderId:"65241322899",appId:"1:65241322899:web:0c94d1ab9c178f030f0466"};
-var PIN="2026", OBJ=40;
+var PIN_HASH="158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab", OBJ=40;
 // ── MOT DE PASSE PARENTS ─────────────────────
-var ACCESS_PASS="clardeluna2026"; // modifiable dans Réglages
+var ACCESS_HASH="32c648ed8cb4f5d0bc6c5466231c04a3f749de269c30488bb78e82c7032619f8"; // mot de passe parents (hash SHA-256)
 var ACCESS_ENABLED=true;          // false = pas d'écran de connexion
 // ── ANNÉE SCOLAIRE — modifiable dans Réglages ────────────────
 var RENTREE="2025-09-02"; // date de rentrée ISO
@@ -229,7 +229,7 @@ function fbSaveAnnee(){return db.collection("config").doc("annee").set({rentree:
 function fbLoadAnnee(){return db.collection("config").doc("annee").get();}
 function fbSaveActs(){return db.collection("config").doc("activites").set({acts:ACTS});}
 function fbLoadActs(){return db.collection("config").doc("activites").get();}
-function fbSaveAccess(){return db.collection("config").doc("access").set({pass:ACCESS_PASS,enabled:ACCESS_ENABLED});}
+function fbSaveAccess(){return db.collection("config").doc("access").set({hash:ACCESS_HASH,enabled:ACCESS_ENABLED});}
 function fbLoadAccess(){return db.collection("config").doc("access").get();}
 // ── UTILITAIRES ───────────────────────────────
 function nrm(s){return String(s||"").replace(/æ/gi,"ae").replace(/œ/gi,"oe").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
@@ -807,9 +807,10 @@ function rAdmin(){
   if(S.adminTab==="saisie-admin")c=rManSaisie();
   return tb("Tableau de bord","home",subs.length+" saisies · "+rnd(tot)+"h total")+
     (S.err?'<div class="al ae" style="margin:8px 16px">'+esc(S.err)+'</div>':"")+
-    '<div style="display:flex;justify-content:flex-end;padding:6px 16px 0">'+
-      '<button class="btn bo" data-a="refresh-overview" style="display:flex;align-items:center;gap:5px;padding:6px 14px;font-size:13px">'+
-        '<span style="font-size:15px">↻</span> Rafraîchir'+
+    '<div style="display:flex;justify-content:flex-end;padding:4px 16px 0">'+
+      '<button data-a="refresh-overview" style="display:flex;align-items:center;gap:0;border:none;border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.15);font-family:inherit">'+
+        '<span style="display:flex;align-items:center;justify-content:center;background:var(--redm);width:26px;height:26px;font-size:13px;line-height:1">↻</span>'+
+        '<span style="background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:0 10px;height:26px;display:flex;align-items:center;letter-spacing:.04em;text-transform:uppercase">Rafraîchir</span>'+
       '</button>'+
     '</div>'+
     '<div class="tabs">'+
@@ -1480,7 +1481,7 @@ function rAccessSec(){
     '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px">🔑 Mot de passe parents</h3>'+
     '<p style="font-size:12px;color:var(--mu);margin-bottom:14px">'+
       'Statut : '+statusLabel+
-      (ACCESS_ENABLED?' · Mot de passe actuel : <code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px">'+esc(ACCESS_PASS)+'</code>':'')+
+      (ACCESS_ENABLED?' · Mot de passe actuel : <code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px">••••••••</code>':'')+
     '</p>'+
     '<div style="display:flex;gap:8px;margin-bottom:10px">'+
       '<button class="btn bsm" style="border:1px solid var(--bd);background:'+(ACCESS_ENABLED?"var(--redl)":"var(--gnl)")+';color:'+(ACCESS_ENABLED?"var(--red)":"var(--gn)")+'" data-a="toggle-access">'+
@@ -1626,16 +1627,18 @@ function bindAll(){
   // Touche Entrée sur l'écran d'accès parents
   var ai=document.getElementById("ai");
   if(ai){
-    ai.addEventListener("input",function(){sil({accessInput:ai.value,accessErr:false});});
+    ai.oninput=function(){sil({accessInput:ai.value,accessErr:false});};
     ai.addEventListener("keydown",function(e){
       if(e.key==="Enter"){
         var v=ai.value.trim();
-        if(v===ACCESS_PASS){
-          try{sessionStorage.setItem("cl_unlocked","1");}catch(err){}
-          go({page:"home",accessErr:false,accessInput:""});
-        }else{
-          go({accessErr:true,accessInput:v});
-        }
+        sha256hex(v).then(function(h){
+          if(h===ACCESS_HASH){
+            try{sessionStorage.setItem("cl_unlocked","1");}catch(err){}
+            go({page:"home",accessErr:false,accessInput:""});
+          }else{
+            go({accessErr:true,accessInput:v});
+          }
+        });
       }
     });
   }
@@ -1659,13 +1662,13 @@ function bindAll(){
   var pq=document.getElementById("pq");
   if(pq){
     // Live search as user types (if data already loaded)
-    pq.addEventListener("input",function(){
+    pq.oninput=function(){
       sil({portalQ:pq.value});
       if(S.subs!==null){
         var res=document.getElementById("portal-results");
         if(res){res.innerHTML=portalResults();reattach();}
       }
-    });
+    };
     // Trigger search on Enter key
     pq.addEventListener("keydown",function(e){
       if(e.key==="Enter"){doSearch();}
@@ -1784,6 +1787,7 @@ function onClick(e){
       go({manHeures:v});break;
     case"man-reset":
       go({manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",manErr:"",manSaved:false});break;
+
     case"man-submit":
       var mhS=document.getElementById('man-h-inp');if(mhS&&mhS.value)sil({manHeures:mhS.value});
       var mdS=document.getElementById('man-date');if(mdS&&mdS.value)sil({manDate:mdS.value});
@@ -1816,7 +1820,8 @@ function onClick(e){
       if(!ACTS[aCatx])ACTS[aCatx]=[];ACTS[aCatx]=ACTS[aCatx].concat([navx]);go({actsSaved:false});break;
     case"del-act":
       var daCatx=el.dataset.cat,daIdxx=parseInt(el.dataset.idx),daActx=ACTS[daCatx]&&ACTS[daCatx][daIdxx];
-      if(!daActx)break;if(!confirm("Supprimer "+daActx+" ?"))break;
+      if(!daActx)break;
+      if(!confirm("Supprimer "+daActx+" ?"))break;
       ACTS[daCatx]=ACTS[daCatx].filter(function(_,i){return i!==daIdxx;});go({actsSaved:false});break;
     case"move-act-up":
       var muCatx=el.dataset.cat,muIdxx=parseInt(el.dataset.idx);
@@ -1882,12 +1887,14 @@ function onClick(e){
         case"check-access":
       var aiEl=document.getElementById("ai");
       var aiVal=aiEl?aiEl.value.trim():"";
-      if(aiVal===ACCESS_PASS){
-        try{sessionStorage.setItem("cl_unlocked","1");}catch(e){}
-        go({page:"home",accessErr:false,accessInput:""});
-      }else{
-        go({accessErr:true,accessInput:aiVal});
-      }break;
+      sha256hex(aiVal).then(function(h){
+        if(h===ACCESS_HASH){
+          try{sessionStorage.setItem("cl_unlocked","1");}catch(e){}
+          go({page:"home",accessErr:false,accessInput:""});
+        }else{
+          go({accessErr:true,accessInput:aiVal});
+        }
+      });break;
         case"check-pin":checkPin();break;
     case"tab":go({adminTab:v});break;
     case"fcls":go({aCls:v});break;
@@ -1904,7 +1911,8 @@ function onClick(e){
     case"close-classe":go({elevesOpen:null});break;
     case"del-eleve":
       var dcl=el.dataset.cl,didx=parseInt(el.dataset.idx);
-      if(confirm("Supprimer cet élève et ses parents enregistrés ?")){
+      if(ELEVES[dcl]&&ELEVES[dcl][didx])
+        if(confirm("Supprimer cet élève et ses parents enregistrés ?")){
         var eName=ELEVES[dcl][didx];
         delete PARENTS_MAP[eName];
         ELEVES[dcl]=ELEVES[dcl].filter(function(_,i){return i!==didx;});
@@ -1939,7 +1947,7 @@ function onClick(e){
       var aiEl=document.getElementById("annee-inp");
       var newRentree=riEl?riEl.value.trim():"";
       var newAnnee=aiEl?aiEl.value.trim():"";
-      if(!newRentree||!newAnnee){alert("Renseignez la date de rentrée et le libellé de l\'année");break;}
+      if(!newRentree||!newAnnee){alert("Renseignez la date de rentrée et le libellé de l'année")}
       // Validation date
       var testD=new Date(newRentree);
       if(isNaN(testD)){alert("Date de rentrée invalide");break;}
@@ -1966,10 +1974,12 @@ function onClick(e){
     case"save-access-pass":
       var napEl=document.getElementById("new-ap"),napv=napEl?napEl.value.trim():"";
       if(napv.length<4){go({accessPassErr:"Mot de passe trop court (min 4 caractères)"});break;}
-      ACCESS_PASS=napv;ACCESS_ENABLED=true;
-      go({accessPassSaved:true,accessPassErr:""});
-      fbSaveAccess().catch(function(){});
-      setTimeout(function(){go({accessPassSaved:false});},3000);break;
+      sha256hex(napv).then(function(h){
+        ACCESS_HASH=h;ACCESS_ENABLED=true;
+        go({accessPassSaved:true,accessPassErr:""});
+        fbSaveAccess().catch(function(){});
+        setTimeout(function(){go({accessPassSaved:false});},3000);
+      });break;
     case"toggle-access":
       ACCESS_ENABLED=!ACCESS_ENABLED;
       if(!ACCESS_ENABLED){try{sessionStorage.removeItem("cl_unlocked");}catch(e){}}
@@ -2011,10 +2021,19 @@ function doSearch(){
     if(r){r.innerHTML='<div class="al ae">'+esc(S.err)+'</div>';reattach();}
   });
 }
+function sha256hex(str){
+  // Calcul SHA-256 synchrone via SubtleCrypto — retourne une Promise
+  return crypto.subtle.digest("SHA-256",new TextEncoder().encode(str))
+    .then(function(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");});
+}
 function checkPin(){
   var pi=document.getElementById("pi");
-  if((pi?pi.value:S.pinInput)===PIN){go({page:"admin",adminTab:"overview",err:""});loadSubs();}
-  else go({pinErr:true});
+  var val=pi?pi.value:S.pinInput;
+  if(!val){go({pinErr:true});return;}
+  sha256hex(val).then(function(h){
+    if(h===PIN_HASH){go({page:"admin",adminTab:"overview",err:""});loadSubs();}
+    else go({pinErr:true});
+  });
 }
 function doSubmit(){
   var f=S.form;go({sending:true,sendErr:""});
@@ -2025,7 +2044,6 @@ function doSubmit(){
   }).catch(function(e){go({sending:false,sendErr:"Erreur : "+e.message});});
 }
 function doDel(id){
-  if(!confirm("Supprimer cette saisie ?"))return;
   sil({deleting:id});render();
   fbDel(id).then(function(){go({deleting:null,subs:(S.subs||[]).filter(function(s){return s.id!==id;})});})
            .catch(function(e){go({deleting:null,err:"Erreur : "+e.message});});
@@ -2061,7 +2079,7 @@ function loadElevesConfig(){
   fbLoadAccess().then(function(doc){
     if(doc.exists){
       var data=doc.data();
-      if(typeof data.pass==="string"&&data.pass)ACCESS_PASS=data.pass;
+      if(typeof data.hash==="string"&&data.hash)ACCESS_HASH=data.hash;
       if(typeof data.enabled==="boolean")ACCESS_ENABLED=data.enabled;
       // Si le mot de passe vient d'être chargé et qu'on est sur la page access, re-rendre
       if(S.page==="access")render();
@@ -2080,6 +2098,7 @@ function doPromotion(){
   if(!confirm(msg))return;
   // Étape 2 : double confirmation
   if(!confirm("CONFIRMATION FINALE\n\nToutes les heures de l annee en cours seront EFFACÉES.\nCette action est irréversible.\n\nContinuer ?"))return;
+
   // Export CSV automatique avant suppression
   exportCsv();
   go({promoSaved:false,err:""});
