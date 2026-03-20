@@ -56,6 +56,12 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .fc2{padding:6px 12px;border-radius:20px;border:1px solid var(--bd);background:var(--sf);font-size:12px;cursor:pointer;font-family:inherit;color:var(--mu)}
 .fc2.on{background:var(--red);color:#fff;border-color:var(--red)}
+.fbar-compact{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.fbar-search{flex:1;min-width:140px;padding:7px 10px 7px 32px;border:1px solid var(--bd);border-radius:8px;font-size:13px;font-family:inherit;background-color:var(--sf);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center;color:var(--tx);outline:none}
+.fbar-search:focus{border-color:var(--red)}
+.fbar-sel{padding:7px 26px 7px 10px;border:1px solid var(--bd);border-radius:8px;font-size:12px;font-family:inherit;background-color:var(--sf);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;color:var(--tx);cursor:pointer;-webkit-appearance:none;appearance:none;outline:none}
+.fbar-sel:focus{border-color:var(--red)}
+.fbar-sel.active{border-color:var(--red);color:var(--red);font-weight:700}
 .scard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-top:14px}
 .sr2{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--bd);font-size:14px}
 .sr2:last-child{border-bottom:none}.sml{color:var(--mu)}
@@ -401,7 +407,7 @@ var S={
   step:0,form:{cl:"",eleve:"",nbParents:1,p1:"",p2:"",typeAct:"",sousAct:"",heures:""},
   done:false,sending:false,sendErr:"",eleveQ:"",
   portalQ:"",portalFam:null,
-  adminTab:"overview",aFilter:"all",aCls:"all",aSubQ:"",
+  adminTab:"overview",aFilter:"all",aCls:"all",aSubQ:"",aHeureQ:"",
   elevesOpen:null,regSaving:false,regSaved:false,promoSaved:false,pinSaved:false,
   pinInput:"",pinErr:false,deleting:null,
   anneeSaved:false,anneeSaving:false,
@@ -894,21 +900,24 @@ function rHeures(fs){
   var slbls={all:"Tous","ok":"A jour",warn:"Vigilance",late:"En retard",zero:"Aucune heure",complete:"Objectif atteint"};
   // Utiliser buildFullFamilies pour inclure les familles à 0h
   var fsAll=(S.subs!==null)?buildFullFamilies(S.subs):fs;
-  var fCls='<div class="fbar">'+cls.map(function(cl){
-    return'<button class="fc2'+(S.aCls===cl?" on":"")+'" data-a="fcls" data-v="'+cl+'">'+(cl==="all"?"Toutes classes":cl)+'</button>';
-  }).join("")+'</div>';
-  var fSt='<div class="fbar">'+sts.map(function(st){
-    return'<button class="fc2'+(S.aFilter===st?" on":"")+'" data-a="fst" data-v="'+st+'">'+slbls[st]+'</button>';
-  }).join("")+'</div>';
+  var clsOpts=cls.map(function(cl){return'<option value="'+cl+'"'+(S.aCls===cl?' selected':'')+'>'+( cl==="all"?"🏫 Toutes classes":cl)+'</option>';}).join("");
+  var stOpts=sts.map(function(st){return'<option value="'+st+'"'+(S.aFilter===st?' selected':'')+'>'+{all:"🎯 Tous statuts","ok":"✅ À jour",warn:"⚠️ Vigilance",late:"🔴 En retard",zero:"⬜ Aucune heure",complete:"🏆 Objectif atteint"}[st]+'</option>';}).join("");
+  var fBar='<div class="fbar-compact">'+
+    '<input id="heure-q" class="fbar-search" type="text" placeholder="Rechercher une famille…" value="'+esc(S.aHeureQ||'')+'" data-a="heure-q" autocomplete="off">'+
+    '<select class="fbar-sel'+(S.aCls!=="all"?" active":"")+'" data-a="fcls-sel">'+clsOpts+'</select>'+
+    '<select class="fbar-sel'+(S.aFilter!=="all"?" active":"")+'" data-a="fst-sel">'+stOpts+'</select>'+
+  '</div>';
+  var hq=nrm(S.aHeureQ||"");
   var filtered=fsAll.filter(function(f){
     var clsOk=S.aCls==="all"||Object.values(f.children).indexOf(S.aCls)!==-1;
     var stOk;
     if(S.aFilter==="all")stOk=true;
     else if(S.aFilter==="zero")stOk=f.totalH===0;
     else stOk=f.totalH>0&&status(f.totalH)===S.aFilter;
-    return clsOk&&stOk;
+    var qOk=!hq||nrm(f.key).includes(hq)||Object.keys(f.children).some(function(ch){return nrm(ch).includes(hq);});
+    return clsOk&&stOk&&qOk;
   }).sort(function(a,b){return a.key.localeCompare(b.key);});
-  if(!filtered.length)return fCls+fSt+'<p class="empty">Aucune famille</p>';
+  if(!filtered.length)return fBar+'<p class="empty">Aucune famille</p>';
   var rows=filtered.map(function(f){
     var s=f.totalH===0?"zero":status(f.totalH);
     var nbPar=f.parents.length||1,famObj=nbPar*OBJ;
@@ -945,7 +954,7 @@ function rHeures(fs){
     '</tr>';
   }).join("");
   var totalH=filtered.reduce(function(a,f){return a+f.totalH;},0);
-  return fCls+fSt+
+  return fBar+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
       '<p style="font-size:11px;color:var(--mu)">'+filtered.length+' famille(s) - Objectif : '+OBJ+'h par famille'+(filtered.length?(' - Total : '+rnd(totalH)+'h'):'')+'</p>'+
       '<button class="btn bo bsm" data-a="print-heures">Imprimer / PDF</button>'+
@@ -1261,13 +1270,15 @@ function printOverview(){
 
 function printHeures(){
   var fsAll=(S.subs!==null)?buildFullFamilies(S.subs):computeFamilies(S.subs||[]);
+  var hq=nrm(S.aHeureQ||"");
   var filtered=fsAll.filter(function(f){
     var clsOk=S.aCls==="all"||Object.values(f.children).indexOf(S.aCls)!==-1;
     var stOk;
     if(S.aFilter==="all")stOk=true;
     else if(S.aFilter==="zero")stOk=f.totalH===0;
     else stOk=f.totalH>0&&status(f.totalH)===S.aFilter;
-    return clsOk&&stOk;
+    var qOk=!hq||nrm(f.key).includes(hq)||Object.keys(f.children).some(function(ch){return nrm(ch).includes(hq);});
+    return clsOk&&stOk&&qOk;
   }).sort(function(a,b){return a.key.localeCompare(b.key);});
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
   var clsLabel=S.aCls==="all"?"Toutes classes":S.aCls;
@@ -1739,6 +1750,13 @@ function bindChequeSelects(){
         .catch(function(e){alert("Erreur cheque: "+e.message);});
     };
   });
+  // Filtres famille compacts
+  var fcls=document.querySelector('[data-a="fcls-sel"]');
+  if(fcls)fcls.onchange=function(){go({aCls:fcls.value});};
+  var fst=document.querySelector('[data-a="fst-sel"]');
+  if(fst)fst.onchange=function(){go({aFilter:fst.value});};
+  var hq=document.getElementById("heure-q");
+  if(hq)hq.oninput=function(){sil({aHeureQ:hq.value});go({});};
 }
 function reattach(){document.addEventListener("click",onClick,{once:true});bindChequeSelects();}
 function onClick(e){
