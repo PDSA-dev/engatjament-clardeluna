@@ -1673,21 +1673,21 @@ function bindAll(){
   var sq=document.getElementById("sq");
   if(sq){
     sq.addEventListener("input",function(){
-      // go() recalcule tout proprement incluant les chips parents
-      go({aSubQ:sq.value,saisiesParents:[]});
-      // Restaurer le focus
+      var pos=sq.selectionStart;
+      sil({aSubQ:sq.value});
+      go({});
       var newSq=document.getElementById("sq");
-      if(newSq){newSq.focus();newSq.setSelectionRange(newSq.value.length,newSq.value.length);}
+      if(newSq){newSq.focus();newSq.setSelectionRange(pos,pos);}
     });
   }
-}
-  // Saisie manuelle admin — listener heures libre
+  // Saisie manuelle — champ heures libre
   var manHInp=document.getElementById('man-h-inp');
   if(manHInp)manHInp.addEventListener('input',function(){
     sil({manHeures:manHInp.value});
     var btn=document.querySelector('[data-a="man-submit"]');
     if(btn)btn.disabled=!(S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct&&parseFloat(manHInp.value)>0);
   });
+}
 function bindChequeSelects(){
   document.querySelectorAll('[data-a="set-cheque"]').forEach(function(sel){
     sel.onchange=function(){
@@ -1703,7 +1703,12 @@ function bindChequeSelects(){
   var fst=document.querySelector('[data-a="fst-sel"]');
   if(fst)fst.onchange=function(){go({aFilter:fst.value});};
   var hq=document.getElementById("heure-q");
-  if(hq)hq.oninput=function(){sil({aHeureQ:hq.value});go({});};
+  if(hq)hq.oninput=function(){
+    var pos=hq.selectionStart;
+    sil({aHeureQ:hq.value});go({});
+    var nhq=document.getElementById('heure-q');
+    if(nhq){nhq.focus();nhq.setSelectionRange(pos,pos);}
+  };
   // Filtres saisies compacts
   var sfam=document.querySelector('[data-a="sel-fam"]');
   if(sfam)sfam.onchange=function(){go({saisiesFam:sfam.value,saisiesPar:"all"});};
