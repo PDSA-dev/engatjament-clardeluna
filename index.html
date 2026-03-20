@@ -698,39 +698,12 @@ function rStep(){
         });
       }
       return'<h2 class="ptt">Votre enfant</h2><p class="pss">'+f.cl+'</p>'+
-        '<input class="inp" id="eq" placeholder="Rechercher…" value="'+esc(S.eleveQ)+'">'+
-        '<div style="margin-top:10px">'+(list.map(function(e){
-          // Chercher les parents connus pour cet enfant
-          var pknown=[];
-          // 1. Depuis PARENTS_MAP (réglages)
-          if(PARENTS_MAP[e]&&PARENTS_MAP[e].length){
-            PARENTS_MAP[e].forEach(function(p){if(p)pknown.push(p);});
-          }
-          // 2. Depuis les saisies Firebase si aucun parent enregistré
-          if(pknown.length===0&&S.subs){
-            var fkE=familyKey(e);
-            computeFamilies(S.subs).forEach(function(fam){
-              if(fam.key===fkE){
-                Object.keys(fam.children).forEach(function(ch){
-                  if(ch===e)fam.parents.forEach(function(par){
-                    var pn=displayPrenom(par.prenoms);
-                    if(pknown.indexOf(pn)===-1)pknown.push(pn);
-                  });
-                });
-              }
-            });
-          }
-          var parentsTag=pknown.length?
-            '<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">'+
-              pknown.map(function(p){
-                return'<span style="font-size:11px;background:'+(f.eleve===e?"rgba(255,255,255,0.4)":"var(--redl)")+';color:'+(f.eleve===e?"#fff":"var(--red)")+';padding:2px 8px;border-radius:10px">'+esc(p)+'</span>';
-              }).join("")+
-            '</div>':"";
-          return'<button class="li'+(f.eleve===e?" on":"")+'" data-a="s1" data-v="'+esc(e)+'" style="text-align:left">'+
-            '<div style="font-weight:600">'+(f.eleve===e?"✓  ":"")+esc(e)+'</div>'+
-            parentsTag+
-          '</button>';
-        }).join("")||'<p class="empty">Aucun résultat</p>')+'</div>';
+        '<select class="inp" id="eq" style="margin-top:16px;cursor:pointer">'+
+        '<option value="">— Sélectionnez votre enfant —</option>'+
+        list.map(function(e){
+          return'<option value="'+esc(e)+'"'+(f.eleve===e?' selected':'')+'>'+esc(e)+'</option>';
+        }).join("")+
+        '</select>';
     case 2:
       // ── Parents enregistrés depuis l'admin (PARENTS_MAP uniquement) ──
       var plist2=[];
@@ -1692,15 +1665,9 @@ function bindAll(){
   // Recherche élève
   var eq=document.getElementById("eq");
   if(eq){
-    eq.addEventListener("input",function(){
-      sil({eleveQ:eq.value});
-      var c=document.querySelector("#eq + div");
-      if(!c)return;
-      var list=(ELEVES[S.form.cl]||[]).filter(function(e){return!S.eleveQ||nrm(e).includes(nrm(S.eleveQ));});
-      c.innerHTML=list.map(function(e){
-        return'<button class="li'+(S.form.eleve===e?" on":"")+'" data-a="s1" data-v="'+esc(e)+'">'+(S.form.eleve===e?"✓  ":"")+esc(e)+'</button>';
-      }).join("")||'<p class="empty">Aucun résultat</p>';
-      reattach();
+    eq.addEventListener("change",function(){
+      var v=eq.value;
+      if(v)go(function(s){return{step:2,form:Object.assign({},s.form,{eleve:v,p1:'',p2:'',nbParents:1})};});
     });
   }
   var sq=document.getElementById("sq");
