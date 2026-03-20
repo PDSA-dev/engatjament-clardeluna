@@ -864,7 +864,12 @@ function rOverview(fs,tot){
     '</div>'  :"";
   var loadingNote=S.subs===null?'<div class="al aw mt8">Chargement...</div>'  :"";
   return stats+loadingNote+info+lateCard+
-    '<div class="mt16"><button class="btn bo" data-a="print-overview">Exporter PDF</button></div>';
+    '<div class="mt16" style="display:flex;gap:8px">'+
+      '<button class="btn bo" data-a="print-overview">Exporter PDF</button>'+
+      '<button class="btn bo" data-a="refresh-overview" style="display:flex;align-items:center;gap:5px">'+
+        '<span style="font-size:16px">↻</span> Rafraîchir'+
+      '</button>'+
+    '</div>';
 }
 
 function rHeures(fs){
@@ -1542,9 +1547,12 @@ function rManSaisie(){
     (S.manSaved?'<div class="al aok" style="margin-bottom:12px">✓ Saisie enregistrée avec succès !</div>':'')+
     (S.manErr?'<div class="al ae" style="margin-bottom:8px">'+esc(S.manErr)+'</div>':'')+
     '<div class="card">'+clChips+eleveList+parentSec+catSec+sousActSec+heurSec+dateSec+
-    '<div class="mt16"><button class="btn bp" '+(canSubmit?'':'disabled')+' data-a="man-submit">'+
-      (S.manSaving?'Enregistrement…':'✓ Enregistrer les heures')+
-    '</button></div>'+
+    '<div class="mt16" style="display:flex;gap:8px">'+
+      '<button class="btn bp" '+(canSubmit?'':'disabled')+' data-a="man-submit" style="flex:1">'+
+        (S.manSaving?'Enregistrement…':'✓ Enregistrer les heures')+
+      '</button>'+
+      (S.manEleve||S.manCl?'<button class="btn bo" data-a="man-reset" style="flex-shrink:0">✕ Annuler</button>':"")+
+    '</div>'+
     '</div>';
 }
 function doManSaisie(){
@@ -1672,14 +1680,22 @@ function bindAll(){
   }
   var sq=document.getElementById("sq");
   if(sq){
-    sq.addEventListener("input",function(){
+    sq.oninput=function(){
       var pos=sq.selectionStart;
       sil({aSubQ:sq.value});
       go({});
       var newSq=document.getElementById("sq");
       if(newSq){newSq.focus();newSq.setSelectionRange(pos,pos);}
-    });
+    };
   }
+  // Recherche Heures — live sans perte de focus
+  var hq2=document.getElementById("heure-q");
+  if(hq2)hq2.oninput=function(){
+    var pos=hq2.selectionStart;
+    sil({aHeureQ:hq2.value});go({});
+    var nhq=document.getElementById("heure-q");
+    if(nhq){nhq.focus();nhq.setSelectionRange(pos,pos);}
+  };
   // Saisie manuelle — champ heures libre
   var manHInp=document.getElementById('man-h-inp');
   if(manHInp)manHInp.addEventListener('input',function(){
@@ -1702,13 +1718,7 @@ function bindChequeSelects(){
   if(fcls)fcls.onchange=function(){go({aCls:fcls.value});};
   var fst=document.querySelector('[data-a="fst-sel"]');
   if(fst)fst.onchange=function(){go({aFilter:fst.value});};
-  var hq=document.getElementById("heure-q");
-  if(hq)hq.oninput=function(){
-    var pos=hq.selectionStart;
-    sil({aHeureQ:hq.value});go({});
-    var nhq=document.getElementById('heure-q');
-    if(nhq){nhq.focus();nhq.setSelectionRange(pos,pos);}
-  };
+  // heure-q handler moved to bindAll
   // Filtres saisies compacts
   var sfam=document.querySelector('[data-a="sel-fam"]');
   if(sfam)sfam.onchange=function(){go({saisiesFam:sfam.value,saisiesPar:"all"});};
@@ -1772,6 +1782,8 @@ function onClick(e){
     case"man-h":
       var mhI=document.getElementById('man-h-inp');if(mhI)mhI.value=v;
       go({manHeures:v});break;
+    case"man-reset":
+      go({manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",manErr:"",manSaved:false});break;
     case"man-submit":
       var mhS=document.getElementById('man-h-inp');if(mhS&&mhS.value)sil({manHeures:mhS.value});
       var mdS=document.getElementById('man-date');if(mdS&&mdS.value)sil({manDate:mdS.value});
@@ -1860,7 +1872,13 @@ function onClick(e){
         .catch(function(e){go({editSaisieErr:"Erreur: "+e.message});});
       break;
         case"tog-pw-vis":var tEl=document.getElementById(el.dataset.t);if(tEl)tEl.type=tEl.type==="password"?"text":"password";reattach();break;
-        case"print-heures":printHeures();break;
+        case"refresh-overview":
+      go({subs:null});
+      fbLoad().then(function(docs){
+        go({subs:docs,adminTab:"overview"});
+      }).catch(function(e){alert("Erreur chargement: "+e.message);});
+      break;
+    case"print-heures":printHeures();break;
         case"check-access":
       var aiEl=document.getElementById("ai");
       var aiVal=aiEl?aiEl.value.trim():"";
