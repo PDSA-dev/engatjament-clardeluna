@@ -412,7 +412,7 @@ var S={
   done:false,sending:false,sendErr:"",eleveQ:"",
   portalQ:"",portalFam:null,
   adminTab:"overview",aFilter:"all",aCls:"all",aSubQ:"",aHeureQ:"",
-  elevesOpen:null,regSaving:false,regSaved:false,promoSaved:false,pinSaved:false,
+  elevesOpen:null,regSaving:false,regSaved:false,promoSaved:false,promoArchiving:false,pinSaved:false,archives:null,archivesLoading:false,archivesErr:"",restoring:null,restoreDone:null,
   pinInput:"",pinErr:false,deleting:null,
   anneeSaved:false,anneeSaving:false,
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
@@ -1364,12 +1364,48 @@ function rReglages(){
         '<li>Monte tous les élèves d une classe</li>'+
         '<li><strong>Efface toutes les heures</strong> de l annee en cours</li>'+
         '<li>Génère automatiquement un CSV de sauvegarde</li>'+
+        '<li>📦 <strong>Sauvegarde complète dans Firebase</strong> (restaurable)</li>'+
       '</ul>'+
       '<p style="margin-top:4px">👉 <strong>Exportez avant tout le rapport PDF</strong> (onglet Rapport - Imprimer / PDF)</p>'+
     '</div>'+
     '<p style="font-size:12px;color:var(--mu);margin-bottom:12px">3ème → diplômés · 4ème → 3ème · 5ème → 4ème · 6ème → 5ème</p>'+
-    '<button class="btn bo" data-a="do-promote" style="border-color:var(--red);color:var(--red);font-weight:700">🎓 Effectuer la promotion de fin d annee</button>'+
-    (S.promoSaved?'<div class="al aok mt8">✅ Promotion effectuée ! Les heures ont été remises à zéro. Un CSV a été téléchargé automatiquement.</div>':"")+
+    (S.promoArchiving?'<div class="al" style="background:#E3F2FD;border:1px solid #90CAF9;color:#1565C0;border-radius:var(--rs);padding:10px;font-size:13px;margin-bottom:8px">⏳ Archivage Firebase en cours…</div>':"")+
+    '<button class="btn bo" data-a="do-promote" style="border-color:var(--red);color:var(--red);font-weight:700"'+(S.promoArchiving?" disabled":"")+'">🎓 Effectuer la promotion de fin d annee</button>'+
+    (S.promoSaved?'<div class="al aok mt8">✅ Promotion effectuée ! Archive Firebase créée + CSV téléchargé.</div>':"")+
+  '</div>'+
+  // ── Section Restauration ──
+  '<div class="card">'+
+    '<h3 style="font-size:15px;font-weight:700;margin-bottom:8px">🔄 Restauration d\'archive</h3>'+
+    '<p style="font-size:12px;color:var(--mu);margin-bottom:12px">Restaurez une année précédente en cas d\'erreur. Les données actuelles seront remplacées.</p>'+
+    (S.restoreDone?'<div class="al aok mt8 mb8">✅ Restauration de '+S.restoreDone+' effectuée avec succès !</div>':"")+
+    (S.archivesErr?'<div class="al" style="background:#FFEBEE;border:1px solid #EF9A9A;color:var(--red);border-radius:var(--rs);padding:10px;font-size:13px;margin-bottom:8px">'+S.archivesErr+'</div>':"")+
+    (!S.archives && !S.archivesLoading?
+      '<button class="btn bo" data-a="load-archives">📂 Voir les archives disponibles</button>'
+    : S.archivesLoading?
+      '<p style="font-size:13px;color:var(--mu)">⏳ Chargement des archives…</p>'
+    : S.archives.length===0?
+      '<div class="al" style="background:#F5F5F5;border:1px solid #DDD;color:var(--mu);border-radius:var(--rs);padding:10px;font-size:13px">Aucune archive disponible.</div>'
+    :
+      S.archives.map(function(arch){
+        var d=arch.archivedAt?new Date(arch.archivedAt).toLocaleDateString("fr-FR"):"";
+        var isRestoring=S.restoring===arch.id;
+        return '<div style="border:1px solid var(--bd);border-radius:var(--rs);padding:12px;margin-bottom:8px">'+
+          '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
+            '<div>'+
+              '<p style="font-weight:700;font-size:13px">📦 Année '+arch.id+'</p>'+
+              '<p style="font-size:11px;color:var(--mu)">Archivée le '+d+' · '+( arch.nbSaisies||"?")+ ' saisies</p>'+
+            '</div>'+
+            '<div style="display:flex;gap:6px">'+
+              '<button class="btn bo" data-a="export-archive-csv" data-annee="'+arch.id+'" style="font-size:12px;padding:6px 10px">📥 CSV</button>'+
+              '<button class="btn bo" data-a="restore-archive" data-annee="'+arch.id+'" style="font-size:12px;padding:6px 10px;border-color:var(--red);color:var(--red)"'+(isRestoring?" disabled":"")+'>'+
+                (isRestoring?"⏳ Restauration…":"🔄 Restaurer")+
+              '</button>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
+      }).join("")+
+      '<button class="btn bo" data-a="load-archives" style="font-size:12px;margin-top:4px">🔁 Rafraîchir</button>'
+    )+
   '</div>';
   var clsSecs=cls.map(function(cl){
     var isOpen=S.elevesOpen===cl,eleves=ELEVES[cl];
@@ -1965,6 +2001,9 @@ function onClick(e){
       ELEVES[acl]=ELEVES[acl].concat([nom]).sort();go({regSaved:false});break;
     case"save-eleves":doSaveEleves();break;
     case"do-promote":doPromotion();break;
+    case"load-archives":loadArchives();break;
+    case"restore-archive":doRestore(el.dataset.annee);break;
+    case"export-archive-csv":exportArchiveCsv(el.dataset.annee);break;
     case"save-annee":
       var riEl=document.getElementById("rentree-inp");
       var aiEl=document.getElementById("annee-inp");
@@ -2126,9 +2165,36 @@ function doPromotion(){
 
   // Export CSV automatique avant suppression
   exportCsv();
-  go({promoSaved:false,err:""});
-  // Supprimer toutes les saisies Firebase
+  go({promoSaved:false,err:"",promoArchiving:true});
+
+  // ── Archivage Firebase complet avant toute suppression ──
+  var archiveRef=db.collection("archives").doc(ANNEE);
   db.collection("submissions").get().then(function(snap){
+    // 1. Sauvegarder la config (élèves + parents) dans l'archive
+    return archiveRef.set({
+      annee:ANNEE,
+      rentree:RENTREE,
+      archivedAt:new Date().toISOString(),
+      eleves:ELEVES,
+      parents:PARENTS_MAP,
+      nbSaisies:snap.size
+    }).then(function(){
+      // 2. Copier chaque saisie dans la sous-collection archives/{ANNEE}/submissions
+      var batches=[];
+      var batch=db.batch();
+      var count=0;
+      snap.docs.forEach(function(doc){
+        var ref=archiveRef.collection("submissions").doc(doc.id);
+        batch.set(ref,doc.data());
+        count++;
+        if(count===499){batches.push(batch.commit());batch=db.batch();count=0;}
+      });
+      if(count>0)batches.push(batch.commit());
+      return Promise.all(batches);
+    }).then(function(){return snap;});
+  }).then(function(snap){
+    go({promoArchiving:false});
+    // ── Suppression des saisies en cours ──
     var batch=db.batch();
     var count=0;
     snap.docs.forEach(function(doc){
@@ -2168,7 +2234,7 @@ function doPromotion(){
     return fbSaveEl(ELEVES);
   }).then(function(){
     // Remettre les compteurs à zéro dans l'état
-    go({subs:[],promoSaved:true,aFilter:"all",aCls:"all"});
+    go({subs:[],promoSaved:true,aFilter:"all",aCls:"all",archives:null});
     setTimeout(function(){go({promoSaved:false});},6000);
   }).catch(function(e){
     go({err:"Erreur promotion : "+e.message});
@@ -2240,6 +2306,70 @@ function printSaisies(){
   if(overlay){overlay.innerHTML=html;window.print();setTimeout(function(){overlay.innerHTML="";},2000);}
 }
 
+// ── RESTAURATION D'ARCHIVE ────────────────────────────────
+function loadArchives(){
+  go({archivesLoading:true,archivesErr:""});
+  db.collection("archives").orderBy("archivedAt","desc").get().then(function(snap){
+    var list=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    go({archivesLoading:false,archives:list});
+  }).catch(function(e){
+    go({archivesLoading:false,archivesErr:"Erreur chargement : "+e.message});
+  });
+}
+function doRestore(annee){
+  if(!confirm("⚠️ RESTAURATION DE L'ARCHIVE "+annee+"\n\nCette action va :\n• Supprimer les saisies actuelles\n• Restaurer toutes les saisies de l'archive "+annee+"\n• Restaurer la liste des élèves et parents de "+annee+"\n\nContinuer ?"))return;
+  go({restoring:annee,err:""});
+  var archiveRef=db.collection("archives").doc(annee);
+  // 1. Charger config de l'archive
+  archiveRef.get().then(function(doc){
+    if(!doc.exists)throw new Error("Archive introuvable");
+    var cfg=doc.data();
+    // 2. Charger les saisies archivées
+    return archiveRef.collection("submissions").get().then(function(snap){
+      return {cfg:cfg,snap:snap};
+    });
+  }).then(function(res){
+    var cfg=res.cfg,snap=res.snap;
+    // 3. Supprimer les saisies actuelles
+    return db.collection("submissions").get().then(function(curSnap){
+      var b=db.batch();var c=0;
+      curSnap.docs.forEach(function(d){b.delete(d.ref);c++;if(c===499){b.commit();b=db.batch();c=0;}});
+      return c>0?b.commit():Promise.resolve();
+    }).then(function(){return {cfg:cfg,snap:snap};});
+  }).then(function(res){
+    var cfg=res.cfg,snap=res.snap;
+    // 4. Ré-insérer les saisies archivées
+    var b=db.batch();var c=0;
+    snap.docs.forEach(function(d){
+      var ref=db.collection("submissions").doc(d.id);
+      b.set(ref,d.data());c++;
+      if(c===499){b.commit();b=db.batch();c=0;}
+    });
+    return (c>0?b.commit():Promise.resolve()).then(function(){return cfg;});
+  }).then(function(cfg){
+    // 5. Restaurer config élèves / parents
+    ELEVES=cfg.eleves||ELEVES;
+    PARENTS_MAP=cfg.parents||PARENTS_MAP;
+    return fbSaveEl(ELEVES);
+  }).then(function(){
+    // 6. Recharger les saisies
+    return fbLoad();
+  }).then(function(subs){
+    go({subs:subs,restoring:null,restoreDone:annee,aFilter:"all",aCls:"all"});
+    setTimeout(function(){go({restoreDone:null});},6000);
+  }).catch(function(e){
+    go({restoring:null,err:"Erreur restauration : "+e.message});
+  });
+}
+function exportArchiveCsv(annee){
+  db.collection("archives").doc(annee).collection("submissions").get().then(function(snap){
+    var subs=snap.docs.map(function(d){return d.data();});
+    var hd=["Horodatage","Classe","Élève","Parent(s)","Nb parents","Type","Sous-activité","Heures","Trimestre"];
+    var rows=subs.map(function(s){return[new Date(s.ts).toLocaleString("fr-FR"),s.classe,s.eleve,s.parents,s.nbParents,s.activiteType,s.sousActivite,s.heures,"T"+(getTri(s.ts)||"?")];});
+    var csv="\uFEFF"+[hd].concat(rows).map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
+    var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="clardeluna-archive-"+annee+".csv";a.click();
+  });
+}
 function exportCsv(){
   var subs=S.subs||[];
   var hd=["Horodatage","Classe","Élève","Parent(s)","Nb parents","Type","Sous-activité","Heures","Trimestre"];
