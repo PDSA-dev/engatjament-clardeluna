@@ -1165,18 +1165,24 @@ function rRapport(fs,tot){
     });
   });
 
+  // ── Pré-calcul du grand total (avant la boucle d'affichage) ──
+  var categTotals={};
+  var grandTotal=0;
+  ORDER.forEach(function(cat){
+    if(!byCateg[cat])return;
+    var t=Object.values(byCateg[cat]).reduce(function(a,v){return a+v;},0);
+    if(t>0){categTotals[cat]=t;grandTotal+=t;}
+  });
+  grandTotal+=totalCheques; // inclure les chèques dans le total de référence
+
   // ── Tableau principal ──
   var tableRows="";
-  var grandTotal=0;
-  var categTotals={};
 
   ORDER.forEach(function(cat){
     if(!byCateg[cat])return;
     var subMap=byCateg[cat];
-    var catTotal=Object.values(subMap).reduce(function(a,v){return a+v;},0);
+    var catTotal=categTotals[cat]||0;
     if(catTotal===0)return;
-    categTotals[cat]=catTotal;
-    grandTotal+=catTotal;
 
     // En-tête catégorie
     var catColor=cat==="Commissions"?"#C0472A":cat==="Festivités"?"#2E7D4F":"#8B6000";
@@ -1205,7 +1211,6 @@ function rRapport(fs,tot){
 
   // ── Section Chèques ──
   if(totalCheques>0){
-    grandTotal+=totalCheques;
     var cheqPct=Math.round(totalCheques/(grandTotal||1)*100);
     tableRows+='<tr style="background:#5B4A9B;color:#fff">'+
       '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">🎫 Ch&egrave;ques encaiss&eacute;s pour non investissement = 40 heures'+
