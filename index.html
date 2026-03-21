@@ -1017,7 +1017,7 @@ function rHeures(fs){
     var enfants=Object.keys(f.children).join(" + ");
     var classes=Object.values(f.children).filter(function(v,i,a){return a.indexOf(v)===i;}).join(" / ");
     var famCheqTot=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
-    var famBg=f.totalH===0?"#FFF5F5":"#F7F4F1";
+    var famBg=f.totalH===0?"var(--redl)":"var(--bg)";
     var allParsForFam=[];
     Object.keys(PARENTS_MAP).forEach(function(e){
       if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){
@@ -1044,8 +1044,8 @@ function rHeures(fs){
       var noHours=ph===0?'<div style="font-size:11px;color:var(--mu);font-style:italic">Aucune heure déclarée</div>':"";
       return'<tr style="background:var(--sf);border-bottom:1px solid var(--bd)">'+
         '<td style="padding:7px 10px 7px 22px;font-size:12px;color:var(--tx);vertical-align:middle">'+
-          '<span style="color:#999;margin-right:4px">|-</span><strong>'+esc(pname)+'</strong>'+
-          (par.prenoms.length>1?'<span style="font-size:10px;color:#aaa;margin-left:6px">(aussi: '+esc(par.prenoms.filter(function(x){return x!==pname;}).join(", "))+')</span>':"")+
+          '<span style="color:var(--mu);margin-right:4px">|-</span><strong>'+esc(pname)+'</strong>'+
+          (par.prenoms.length>1?'<span style="font-size:10px;color:var(--mu);margin-left:6px">(aussi: '+esc(par.prenoms.filter(function(x){return x!==pname;}).join(", "))+')</span>':"")+
           chequeInfo+
           (cats?'<div style="font-size:11px;color:#888;margin-top:2px">'+cats+'</div>':"")+
           noHours+
@@ -1066,8 +1066,8 @@ function rHeures(fs){
     return'<tr style="border-top:2px solid '+rowBorder2+';background:'+rowBg2+'">'+ 
       '<td colspan="3" style="padding:10px;background:'+famBg+'">'+
         '<span style="font-weight:700;font-size:14px">'+esc(enfants)+'</span>'+
-        '<span style="font-size:11px;color:#888;margin-left:8px">'+esc(classes)+'</span>'+
-        '<span style="font-size:12px;color:#7A7268;margin-left:12px">Total famille : <strong style="color:'+(f.totalH>0?"#C0472A":"#bbb")+'">'+(f.totalH===0?"---":rnd(f.totalH)+"h")+'</strong></span>'+
+        '<span style="font-size:11px;color:var(--mu);margin-left:8px">'+esc(classes)+'</span>'+
+        '<span style="font-size:12px;color:var(--mu);margin-left:12px">Total famille : <strong style="color:'+(f.totalH>0?"var(--red)":"var(--hi)")+'">'+(f.totalH===0?"---":rnd(f.totalH)+"h")+'</strong></span>'+
         (famCheqTot>0&&f.subs&&f.subs.length===0?'<span style="font-size:11px;background:#FFF8E1;color:#8B6000;padding:1px 6px;border-radius:8px;margin-left:8px">cheques uniquement</span>':"")+
       '</td>'+
     '</tr>'+parRows;
