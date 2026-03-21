@@ -14,8 +14,7 @@
 <title>Clardeluna 2025-2026</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--red:#C0472A;--redl:#F5EAE7;--redm:#E8C4BA;--bg:#F7F4F1;--sf:#fff;--tx:#1C1814;--mu:#7A7268;--hi:#B0A89E;--bd:#E0D9D3;--gn:#2E7D4F;--gnl:#E8F5EE;--am:#8B6000;--aml:#FFF8E1;--r:10px;--rs:6px;--shadow-sm:0 1px 3px rgba(0,0,0,.08);--transition:all .18s cubic-bezier(.4,0,.2,1)}
-@media(prefers-color-scheme:dark){:root{--bg:#1A1714;--sf:#252220;--tx:#F0EDE8;--mu:#8A8278;--hi:#5A5450;--bd:#3A3530;--redl:#3D1A14;--gnl:#0E2D1A;--aml:#2D2000}}
+:root{--red:#C0472A;--redl:#F5EAE7;--redm:#E8C4BA;--bg:#F7F4F1;--sf:#fff;--tx:#1C1814;--mu:#7A7268;--hi:#B0A89E;--bd:#E0D9D3;--gn:#2E7D4F;--gnl:#E8F5EE;--am:#8B6000;--aml:#FFF8E1;--r:10px;--rs:6px}
 html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.5}
 .wrap{max-width:480px;margin:0 auto;padding:0 16px 60px}
 .wlg{max-width:640px;margin:0 auto;padding:0 16px 60px}
@@ -48,12 +47,12 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
 .bg2{background:var(--gnl);color:var(--gn)}.br2{background:var(--redl);color:var(--red)}.ba{background:var(--aml);color:var(--am)}
 .srow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
-.sc{background:var(--bg);border-radius:var(--rs);padding:14px;text-align:center}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:14px;text-align:center}
 .sv{font-size:24px;font-weight:700;color:var(--red)}.slbl{font-size:11px;color:var(--mu);margin-top:2px}
 .si{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px}
-.tabs{display:flex;background:var(--bg);padding:6px 10px;border-bottom:1px solid var(--bd);overflow-x:auto;position:sticky;top:var(--topbar-h,43px);z-index:10;gap:4px}
-.tab{flex:0 0 auto;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--mu);border-radius:8px;transition:var(--transition);font-family:inherit;white-space:nowrap}
-.tab.on{background:var(--sf);color:var(--tx);border-radius:8px;box-shadow:var(--shadow-sm)}
+.tabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto;position:sticky;top:var(--topbar-h,43px);z-index:10;box-shadow:0 2px 4px rgba(0,0,0,.06)}
+.tab{flex:1;min-width:70px;padding:11px 8px;border:none;background:none;font-size:12px;cursor:pointer;color:var(--mu);border-bottom:2px solid transparent;font-family:inherit;white-space:nowrap;font-weight:600}
+.tab.on{color:var(--red);border-bottom-color:var(--red)}
 .fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .fc2{padding:6px 12px;border-radius:20px;border:1px solid var(--bd);background:var(--sf);font-size:12px;cursor:pointer;font-family:inherit;color:var(--mu)}
 .fc2.on{background:var(--red);color:#fff;border-color:var(--red)}
@@ -81,7 +80,7 @@ html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .htbl th.nr{text-align:right}.htbl td{padding:9px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
 .htbl td.nr{text-align:right;font-weight:600}.htbl tr:last-child td{border-bottom:none}.htbl tbody tr:hover td{background:#FAF7F4}
 .hbw{width:60px;height:6px;background:var(--bd);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:4px}
-.hb{height:100%;border-radius:3px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.hb{height:100%;border-radius:3px}
 .sbar{display:flex;gap:8px;margin-bottom:14px}.sbar .inp{flex:1}
 .cat-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .cat-pill{padding:3px 10px;border-radius:20px;font-size:12px;background:var(--bg);border:1px solid var(--bd)}
@@ -101,28 +100,6 @@ p.pss{font-size:14px;color:var(--mu);margin-bottom:16px}
 @media(max-width:380px){.srow{grid-template-columns:repeat(2,1fr)}}
 #print-overlay{display:none}
 @media print{body>*{display:none!important}#print-overlay{display:block!important;font-family:-apple-system,sans-serif;font-size:13px;color:#1C1814;padding:20px}#print-overlay table{width:100%;border-collapse:collapse}#print-overlay th{padding:8px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1}#print-overlay td{padding:7px 10px;border-bottom:1px solid #E0D9D3}}
-
-.htbl tr.row-ok{background:rgba(46,125,79,.06);border-left:3px solid var(--gn)}
-.htbl tr.row-warn{background:rgba(139,96,0,.05);border-left:3px solid #E6A817}
-.htbl tr.row-late,.htbl tr.row-zero+tr{background:rgba(192,71,42,.05);border-left:3px solid var(--red)}
-.htbl tr.row-zero{background:rgba(0,0,0,.02);border-left:3px solid var(--bd)}
-.htbl tr.row-complete{background:rgba(46,125,79,.10);border-left:3px solid var(--gn)}
-#toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;min-width:200px;max-width:340px}
-.toast{display:flex;align-items:center;gap:10px;padding:11px 16px;background:#1C1814;color:#F0EDE8;border-radius:12px;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);pointer-events:auto;animation:toastIn .28s cubic-bezier(.34,1.56,.64,1)}
-.toast.out{animation:toastOut .22s ease forwards}
-.toast-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.toast-ok .toast-icon{background:var(--gn)}.toast-err .toast-icon{background:var(--red)}.toast-info .toast-icon{background:#378ADD}
-@keyframes toastIn{from{opacity:0;transform:translateY(12px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes toastOut{to{opacity:0;transform:translateY(8px) scale(.96)}}
-.skel{background:linear-gradient(90deg,var(--bg) 25%,var(--bd) 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px}
-.skel-line{height:10px;margin-bottom:8px}.skel-title{height:14px;width:55%;margin-bottom:12px}
-.skel-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:10px}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@media(min-width:640px){.wlg{padding:0 24px 60px}.sg{grid-template-columns:repeat(3,1fr)}.htbl{font-size:14px}.htbl th,.htbl td{padding:11px 14px}}
-@media(min-width:900px){.wlg{max-width:900px}}
-
-.icon-print::before{content:"";display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:5px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='1.4'%3E%3Crect x='2' y='5' width='10' height='6' rx='1'/%3E%3Cpath d='M4 5V2h6v3M4 8.5h6M4 10.5h4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:contain}
-.icon-logout::before{content:"";display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:4px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='1.4'%3E%3Cpath d='M9 2h3v10H9M5.5 9.5L3 7l2.5-2.5M3 7h7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:contain}
 </style>
 </head>
 <body>
@@ -131,40 +108,6 @@ p.pss{font-size:14px;color:var(--mu);margin-bottom:16px}
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
-// ── CONSTANTES MÉTIER ─────────────────────
-var OBJ_HEURES=40,H_CHEQUE=10;
-var CAT_COM='Commissions',CAT_FES='Festivités',CAT_ADM='Administratif / gestion Collège / CA';
-// ── Icônes SVG ────────────────────────────
-var ICONS={
-  edit:'<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" style="vertical-align:-2px;margin-right:4px"><path d="M9 2l3 3-7 7H2v-3z" stroke-linejoin="round"/><path d="M7.5 3.5l3 3"/></svg>',
-  print:'<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" style="vertical-align:-2px;margin-right:5px"><rect x="2" y="5" width="10" height="6" rx="1"/><path d="M4 5V2h6v3M4 8.5h6M4 10.5h4"/></svg>',
-  logout:'<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" style="vertical-align:-2px;margin-right:4px"><path d="M9 2h3v10H9M5.5 9.5L3 7l2.5-2.5M3 7h7"/></svg>',
-  refresh:'<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" style="vertical-align:-2px"><path d="M11.5 7A4.5 4.5 0 1 1 9 3.2" stroke-linecap="round"/><path d="M9 1.5v2h2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  download:'<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" style="vertical-align:-2px;margin-right:4px"><path d="M7 2v7M4.5 7l2.5 2.5L9.5 7" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke-linecap="round"/></svg>',
-  cheque:'<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" style="vertical-align:-2px;margin-right:4px"><rect x="1" y="3.5" width="12" height="7" rx="1"/><path d="M4.5 3.5v7M1 6.5h3M1 8h3M10.5 3.5v7"/></svg>'
-};
-// ── Toast ──────────────────────────────────
-function showToast(msg,type){
-  type=type||'ok';
-  var tc=document.getElementById('toast-container');if(!tc)return;
-  var icons={ok:'<path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',err:'<path d="M1 1l8 8M9 1L1 9" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>',info:'<circle cx="5" cy="5" r="4" stroke="#fff" stroke-width="1.2" fill="none"/><path d="M5 4.5v3M5 3v.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>'};
-  var t=document.createElement('div');
-  t.className='toast toast-'+type;
-  t.innerHTML='<span class="toast-icon"><svg width="10" height="10" viewBox="0 0 10 10">'+icons[type||'ok']+'</svg></span><span>'+msg+'</span>';
-  tc.appendChild(t);
-  setTimeout(function(){t.classList.add('out');setTimeout(function(){t.remove();},250);},3000);
-}
-// ── slabel partagé ──────────────────────────
-function slabel(h){
-  if(h>=OBJ_HEURES)return['Objectif atteint','var(--gn)','var(--gnl)'];
-  if(h>=30)return['Bon avancement','var(--gn)','var(--gnl)'];
-  if(h>=20)return['En cours','var(--am)','var(--aml)'];
-  if(h>=10)return['\u00c0 renforcer','var(--red)','var(--redl)'];
-  if(h>0)return['Insuffisant','var(--red)','var(--redl)'];
-  return['Aucune heure','var(--hi)','var(--bg)'];
-}
-// ───────────────────────────────────────────
-
 // ── CONFIG ───────────────────────────────────
 var FB_CFG={apiKey:"AIzaSyB-wIHxxQKYKlss2byJiN26d4VPc5dozlc",authDomain:"clardeluna-2026.firebaseapp.com",projectId:"clardeluna-2026",storageBucket:"clardeluna-2026.firebasestorage.app",messagingSenderId:"65241322899",appId:"1:65241322899:web:0c94d1ab9c178f030f0466"};
 var PIN_HASH="158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab", OBJ=40;
@@ -558,7 +501,7 @@ function rHome(){
     '<button class="btn bo" data-a="go-form">Déclarer des heures</button></div>'+
     '<div style="margin-top:28px;text-align:center"><button class="btn bgh" data-a="go-login">Administration</button></div>'+
     '<p style="text-align:center;font-size:11px;color:var(--hi);margin-top:20px">Objectif : 40h par parent</p>'+
-    (ACCESS_ENABLED?'<div style="text-align:center;margin-top:24px"><button data-a="logout" class="btn-logout">Se déconnecter</button></div>':"")+ 
+    (ACCESS_ENABLED?'<div style="text-align:center;margin-top:24px"><button data-a="logout" class="btn-logout">🔒 Se déconnecter</button></div>':"")+ 
   '</div>';
 }
 // ── PORTAIL ───────────────────────────────────
@@ -567,8 +510,7 @@ function rPortal(){
     '<div class="wrap" style="padding-top:20px">'+
       '<h2 class="ptt">Votre progression</h2>'+
       '<p class="pss">Recherchez par nom de famille, élève ou prénom d un parent</p>'+
-      (S.loading?'<div class="skel-card"><div class="skel skel-title"></div><div class="skel skel-line"></div><div class="skel skel-line" style="width:70%"></div></div>':"")
-+
+      (S.loading?'<div class="al aw" style="margin-bottom:10px">Chargement des données…</div>':'')+
       (S.err?'<div class="al ae" style="margin-bottom:10px">'+esc(S.err)+'</div>':'')+
       '<div style="display:flex;gap:8px">'+
         '<input class="inp" id="pq" placeholder="ex: DUPONT ou Sophie" value="'+esc(S.portalQ)+'" autocomplete="off" style="flex:1">'+
@@ -578,79 +520,67 @@ function rPortal(){
       '<div class="mt20"><button class="btn bo" data-a="go-form">Déclarer des heures</button></div>'+
     '</div>';
 }
-function portalResults(fam){
-  var f=fam;
-  if(!f)return'<p class="empty">Famille introuvable.</p>';
-  var OBJ=OBJ_HEURES,nbPar=Math.max(1,f.parents.length),famObj=nbPar*OBJ;
-  var p=Math.min(100,Math.round(f.totalH/famObj*100));
-  var s=f.totalH===0?'zero':status(f.totalH);
-  var bc=s==='complete'||s==='ok'?'var(--gn)':s==='warn'?'#E6A817':s==='zero'?'var(--bd)':'var(--red)';
-  var barH='<div style="margin-bottom:20px">'+
-    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">'+
-      '<span style="font-size:14px;font-weight:700">Famille '+esc(f.key)+'</span>'+
-      '<span style="font-size:13px;color:'+bc+';font-weight:700">'+rnd(f.totalH)+'h / '+famObj+'h</span>'+
-    '</div>'+
-    '<div style="height:10px;background:var(--bd);border-radius:5px;overflow:hidden;margin-bottom:8px">'+
-      '<div style="height:100%;width:'+p+'%;background:'+bc+';border-radius:5px;transition:width 1s cubic-bezier(.4,0,.2,1)"></div>'+
-    '</div>'+
-    '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu)">'+
-      '<span>'+p+'% atteint</span>'+
-      badge(s)+
-    '</div>'+
-  '</div>';
-  var parsH=f.parents.map(function(par){
-    var pname=displayPrenom(par.prenoms);
-    var ph=par.totalH||0;
-    var pp=Math.min(100,Math.round(ph/OBJ*100));
-    var pl=slabel(ph);
-    var cats=Object.keys(par.byAct).map(function(k){
-      return'<span style="font-size:10px;background:var(--bg);padding:2px 8px;border-radius:10px;margin-right:4px;color:var(--mu)">'+esc(k)+' '+rnd(par.byAct[k])+'h</span>';
-    }).join('');
-    return'<div class="card" style="margin-bottom:8px">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
-        '<span style="font-weight:700;font-size:13px">'+esc(pname)+'</span>'+
-        '<span style="font-size:14px;font-weight:700;color:'+pl[1]+'">'+rnd(ph)+'h</span>'+
-      '</div>'+
-      '<div style="height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:6px">'+
-        '<div style="height:100%;width:'+pp+'%;background:'+pl[1]+';border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1)"></div>'+
-      '</div>'+
-      '<div>'+cats+'</div>'+
-    '</div>';
-  }).join('');
-  var famSubs=(S.subs||[]).filter(function(s2){return familyKey(s2.eleve)===f.key;})
-    .sort(function(a,b){return(b.ts||'').localeCompare(a.ts||'')});
-  var timelineH='';
-  if(famSubs.length){
-    var dots={Commissions:'var(--red)',Festivités:'var(--gn)'};
-    var tlItems=famSubs.slice(0,15).map(function(s2){
-      var cat=s2.activiteType||'';
-      var dot=dots[cat]||'var(--am)';
-      var dt=s2.ts?new Date(s2.ts).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}):'';
-      return'<div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:0.5px solid var(--bd)">'+
-        '<div style="width:8px;height:8px;border-radius:50%;background:'+dot+';flex-shrink:0;margin-top:3px"></div>'+
+function portalResults(){
+  var q=S.portalQ;
+  if(!q||q.length<2)return q.length===1?'<p style="font-size:13px;color:var(--mu);text-align:center;margin-top:16px">Saisissez au moins 2 caracteres...</p>':"";
+  if(S.loading)return'<div class="loader"><div class="spin"></div></div>';
+  if(S.err)return'<div class="al ae">'+esc(S.err)+'</div>';
+  if(!S.subs)return'<div class="loader"><div class="spin"></div>Chargement...</div>';
+  var qn=nrm(q);
+  // Index complet: familles avec saisies + TOUTES les familles de ELEVES
+  var allFamsComplete=buildFullFamilies(S.subs);
+  var found=allFamsComplete.filter(function(f){
+    // 1. Nom de famille
+    if(nrm(f.key).includes(qn))return true;
+    // 2. Nom complet ou prénom de l'élève
+    if(Object.keys(f.children).some(function(ch){return nrm(ch).includes(qn);}))return true;
+    // 3. Prénom parent (saisies Firebase)
+    if(f.parents.some(function(p){return p.prenoms.some(function(pr){return nrm(pr).includes(qn);});}))return true;
+    // 4. Prénom parent (PARENTS_MAP)
+    var allP=[];Object.keys(PARENTS_MAP).forEach(function(e){if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){if(allP.indexOf(p)===-1)allP.push(p);});});
+    if(allP.some(function(p){return nrm(p).includes(qn);}))return true;
+    return false;
+  });
+  if(!found.length)return'<p class="empty">Aucun resultat pour <strong>'+esc(q)+'</strong><br><span style="font-size:12px;color:var(--mu)">Essayez le nom de famille, le prenom de l\'enfant ou d\'un parent</span></p>';
+  return found.sort(function(a,b){return a.key.localeCompare(b.key);}).map(function(f){
+    var totCheqR=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
+    var nbPar=f.parents.length||1,famObj2=nbPar*OBJ;
+    var s=f.totalH>=famObj2?"complete":status(f.totalH);
+    var p2=pct(f.totalH,famObj2);
+    var enfants=Object.keys(f.children).map(function(ch){return ch+" ("+f.children[ch]+")";}).join(", ");
+    var dispPars=[];
+    Object.keys(PARENTS_MAP).forEach(function(e){if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){if(dispPars.indexOf(p)===-1)dispPars.push(p);});});
+    if(!dispPars.length)dispPars=f.parents.map(function(p2){return displayPrenom(p2.prenoms);});
+    var parentsDisp=dispPars.join(' - ');
+    var hoursDisplay;
+    if(f.totalH===0){
+      hoursDisplay='<div style="font-size:12px;color:var(--mu);font-style:italic;margin-top:2px">Aucune heure declaree</div>';
+    }else if(f.subs&&f.subs.length===0&&totCheqR>0){
+      hoursDisplay='<div style="font-size:20px;font-weight:700;color:var(--am)">'+rnd(totCheqR)+'h</div>'+
+        '<div style="font-size:10px;color:var(--am)">cheque(s)</div>';
+    }else{
+      hoursDisplay='<div style="font-size:22px;font-weight:700;color:var(--red)">'+rnd(f.totalH)+'h</div>'+
+        (totCheqR>0?'<div style="font-size:10px;color:var(--am)">dont '+rnd(totCheqR)+'h cheques</div>':'')+
+        '<div style="font-size:10px;color:var(--mu)">/ '+famObj2+'h</div>';
+    }
+    return'<button class="li" style="margin-bottom:10px" data-a="portal-sel" data-key="'+esc(f.key)+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'+
         '<div style="flex:1;min-width:0">'+
-          '<div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(s2.sousActivite||cat)+'</div>'+
-          '<div style="font-size:11px;color:var(--mu)">'+esc(s2.parents||'')+(dt?' · '+dt:'')+'</div>'+
+          '<div style="font-weight:700;font-size:15px">Famille '+esc(f.key)+'</div>'+
+          '<div style="font-size:12px;color:var(--mu);margin-top:2px">'+esc(enfants)+'</div>'+
+          '<div style="font-size:12px;color:var(--mu)">Parents : '+esc(parentsDisp)+'</div>'+
+          (f.totalH>0?'<div style="margin-top:6px"><div class="pt2"><div class="pf '+fcls(s)+'" style="width:'+p2+'%"></div></div></div>':'')+
         '</div>'+
-        '<div style="font-size:12px;font-weight:700;color:var(--tx);flex-shrink:0">'+rnd(parseFloat(s2.heures)||0)+'h</div>'+
-      '</div>';
-    }).join('');
-    timelineH='<div class="card" style="margin-top:16px">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
-        '<div style="font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em">Historique</div>'+
-        '<div style="display:flex;gap:10px;font-size:10px;color:var(--mu)">'+
-          '<span style="display:flex;align-items:center;gap:3px"><span style="width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block"></span>Commissions</span>'+
-          '<span style="display:flex;align-items:center;gap:3px"><span style="width:7px;height:7px;border-radius:50%;background:var(--gn);display:inline-block"></span>Festivités</span>'+
-          '<span style="display:flex;align-items:center;gap:3px"><span style="width:7px;height:7px;border-radius:50%;background:var(--am);display:inline-block"></span>Admin</span>'+
+        '<div style="text-align:right;flex-shrink:0">'+
+          hoursDisplay+
+          (f.totalH>0?badge(s):'')+
         '</div>'+
       '</div>'+
-      tlItems+
-      (famSubs.length>15?'<div style="font-size:11px;color:var(--mu);text-align:center;padding-top:8px">+'+(famSubs.length-15)+' autres</div>':'')+
-    '</div>';
-  }
-  return barH+parsH+timelineH;
+    '</button>';
+  }).join("");
 }
 
+// ── VUE FAMILLE ───────────────────────────────
 function rView(){
   var f=S.portalFam;if(!f)return rPortal();
   // Objectif = nb de parents × 40h (chèques par parent inclus)
@@ -898,17 +828,6 @@ function rAdmin(){
     `</div><div class="wlg" style="padding-top:16px">${c}</div>`;
 }
 function rOverview(fs,tot){
-  var nOk=fs.filter(function(f){return f.totalH>=OBJ_HEURES;}).length;
-  function gauge(val,max,color){
-    var p=Math.min(1,val/(max||1));
-    var circ=125.66;var dash=rnd(circ*p);
-    return'<svg viewBox="0 0 100 56" width="110" height="62" style="display:block;margin:4px auto">'+
-      '<path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="var(--bd)" stroke-width="8" stroke-linecap="round"/>'+
-      '<path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="'+color+'" stroke-width="8" stroke-linecap="round"'+
-        ' stroke-dasharray="'+dash+' '+circ+'" style="transition:stroke-dasharray 1.2s .2s cubic-bezier(.4,0,.2,1)"/>'+
-      '<text x="50" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="'+color+'">'+Math.round(p*100)+'%</text>'+
-    '</svg>';
-  }
   var att=rnd(hAtt()),ct=curTri();
   // N utiliser buildFullFamilies que si subs sont charges
   var fsForStats=(S.subs!==null)?buildFullFamilies(S.subs):fs;
@@ -936,23 +855,9 @@ function rOverview(fs,tot){
     '</div>'  :"";
   var loadingNote=S.subs===null?'<div class="al aw mt8">Chargement...</div>'  :"";
   return stats+loadingNote+info+
-    '<div class="mt16"><button class="btn bo" data-a="print-overview">Exporter PDF</button></div>'+
+    '<div class="mt16"><button class="btn bo" data-a="print-overview">🖨 Exporter PDF</button></div>'+
     lateCard;
 }
-  var heuresPot=Math.max(1,fs.length*2*OBJ_HEURES);
-  var gaugeHtml='<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px">'+
-    '<div class="sc" style="flex:1;min-width:140px;padding:16px">'+
-      '<div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Avancement global</div>'+
-      gauge(tot,heuresPot,'var(--red)')+
-      '<div style="font-size:11px;color:var(--mu)">'+rnd(tot)+'h investies</div>'+
-    '</div>'+
-    '<div class="sc" style="flex:1;min-width:140px;padding:16px">'+
-      '<div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Objectif atteint</div>'+
-      gauge(nOk,fs.length,'var(--gn)')+
-      '<div style="font-size:11px;color:var(--mu)">'+nOk+' / '+fs.length+' familles</div>'+
-    '</div>'+
-  '</div>';
-
 
 function rHeures(fs){
   var elevesActuels=[];
@@ -1025,9 +930,7 @@ function rHeures(fs){
         '</td>'+
       '</tr>';
     }).join("");
-    var rowBg2=f.totalH===0?'rgba(0,0,0,.02)':f.totalH>=OBJ_HEURES?'rgba(46,125,79,.08)':f.totalH<15?'rgba(192,71,42,.06)':'rgba(230,168,23,.05)';
-    var rowBorder2=f.totalH===0?'var(--bd)':f.totalH>=OBJ_HEURES?'var(--gn)':f.totalH<15?'var(--red)':'#E6A817';
-    return'<tr style="border-top:2px solid '+rowBorder2+';background:'+rowBg2+'">'+ 
+    return'<tr style="border-top:2px solid #C0472A">'+
       '<td colspan="3" style="padding:10px;background:'+famBg+'">'+
         '<span style="font-weight:700;font-size:14px">'+esc(enfants)+'</span>'+
         '<span style="font-size:11px;color:#888;margin-left:8px">'+esc(classes)+'</span>'+
@@ -1168,7 +1071,7 @@ function rSaisies(subs){
     '<input class="fbar-search" id="sq" placeholder="Rechercher..." value="'+esc(S.aSubQ||"")+'" autocomplete="off">'+
     (famKeys.length>1?'<select class="fbar-sel'+(selFam!="all"?" active":"")+'" data-a="sel-fam">'+famOpts+'</select>':'')+
     (parentSugg.length>1?'<select class="fbar-sel'+(selPar!="all"?" active":"")+'" data-a="sel-par">'+parOpts+'</select>':'')+
-    '<button class="btn bp bsm" data-a="print-saisies" style="flex-shrink:0;white-space:nowrap">PDF</button>'+
+    '<button class="btn bp bsm" data-a="print-saisies" style="flex-shrink:0;white-space:nowrap">🖨 PDF</button>'+
     '</div>'+
     '<p style="font-size:12px;color:var(--mu);margin-bottom:10px">'+filtered.length+' saisie'+(filtered.length>1?"s":"")+" / "+subs.length+' total - '+rnd(totalH)+'h</p>'+
     totActH+
@@ -1387,7 +1290,7 @@ function rRapport(fs,tot){
   '</div>';
 
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
-  return`<div id="rapport-content"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px"><div><h2 style="font-size:17px;font-weight:700">Calcul du total global des heures</h2><p style="font-size:12px;color:var(--mu)">Édition du ${dt} — Toutes commissions, festivités et Administratif/CA confondues</p></div><button class="btn bp bsm" style="flex-shrink:0" onclick="printRapport()">'+ICONS.print+'Imprimer / PDF</button></div>`+
+  return`<div id="rapport-content"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px"><div><h2 style="font-size:17px;font-weight:700">Calcul du total global des heures</h2><p style="font-size:12px;color:var(--mu)">Édition du ${dt} — Toutes commissions, festivités et Administratif/CA confondues</p></div><button class="btn bp bsm" style="flex-shrink:0" onclick="printRapport()">🖨️ Imprimer / PDF</button></div>`+
     statsH+
     chartSvg+
     table+
@@ -2203,7 +2106,7 @@ function onClick(e){
       TRI=buildTRI(RENTREE,ANNEE);
       document.title="Clardeluna "+ANNEE;
       fbSaveAnnee().then(function(){
-        showToast('Année enregistrée','ok');go({anneeSaving:false,anneeSaved:true});
+        go({anneeSaving:false,anneeSaved:true});
         setTimeout(function(){go({anneeSaved:false});},3000);
       }).catch(function(e){go({anneeSaving:false,err:"Erreur année : "+e.message});});
       break;
@@ -2592,7 +2495,5 @@ function showErr(msg){
   }catch(e){showErr(e.message);}
 })();
 </script>
-
-<div id="toast-container"></div>
 </body>
 </html>
