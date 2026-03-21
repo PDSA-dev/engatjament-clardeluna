@@ -886,74 +886,109 @@ function rOverview(fs,tot){
 }
 
 function rHeures(fs){
-  var cls=["all"].concat(Object.keys(ELEVES));
-  var sts=["all","ok","warn","late","zero","complete"];
-  var slbls={all:"Tous","ok":"A jour",warn:"Vigilance",late:"En retard",zero:"Aucune heure",complete:"Objectif atteint"};
-  // Utiliser buildFullFamilies pour inclure les familles à 0h
-  var fsAll=(S.subs!==null)?buildFullFamilies(S.subs):fs;
-  var clsOpts=cls.map(function(cl){return'<option value="'+cl+'"'+(S.aCls===cl?' selected':'')+'>'+( cl==="all"?"🏫 Toutes classes":cl)+'</option>';}).join("");
-  var stOpts=sts.map(function(st){return'<option value="'+st+'"'+(S.aFilter===st?' selected':'')+'>'+{all:"🎯 Tous statuts","ok":"✅ À jour",warn:"⚠️ Vigilance",late:"🔴 En retard",zero:"⬜ Aucune heure",complete:"🏆 Objectif atteint"}[st]+'</option>';}).join("");
-  var fBar='<div class="fbar-compact">'+
-    '<input id="heure-q" class="fbar-search" type="text" placeholder="Rechercher une famille…" value="'+esc(S.aHeureQ||'')+'" data-a="heure-q" autocomplete="off">'+
-    '<select class="fbar-sel'+(S.aCls!=="all"?" active":"")+'" data-a="fcls-sel">'+clsOpts+'</select>'+
-    '<select class="fbar-sel'+(S.aFilter!=="all"?" active":"")+'" data-a="fst-sel">'+stOpts+'</select>'+
-  '</div>';
-  var hq=nrm(S.aHeureQ||"");
-  var filtered=fsAll.filter(function(f){
-    var clsOk=S.aCls==="all"||Object.values(f.children).indexOf(S.aCls)!==-1;
-    var stOk;
-    if(S.aFilter==="all")stOk=true;
-    else if(S.aFilter==="zero")stOk=f.totalH===0;
-    else stOk=f.totalH>0&&status(f.totalH)===S.aFilter;
-    var qOk=!hq||nrm(f.key).includes(hq)||Object.keys(f.children).some(function(ch){return nrm(ch).includes(hq);});
-    return clsOk&&stOk&&qOk;
-  }).sort(function(a,b){return a.key.localeCompare(b.key);});
-  if(!filtered.length)return fBar+'<p class="empty">Aucune famille</p>';
-  var rows=filtered.map(function(f){
-    var s=f.totalH===0?"zero":status(f.totalH);
-    var nbPar=f.parents.length||1,famObj=nbPar*OBJ;
-    var p=Math.min(100,Math.round(f.totalH/famObj*100));
-    var bc=s==="complete"||s==="ok"?"var(--gn)":s==="warn"?"#E6A817":s==="zero"?"#bbb":"var(--red)";
-    // Parents: merge Firebase + PARENTS_MAP
-    var dispPars=[];
+  var elevesActuels=[];
+  Object.keys(ELEVES).forEach(function(cl){elevesActuels=elevesActuels.concat(ELEVES[cl]);});
+  var subsActuels=(S.subs||[]).filter(function(s){
+    var eNrm=nrm(s.eleve);
+    return elevesActuels.some(function(e){return nrm(e)===eNrm;});
+  });
+  var fsAll=buildFullFamilies(subsActuels);
+  var OBJ=40;
+  var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
+  var allParents=[];
+  fsAll.forEach(function(f){f.parents.forEach(function(p){allParents.push(p);});});
+  var nOk=allParents.filter(function(p){return p.totalH>=OBJ;}).length;
+  var nZero=allParents.filter(function(p){return p.totalH===0;}).length;
+  function slabel(h,ch){
+    if(ch>0&&h===ch)return["Cheque(s)","#8B6000","#FFF8E1"];
+    if(h>=OBJ)return["Objectif atteint","#2E7D4F","#E8F5EE"];
+    if(h>=30)return["Bon avancement","#2E7D4F","#E8F5EE"];
+    if(h>=20)return["En cours","#8B6000","#FFF8E1"];
+    if(h>=10)return["A renforcer","#C0472A","#F5EAE7"];
+    if(h>0)return["Insuffisant","#C0472A","#FDECEA"];
+    return["Aucune heure","#999","#F5F5F5"];
+  }
+  var rows=fsAll.map(function(f){
+    var enfants=Object.keys(f.children).join(" + ");
+    var classes=Object.values(f.children).filter(function(v,i,a){return a.indexOf(v)===i;}).join(" / ");
+    var famCheqTot=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
+    var famBg=f.totalH===0?"#FFF5F5":"#F7F4F1";
+    var allParsForFam=[];
     Object.keys(PARENTS_MAP).forEach(function(e){
-      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p2){if(dispPars.indexOf(p2)===-1)dispPars.push(p2);});
+      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){
+        if(p&&allParsForFam.indexOf(p)===-1)allParsForFam.push(p);
+      });
     });
-    if(!dispPars.length)dispPars=f.parents.map(function(par){return displayPrenom(par.prenoms);});
-    var cats=Object.keys(f.byAct).map(function(k){
-      return'<span style="font-size:10px;color:var(--mu)">'+esc(k)+' '+rnd(f.byAct[k])+'h</span>';
-    }).join(" - ");
-    var badgeHtml;
-    if(s==="zero"){
-      badgeHtml='<span style="font-size:11px;background:#F5F5F5;color:#999;padding:2px 8px;border-radius:10px;font-weight:600">Aucune heure</span>';
-    }else{
-      badgeHtml=badge(s);
-    }
-    return'<tr>'+
-      '<td>'+
-        '<div style="font-size:13px;font-weight:700">Famille '+esc(f.key)+'</div>'+
-        '<div style="font-size:11px;color:var(--mu)">'+esc(dispPars.join(", "))+'</div>'+
-        '<div style="font-size:11px;color:var(--mu)">'+esc(Object.keys(f.children).join(", "))+'</div>'+
-        (cats?'<div style="margin-top:2px">'+cats+'</div>':"")+
+    var parRowsMap={};
+    f.parents.forEach(function(par){
+      var pname=displayPrenom(par.prenoms);
+      parRowsMap[pname]={pname:pname,prenoms:par.prenoms,ph:par.totalH||0,ch:par.chequeH||0,byAct:par.byAct};
+    });
+    allParsForFam.forEach(function(p){
+      var already=Object.keys(parRowsMap).some(function(k){return prenomMatch(k,p)||nrm(k)===nrm(p);});
+      if(!already){
+        var ch=chequesH(f.key,p);
+        parRowsMap[p]={pname:p,prenoms:[p],ph:ch,ch:ch,byAct:{}};
+      }
+    });
+    var parRows=Object.values(parRowsMap).map(function(par){
+      var ph=par.ph,ch=par.ch,pname=par.pname;
+      var lbl=slabel(ph,ch),pp=Math.min(100,Math.round(ph/OBJ*100));
+      var cats=Object.keys(par.byAct).map(function(k){return esc(k)+": "+rnd(par.byAct[k])+"h";}).join(" - ");
+      var chequeInfo=ch>0?'<span style="font-size:10px;background:#FFF8E1;color:#8B6000;border-radius:8px;padding:1px 6px;margin-left:5px">cheque '+Math.round(ch/10)+'x (+'+rnd(ch)+'h)</span>':"";
+      var noHours=ph===0?'<div style="font-size:11px;color:#999;font-style:italic">Aucune heure déclarée</div>':"";
+      return'<tr style="background:#FAFAF8;border-bottom:1px solid #EEE">'+
+        '<td style="padding:7px 10px 7px 22px;font-size:12px;color:#444;vertical-align:middle">'+
+          '<span style="color:#999;margin-right:4px">|-</span><strong>'+esc(pname)+'</strong>'+
+          (par.prenoms.length>1?'<span style="font-size:10px;color:#aaa;margin-left:6px">(aussi: '+esc(par.prenoms.filter(function(x){return x!==pname;}).join(", "))+')</span>':"")+
+          chequeInfo+
+          (cats?'<div style="font-size:11px;color:#888;margin-top:2px">'+cats+'</div>':"")+
+          noHours+
+        '</td>'+
+        '<td style="padding:7px 10px;font-weight:700;font-size:14px;color:'+lbl[1]+';text-align:right;vertical-align:middle;white-space:nowrap">'+
+          (ph===0?'<span style="color:#bbb">---</span>':rnd(ph)+'h')+
+        '</td>'+
+        '<td style="padding:7px 10px;vertical-align:middle;min-width:150px">'+
+          '<div style="height:6px;background:#E0D9D3;border-radius:3px;overflow:hidden;margin-bottom:3px">'+
+            '<div style="height:100%;width:'+pp+'%;background:'+lbl[1]+';border-radius:3px"></div>'+
+          '</div>'+
+          '<span style="font-size:10px;background:'+lbl[2]+';color:'+lbl[1]+';padding:2px 7px;border-radius:10px;font-weight:700">'+pp+'% - '+lbl[0]+'</span>'+
+        '</td>'+
+      '</tr>';
+    }).join("");
+    return'<tr style="border-top:2px solid #C0472A">'+
+      '<td colspan="3" style="padding:10px;background:'+famBg+'">'+
+        '<span style="font-weight:700;font-size:14px">'+esc(enfants)+'</span>'+
+        '<span style="font-size:11px;color:#888;margin-left:8px">'+esc(classes)+'</span>'+
+        '<span style="font-size:12px;color:#7A7268;margin-left:12px">Total famille : <strong style="color:'+(f.totalH>0?"#C0472A":"#bbb")+'">'+(f.totalH===0?"---":rnd(f.totalH)+"h")+'</strong></span>'+
+        (famCheqTot>0&&f.subs&&f.subs.length===0?'<span style="font-size:11px;background:#FFF8E1;color:#8B6000;padding:1px 6px;border-radius:8px;margin-left:8px">cheques uniquement</span>':"")+
       '</td>'+
-      '<td style="white-space:nowrap">'+
-        '<div class="hbw"><div class="hb" style="width:'+p+'%;background:'+bc+'"></div></div>'+
-        '<span style="font-size:13px;font-weight:700;color:'+bc+'">'+(f.totalH===0?"0h":rnd(f.totalH)+"h")+'</span>'+
-        '<span style="font-size:10px;color:var(--mu);margin-left:3px">/ '+famObj+'h</span>'+
-      '</td>'+
-      '<td>'+badgeHtml+'</td>'+
-    '</tr>';
+    '</tr>'+parRows;
   }).join("");
-  var totalH=filtered.reduce(function(a,f){return a+f.totalH;},0);
-  return fBar+
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
-      '<p style="font-size:11px;color:var(--mu)">'+filtered.length+' famille(s) - Objectif : '+OBJ+'h par famille'+(filtered.length?(' - Total : '+rnd(totalH)+'h'):'')+'</p>'+
-      '<button class="btn bo bsm" data-a="print-heures">Imprimer / PDF</button>'+
-    '</div>'+
-    '<div style="overflow-x:auto"><table class="htbl">'+
-      '<thead><tr><th>Famille</th><th>Total</th><th>Statut</th></tr></thead>'+
-      '<tbody>'+rows+'</tbody>'+
-    '</table></div>';
+  var legendH='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;font-size:11px">'+
+    '<span style="font-weight:700;color:var(--mu);margin-right:4px">Objectif : 40h / parent ---</span>'+
+    [[">=40h Objectif atteint","#2E7D4F","#E8F5EE"],[">=30h Bon avancement","#2E7D4F","#E8F5EE"],[">=20h En cours","#8B6000","#FFF8E1"],[">=10h A renforcer","#C0472A","#F5EAE7"],["<10h Insuffisant","#C0472A","#FDECEA"],["Cheque(s)","#8B6000","#FFF8E1"],["Aucune heure","#999","#F5F5F5"]].map(function(l){
+      return'<span style="background:'+l[2]+';color:'+l[1]+';padding:2px 8px;border-radius:10px;font-weight:600">'+l[0]+'</span>';
+    }).join("")+
+  '</div>';
+  var table='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'+
+    '<thead><tr style="background:var(--bg)">'+
+      '<th style="padding:9px 10px;text-align:left;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--bd)">Enfant(s) / Parent</th>'+
+      '<th style="padding:9px 10px;text-align:right;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--bd)">Heures</th>'+
+      '<th style="padding:9px 10px;text-align:left;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--bd)">Progression / 40h</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  var statsH='<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px">'+
+    [["Familles",fsAll.length,"var(--red)"],["Parents recenses",allParents.length,"var(--red)"],["Objectif atteint",nOk+" parents","var(--gn)"],["Sans heures",nZero+" parents","var(--mu)"]].map(function(s){
+      return'<div class="sc"><div class="sv" style="font-size:18px;color:'+s[2]+'">'+s[1]+'</div><div class="slbl">'+s[0]+'</div></div>';
+    }).join("")+'</div>';
+  return'<div id="rapport-content">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'+
+      '<div><h2 style="font-size:17px;font-weight:700">Rapport d\'investissement</h2>'+
+      '<p style="font-size:12px;color:var(--mu)">Edition du '+dt+' - '+ANNEE+' - Objectif : 40h / parent</p></div>'+
+      '<button class="btn bp bsm" onclick="printRapport()">Imprimer / PDF</button>'+
+    '</div>'+statsH+legendH+table+
+    '<p style="font-size:11px;color:var(--mu);margin-top:10px;text-align:right">Clardeluna '+ANNEE+' - '+dt+'</p>'+
+  '</div>';
 }
 
 function rSaisies(subs){
@@ -1070,108 +1105,163 @@ function rSaisies(subs){
 }
 
 function rRapport(fs,tot){
-  var elevesActuels=[];
-  Object.keys(ELEVES).forEach(function(cl){elevesActuels=elevesActuels.concat(ELEVES[cl]);});
-  var subsActuels=(S.subs||[]).filter(function(s){
-    var eNrm=nrm(s.eleve);
-    return elevesActuels.some(function(e){return nrm(e)===eNrm;});
+  // ── Agrégation des heures par catégorie et sous-activité ──
+  var subs=(S.subs||[]).filter(function(s){
+    var h=parseFloat(s.heures);
+    return !isNaN(h)&&h>0&&s.activiteType&&s.activiteType.trim();
   });
-  var fsAll=buildFullFamilies(subsActuels);
-  var OBJ=40;
-  var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
-  var allParents=[];
-  fsAll.forEach(function(f){f.parents.forEach(function(p){allParents.push(p);});});
-  var nOk=allParents.filter(function(p){return p.totalH>=OBJ;}).length;
-  var nZero=allParents.filter(function(p){return p.totalH===0;}).length;
-  function slabel(h,ch){
-    if(ch>0&&h===ch)return["Cheque(s)","#8B6000","#FFF8E1"];
-    if(h>=OBJ)return["Objectif atteint","#2E7D4F","#E8F5EE"];
-    if(h>=30)return["Bon avancement","#2E7D4F","#E8F5EE"];
-    if(h>=20)return["En cours","#8B6000","#FFF8E1"];
-    if(h>=10)return["A renforcer","#C0472A","#F5EAE7"];
-    if(h>0)return["Insuffisant","#C0472A","#FDECEA"];
-    return["Aucune heure","#999","#F5F5F5"];
-  }
-  var rows=fsAll.map(function(f){
-    var enfants=Object.keys(f.children).join(" + ");
-    var classes=Object.values(f.children).filter(function(v,i,a){return a.indexOf(v)===i;}).join(" / ");
-    var famCheqTot=f.parents.reduce(function(a,par){return a+(par.chequeH||0);},0);
-    var famBg=f.totalH===0?"#FFF5F5":"#F7F4F1";
-    var allParsForFam=[];
-    Object.keys(PARENTS_MAP).forEach(function(e){
-      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){
-        if(p&&allParsForFam.indexOf(p)===-1)allParsForFam.push(p);
-      });
-    });
-    var parRowsMap={};
-    f.parents.forEach(function(par){
-      var pname=displayPrenom(par.prenoms);
-      parRowsMap[pname]={pname:pname,prenoms:par.prenoms,ph:par.totalH||0,ch:par.chequeH||0,byAct:par.byAct};
-    });
-    allParsForFam.forEach(function(p){
-      var already=Object.keys(parRowsMap).some(function(k){return prenomMatch(k,p)||nrm(k)===nrm(p);});
-      if(!already){
-        var ch=chequesH(f.key,p);
-        parRowsMap[p]={pname:p,prenoms:[p],ph:ch,ch:ch,byAct:{}};
-      }
-    });
-    var parRows=Object.values(parRowsMap).map(function(par){
-      var ph=par.ph,ch=par.ch,pname=par.pname;
-      var lbl=slabel(ph,ch),pp=Math.min(100,Math.round(ph/OBJ*100));
-      var cats=Object.keys(par.byAct).map(function(k){return esc(k)+": "+rnd(par.byAct[k])+"h";}).join(" - ");
-      var chequeInfo=ch>0?'<span style="font-size:10px;background:#FFF8E1;color:#8B6000;border-radius:8px;padding:1px 6px;margin-left:5px">cheque '+Math.round(ch/10)+'x (+'+rnd(ch)+'h)</span>':"";
-      var noHours=ph===0?'<div style="font-size:11px;color:#999;font-style:italic">Aucune heure déclarée</div>':"";
-      return'<tr style="background:#FAFAF8;border-bottom:1px solid #EEE">'+
-        '<td style="padding:7px 10px 7px 22px;font-size:12px;color:#444;vertical-align:middle">'+
-          '<span style="color:#999;margin-right:4px">|-</span><strong>'+esc(pname)+'</strong>'+
-          (par.prenoms.length>1?'<span style="font-size:10px;color:#aaa;margin-left:6px">(aussi: '+esc(par.prenoms.filter(function(x){return x!==pname;}).join(", "))+')</span>':"")+
-          chequeInfo+
-          (cats?'<div style="font-size:11px;color:#888;margin-top:2px">'+cats+'</div>':"")+
-          noHours+
-        '</td>'+
-        '<td style="padding:7px 10px;font-weight:700;font-size:14px;color:'+lbl[1]+';text-align:right;vertical-align:middle;white-space:nowrap">'+
-          (ph===0?'<span style="color:#bbb">---</span>':rnd(ph)+'h')+
-        '</td>'+
-        '<td style="padding:7px 10px;vertical-align:middle;min-width:150px">'+
-          '<div style="height:6px;background:#E0D9D3;border-radius:3px;overflow:hidden;margin-bottom:3px">'+
-            '<div style="height:100%;width:'+pp+'%;background:'+lbl[1]+';border-radius:3px"></div>'+
-          '</div>'+
-          '<span style="font-size:10px;background:'+lbl[2]+';color:'+lbl[1]+';padding:2px 7px;border-radius:10px;font-weight:700">'+pp+'% - '+lbl[0]+'</span>'+
+
+  // totaux par catégorie > sous-activité
+  var byCateg={}; // { "Commissions": { "Travaux": 12, ... }, ... }
+  subs.forEach(function(s){
+    var cat=s.activiteType.trim();
+    var sous=(s.sousActivite||"").trim()||"(non précisé)";
+    var h=parseFloat(s.heures)||0;
+    if(!byCateg[cat])byCateg[cat]={};
+    byCateg[cat][sous]=(byCateg[cat][sous]||0)+h;
+  });
+
+  var ORDER=["Commissions","Festivités","Administratif / gestion Collège / CA"];
+  var COLORS_COM=[
+    "#C0472A","#E8714F","#F4A07A","#F7C4A6","#FAE0D0",
+    "#8B2A18","#D45D3A","#E89060","#F2B68A","#F8D4B8",
+    "#6B1E10","#C04830","#DB7550","#ECA070","#F5C8A0",
+    "#9B3520","#CC5C42","#E07A5C","#ECA584","#F5CEAE",
+    "#751508","#B03C28","#CD6448","#E09070","#EFC09A"
+  ];
+  var COLORS_FES=[
+    "#2E7D4F","#4CAF77","#7FCC9F","#AADDB8","#D0EDDA",
+    "#1A5C3A","#3A9C65","#6BBF90","#9FD5B0","#C8E8D5",
+    "#0F4028","#2E8055","#5AB07D","#8FCCA5","#BCE3CA",
+    "#1F6B42","#3A9668","#67BA8C","#96D1AE","#C2E5CF",
+    "#254D35","#3D8A5D","#6AB585","#98CCA8","#C5E2D2"
+  ];
+
+  // ── Tableau principal ──
+  var tableRows="";
+  var grandTotal=0;
+  var categTotals={};
+
+  ORDER.forEach(function(cat){
+    if(!byCateg[cat])return;
+    var subMap=byCateg[cat];
+    var catTotal=Object.values(subMap).reduce(function(a,v){return a+v;},0);
+    if(catTotal===0)return;
+    categTotals[cat]=catTotal;
+    grandTotal+=catTotal;
+
+    // En-tête catégorie
+    var catColor=cat==="Commissions"?"#C0472A":cat==="Festivités"?"#2E7D4F":"#8B6000";
+    tableRows+='<tr style="background:'+catColor+';color:#fff">'+
+      '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">'+cat+'</td>'+
+      '<td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">'+rnd(catTotal)+' h</td>'+
+    '</tr>';
+
+    // Lignes sous-activité
+    Object.keys(subMap).sort().forEach(function(sous){
+      var h=subMap[sous];
+      if(h<=0)return;
+      var pct=Math.round(h/catTotal*100);
+      tableRows+='<tr style="border-bottom:1px solid #EEE">'+
+        '<td style="padding:6px 12px 6px 24px;font-size:12px;color:#555;width:16px;vertical-align:middle">↳</td>'+
+        '<td style="padding:6px 4px 6px 0;font-size:12px;color:#333;vertical-align:middle">'+sous+'</td>'+
+        '<td style="padding:6px 12px;text-align:right;white-space:nowrap;font-size:12px;font-weight:600;vertical-align:middle">'+
+          '<span style="color:#888;font-size:11px;margin-right:6px">'+pct+'%</span>'+rnd(h)+' h'+
         '</td>'+
       '</tr>';
-    }).join("");
-    return'<tr style="border-top:2px solid #C0472A">'+
-      '<td colspan="3" style="padding:10px;background:'+famBg+'">'+
-        '<span style="font-weight:700;font-size:14px">'+esc(enfants)+'</span>'+
-        '<span style="font-size:11px;color:#888;margin-left:8px">'+esc(classes)+'</span>'+
-        '<span style="font-size:12px;color:#7A7268;margin-left:12px">Total famille : <strong style="color:'+(f.totalH>0?"#C0472A":"#bbb")+'">'+(f.totalH===0?"---":rnd(f.totalH)+"h")+'</strong></span>'+
-        (famCheqTot>0&&f.subs&&f.subs.length===0?'<span style="font-size:11px;background:#FFF8E1;color:#8B6000;padding:1px 6px;border-radius:8px;margin-left:8px">cheques uniquement</span>':"")+
-      '</td>'+
-    '</tr>'+parRows;
-  }).join("");
-  var legendH='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;font-size:11px">'+
-    '<span style="font-weight:700;color:var(--mu);margin-right:4px">Objectif : 40h / parent ---</span>'+
-    [[">=40h Objectif atteint","#2E7D4F","#E8F5EE"],[">=30h Bon avancement","#2E7D4F","#E8F5EE"],[">=20h En cours","#8B6000","#FFF8E1"],[">=10h A renforcer","#C0472A","#F5EAE7"],["<10h Insuffisant","#C0472A","#FDECEA"],["Cheque(s)","#8B6000","#FFF8E1"],["Aucune heure","#999","#F5F5F5"]].map(function(l){
-      return'<span style="background:'+l[2]+';color:'+l[1]+';padding:2px 8px;border-radius:10px;font-weight:600">'+l[0]+'</span>';
-    }).join("")+
+    });
+  });
+
+  // Ligne de total général
+  tableRows+='<tr style="border-top:3px solid #1C1814;background:#1C1814;color:#fff">'+
+    '<td colspan="2" style="padding:10px 12px;font-weight:700;font-size:14px;letter-spacing:0.04em">TOTAL GÉNÉRAL (toutes catégories)</td>'+
+    '<td style="padding:10px 12px;font-weight:700;font-size:16px;text-align:right;white-space:nowrap">'+rnd(grandTotal)+' h</td>'+
+  '</tr>';
+
+  var table='<div style="overflow-x:auto;margin-bottom:28px">'+
+    '<table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #E0D9D3">'+
+      '<thead><tr style="background:#F7F4F1">'+
+        '<th colspan="2" style="padding:9px 12px;text-align:left;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #C0472A">Activité</th>'+
+        '<th style="padding:9px 12px;text-align:right;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #C0472A">Heures</th>'+
+      '</tr></thead>'+
+      '<tbody>'+tableRows+'</tbody>'+
+    '</table>'+
   '</div>';
-  var table='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'+
-    '<thead><tr style="background:var(--bg)">'+
-      '<th style="padding:9px 10px;text-align:left;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--bd)">Enfant(s) / Parent</th>'+
-      '<th style="padding:9px 10px;text-align:right;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--bd)">Heures</th>'+
-      '<th style="padding:9px 10px;text-align:left;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--bd)">Progression / 40h</th>'+
-    '</tr></thead><tbody>'+rows+'</tbody></table></div>';
-  var statsH='<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px">'+
-    [["Familles",fsAll.length,"var(--red)"],["Parents recenses",allParents.length,"var(--red)"],["Objectif atteint",nOk+" parents","var(--gn)"],["Sans heures",nZero+" parents","var(--mu)"]].map(function(s){
+
+  // ── Camemberts SVG ──
+  function makePie(title,dataMap,colors){
+    var items=Object.keys(dataMap).filter(function(k){return dataMap[k]>0;}).sort(function(a,b){return dataMap[b]-dataMap[a];});
+    if(!items.length)return'<div style="text-align:center;color:#999;padding:20px">Aucune donnée</div>';
+    var total=items.reduce(function(a,k){return a+dataMap[k];},0);
+    // SVG pie
+    var cx=110,cy=110,r=90;
+    var angle=-Math.PI/2; // start top
+    var slices="";
+    items.forEach(function(k,i){
+      var v=dataMap[k]/total;
+      var a1=angle,a2=angle+v*2*Math.PI;
+      var x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+      var x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+      var large=v>0.5?1:0;
+      var col=colors[i%colors.length];
+      // tooltip via title element
+      var pct=Math.round(v*100);
+      slices+='<path d="M'+cx+','+cy+' L'+x1+','+y1+' A'+r+','+r+' 0 '+large+',1 '+x2+','+y2+' Z" fill="'+col+'" stroke="#fff" stroke-width="1.5">'+
+        '<title>'+k+' : '+rnd(dataMap[k])+'h ('+pct+'%)</title>'+
+      '</path>';
+      // mid angle for small label (only if >=5%)
+      if(v>=0.05){
+        var mid=a1+v*Math.PI;
+        var lx=cx+(r*0.65)*Math.cos(mid),ly=cy+(r*0.65)*Math.sin(mid);
+        slices+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="9" font-weight="700">'+pct+'%</text>';
+      }
+      angle=a2;
+    });
+    // Légende
+    var legend=items.map(function(k,i){
+      var pct=Math.round(dataMap[k]/total*100);
+      return'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px">'+
+        '<div style="width:10px;height:10px;border-radius:2px;flex-shrink:0;background:'+colors[i%colors.length]+'"></div>'+
+        '<span style="color:#333;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+k+'">'+k+'</span>'+
+        '<span style="color:#666;white-space:nowrap;font-weight:600">'+rnd(dataMap[k])+'h ('+pct+'%)</span>'+
+      '</div>';
+    }).join('');
+    return'<div style="background:#F7F4F1;border-radius:10px;padding:16px;margin-bottom:20px">'+
+      '<h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:#1C1814">'+title+'</h3>'+
+      '<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">'+
+        '<svg viewBox="0 0 220 220" width="180" height="180" style="flex-shrink:0">'+slices+'</svg>'+
+        '<div style="flex:1;min-width:180px;max-height:220px;overflow-y:auto">'+legend+'</div>'+
+      '</div>'+
+    '</div>';
+  }
+
+  var pieCommissions = (byCateg["Commissions"])?makePie("Répartition des heures — Commissions",byCateg["Commissions"],COLORS_COM):'<p style="color:#999;font-style:italic">Aucune donnée Commissions</p>';
+  var pieFestivites  = (byCateg["Festivités"])  ?makePie("Répartition des heures — Festivités",byCateg["Festivités"],COLORS_FES):'<p style="color:#999;font-style:italic">Aucune donnée Festivités</p>';
+
+  // ── Stats résumé ──
+  var statsH='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px">'+
+    [
+      ["Total global",rnd(grandTotal)+"h","var(--red)"],
+      ["Commissions",categTotals["Commissions"]?rnd(categTotals["Commissions"])+"h":"---","#C0472A"],
+      ["Festivités",categTotals["Festivités"]?rnd(categTotals["Festivités"])+"h":"---","#2E7D4F"],
+      ["Admin / CA",categTotals["Administratif / gestion Collège / CA"]?rnd(categTotals["Administratif / gestion Collège / CA"])+"h":"---","#8B6000"]
+    ].map(function(s){
       return'<div class="sc"><div class="sv" style="font-size:18px;color:'+s[2]+'">'+s[1]+'</div><div class="slbl">'+s[0]+'</div></div>';
-    }).join("")+'</div>';
-  return'<div id="rapport-content">'+
+    }).join('')+
+  '</div>';
+
+  var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
+  return'<div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'+
-      '<div><h2 style="font-size:17px;font-weight:700">Rapport d\'investissement</h2>'+
-      '<p style="font-size:12px;color:var(--mu)">Edition du '+dt+' - '+ANNEE+' - Objectif : 40h / parent</p></div>'+
-      '<button class="btn bp bsm" onclick="printRapport()">Imprimer / PDF</button>'+
-    '</div>'+statsH+legendH+table+
-    '<p style="font-size:11px;color:var(--mu);margin-top:10px;text-align:right">Clardeluna '+ANNEE+' - '+dt+'</p>'+
+      '<div><h2 style="font-size:17px;font-weight:700">Calcul du total global des heures</h2>'+
+      '<p style="font-size:12px;color:var(--mu)">Édition du '+dt+' — Toutes commissions, festivités et Administratif/CA confondues</p></div>'+
+    '</div>'+
+    statsH+
+    table+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">'+
+      pieCommissions+pieFestivites+
+    '</div>'+
+    '<p style="font-size:11px;color:var(--mu);margin-top:12px">Seules les saisies avec des heures valides sont comptabilisées. Clardeluna '+ANNEE+' — '+dt+'</p>'+
   '</div>';
 }
 
