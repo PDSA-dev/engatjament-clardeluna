@@ -123,6 +123,13 @@ p.pss{font-size:14px;color:var(--mu);margin-bottom:16px}
 
 .icon-print::before{content:"";display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:5px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='1.4'%3E%3Crect x='2' y='5' width='10' height='6' rx='1'/%3E%3Cpath d='M4 5V2h6v3M4 8.5h6M4 10.5h4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:contain}
 .icon-logout::before{content:"";display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:4px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='1.4'%3E%3Cpath d='M9 2h3v10H9M5.5 9.5L3 7l2.5-2.5M3 7h7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:contain}
+
+@media(prefers-color-scheme:dark){
+  .htbl th{background:var(--bg)}
+  .htbl tr:hover td{background:rgba(255,255,255,.03)}
+  table thead tr{background:var(--bg)!important}
+  .skel{background:linear-gradient(90deg,var(--sf) 25%,var(--bd) 50%,var(--sf) 75%);background-size:200% 100%}
+}
 </style>
 </head>
 <body>
@@ -1033,10 +1040,10 @@ function rHeures(fs){
       var ph=par.ph,ch=par.ch,pname=par.pname;
       var lbl=slabel(ph,ch),pp=Math.min(100,Math.round(ph/OBJ*100));
       var cats=Object.keys(par.byAct).map(function(k){return esc(k)+": "+rnd(par.byAct[k])+"h";}).join(" - ");
-      var chequeInfo=ch>0?'<span style="font-size:10px;background:#FFF8E1;color:#8B6000;border-radius:8px;padding:1px 6px;margin-left:5px">cheque '+Math.round(ch/10)+'x (+'+rnd(ch)+'h)</span>':"";
-      var noHours=ph===0?'<div style="font-size:11px;color:#999;font-style:italic">Aucune heure déclarée</div>':"";
-      return'<tr style="background:#FAFAF8;border-bottom:1px solid #EEE">'+
-        '<td style="padding:7px 10px 7px 22px;font-size:12px;color:#444;vertical-align:middle">'+
+      var chequeInfo=ch>0?'<span style="font-size:10px;background:var(--aml);color:var(--am);border-radius:8px;padding:1px 6px;margin-left:5px">cheque '+Math.round(ch/10)+'x (+'+rnd(ch)+'h)</span>':"";
+      var noHours=ph===0?'<div style="font-size:11px;color:var(--mu);font-style:italic">Aucune heure déclarée</div>':"";
+      return'<tr style="background:var(--sf);border-bottom:1px solid var(--bd)">'+
+        '<td style="padding:7px 10px 7px 22px;font-size:12px;color:var(--tx);vertical-align:middle">'+
           '<span style="color:#999;margin-right:4px">|-</span><strong>'+esc(pname)+'</strong>'+
           (par.prenoms.length>1?'<span style="font-size:10px;color:#aaa;margin-left:6px">(aussi: '+esc(par.prenoms.filter(function(x){return x!==pname;}).join(", "))+')</span>':"")+
           chequeInfo+
@@ -1295,7 +1302,7 @@ function rRapport(fs,tot){
       var h=subMap[sous];
       if(h<=0)return;
       var pct=Math.round(h/catTotal*100);
-      tableRows+=`<tr style="border-bottom:1px solid #EEE"><td style="padding:6px 12px 6px 24px;font-size:12px;color:#555;width:16px;vertical-align:middle">↳</td><td style="padding:6px 4px 6px 0;font-size:12px;color:#333;vertical-align:middle">${sous}</td><td style="padding:6px 12px;text-align:right;white-space:nowrap;font-size:12px;font-weight:600;vertical-align:middle"><span style="color:#888;font-size:11px;margin-right:6px">`+pct+`%</span>${rnd(h)} h</td></tr>`;
+      tableRows+=`<tr style="border-bottom:1px solid #EEE"><td style="padding:6px 12px 6px 24px;font-size:12px;color:#555;width:16px;vertical-align:middle">↳</td><td style="padding:6px 4px 6px 0;font-size:12px;color:var(--tx);vertical-align:middle">${sous}</td><td style="padding:6px 12px;text-align:right;white-space:nowrap;font-size:12px;font-weight:600;vertical-align:middle"><span style="color:var(--mu);font-size:11px;margin-right:6px">`+pct+`%</span>${rnd(h)} h</td></tr>`;
     });
   });
 
@@ -1308,14 +1315,14 @@ function rRapport(fs,tot){
       var h=chequeByPar[label];
       var nb=Math.round(h/H_CHEQUE);
       var pct=Math.round(h/totalCheques*100);
-      tableRows+=`<tr style="border-bottom:1px solid #EEE"><td style="padding:6px 12px 6px 24px;font-size:12px;color:#555;width:16px;vertical-align:middle">↳</td><td style="padding:6px 4px 6px 0;font-size:12px;color:#333;vertical-align:middle">${esc(label)}<span style="font-size:10px;background:#EDE8FB;color:#5B4A9B;border-radius:8px;padding:1px 6px;margin-left:6px">`+nb+' chèque'+(nb>1?'s':'')+`</span></td><td style="padding:6px 12px;text-align:right;white-space:nowrap;font-size:12px;font-weight:600;vertical-align:middle"><span style="color:#888;font-size:11px;margin-right:6px">${pct}%</span>`+rnd(h)+' h</td></tr>';
+      tableRows+=`<tr style="border-bottom:1px solid #EEE"><td style="padding:6px 12px 6px 24px;font-size:12px;color:#555;width:16px;vertical-align:middle">↳</td><td style="padding:6px 4px 6px 0;font-size:12px;color:var(--tx);vertical-align:middle">${esc(label)}<span style="font-size:10px;background:#EDE8FB;color:#5B4A9B;border-radius:8px;padding:1px 6px;margin-left:6px">`+nb+' chèque'+(nb>1?'s':'')+`</span></td><td style="padding:6px 12px;text-align:right;white-space:nowrap;font-size:12px;font-weight:600;vertical-align:middle"><span style="color:var(--mu);font-size:11px;margin-right:6px">${pct}%</span>`+rnd(h)+' h</td></tr>';
     });
   }
 
   // Ligne de total général
   tableRows+=`<tr style="border-top:3px solid #1C1814;background:#1C1814;color:#fff"><td colspan="2" style="padding:10px 12px;font-weight:700;font-size:14px;letter-spacing:0.04em">TOTAL GÉNÉRAL (toutes catégories + chèques)</td><td style="padding:10px 12px;font-weight:700;font-size:16px;text-align:right;white-space:nowrap">${rnd(grandTotal)} h</td></tr>`;
 
-  var table=`<div style="overflow-x:auto;margin-bottom:28px"><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #E0D9D3"><thead><tr style="background:#F7F4F1"><th colspan="2" style="padding:9px 12px;text-align:left;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #C0472A">Activité</th><th style="padding:9px 12px;text-align:right;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #C0472A">Heures</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;
+  var table=`<div style="overflow-x:auto;margin-bottom:28px"><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--bd)"><thead><tr style="background:#F7F4F1"><th colspan="2" style="padding:9px 12px;text-align:left;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--red)">Activité</th><th style="padding:9px 12px;text-align:right;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--red)">Heures</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;
 
   // ── Camemberts SVG ──
   function makePie(title,dataMap,colors){
@@ -1349,7 +1356,7 @@ function rRapport(fs,tot){
       var pct=Math.round(dataMap[k]/total*100);
       return'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px"><div style="width:10px;height:10px;border-radius:2px;flex-shrink:0;background:'+colors[i%colors.length]+`"></div><span style="color:#333;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${k}">`+k+`</span><span style="color:#666;white-space:nowrap;font-weight:600">${rnd(dataMap[k])}h (`+pct+'%)</span></div>';
     }).join('');
-    return`<div style="background:#F7F4F1;border-radius:10px;padding:16px;margin-bottom:20px"><h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:#1C1814">${title}</h3><div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap"><svg viewBox="0 0 220 220" width="180" height="180" style="flex-shrink:0">`+slices+`</svg><div style="flex:1;min-width:180px;max-height:220px;overflow-y:auto">${legend}</div></div></div>`;
+    return`<div style="background:var(--sf);border-radius:10px;border:1px solid var(--bd);padding:16px;margin-bottom:20px"><h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:#1C1814">${title}</h3><div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap"><svg viewBox="0 0 220 220" width="180" height="180" style="flex-shrink:0">`+slices+`</svg><div style="flex:1;min-width:180px;max-height:220px;overflow-y:auto">${legend}</div></div></div>`;
   }
 
   var pieCommissions = (byCateg[CAT_COM])?makePie("Répartition des heures — Commissions",byCateg[CAT_COM],COLORS_COM):'<p style="color:#999;font-style:italic">Aucune donnée Commissions</p>';
@@ -1399,7 +1406,7 @@ function rRapport(fs,tot){
         :'<text x="'+(ml+w+6)+'" y="'+(y+barH/2+1)+`" dominant-baseline="middle" text-anchor="start" font-size="11" font-weight="700" fill="#333" font-family="inherit">${rnd(b.val)}h</text>`
       );
   }).join('');
-  var chartSvg='<div style="background:#F7F4F1;border-radius:10px;padding:16px;margin-bottom:20px;overflow-x:auto"><h3 style="font-size:13px;font-weight:700;margin-bottom:14px;color:#1C1814">Synthèse globale — Investissement des adhérents</h3><svg viewBox="0 0 '+(bw)+` ${svgH}" width="100%" style="max-width:520px;display:block">`+
+  var chartSvg='<div style="background:var(--sf);border-radius:10px;border:1px solid var(--bd);padding:16px;margin-bottom:20px;overflow-x:auto"><h3 style="font-size:13px;font-weight:700;margin-bottom:14px;color:#1C1814">Synthèse globale — Investissement des adhérents</h3><svg viewBox="0 0 '+(bw)+` ${svgH}" width="100%" style="max-width:520px;display:block">`+
       svgBars+
     '</svg><p style="font-size:10px;color:#999;margin-top:6px">1 adhérent = 1 parent — Objectif : 40h par adhérent</p></div>';
 
