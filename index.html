@@ -1261,11 +1261,11 @@ function rRapport(fs,tot){
   '</div>';
 
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
-  return'<div>'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'+
+  return'<div id="rapport-content">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">'+
       '<div><h2 style="font-size:17px;font-weight:700">Calcul du total global des heures</h2>'+
       '<p style="font-size:12px;color:var(--mu)">Édition du '+dt+' — Toutes commissions, festivités et Administratif/CA confondues</p></div>'+
-      '<button class="btn bp bsm" onclick="printRapport()">🖨️ Imprimer / PDF</button>'+
+      '<button class="btn bp bsm" style="flex-shrink:0" onclick="printRapport()">🖨️ Imprimer / PDF</button>'+
     '</div>'+
     statsH+
     table+
