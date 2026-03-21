@@ -1205,7 +1205,7 @@ function rRapport(fs,tot){
     grandTotal+=totalCheques;
     tableRows+='<tr style="background:#5B4A9B;color:#fff">'+
       '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">🎫 Ch&egrave;ques encaiss&eacute;s pour non investissement = 40 heures</td>'+
-      '<td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">'+rnd(totalCheques)+' h</td>'+
+      '<td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">'+rnd(totalCheques)+' h <span style="font-size:11px;font-weight:400;opacity:0.85">('+Math.round(totalCheques/(grandTotal||1)*100)+'% du total)</span></td>'+
     '</tr>';
     var nbCheqParents=Object.keys(chequeByPar).length;
     Object.keys(chequeByPar).sort().forEach(function(label){
