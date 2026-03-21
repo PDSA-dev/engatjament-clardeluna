@@ -213,7 +213,16 @@ var PARENTS_MAP={
   "ZAMITH Giulian":[]
 };
 
-var CHEQUES_MAP={};// clé: "FAMILLE_prenomNorm" → nbChèques (0-4). 1 chèque=25%=10h
+var CHEQUES_MAP={};
+// ── CONSTANTES MÉTIER ──────────────────────────────
+var OBJ_HEURES = 40;         // Objectif heures par adhérent
+var H_CHEQUE   = 10;         // Heures équivalentes par chèque
+var CAT_COM    = 'Commissions';
+var CAT_FES    = 'Festivités';
+var CAT_ADM    = 'Administratif / gestion Collège / CA';
+// ─────────────────────────────────────────────────────
+
+// clé: "FAMILLE_prenomNorm" → nbChèques (0-4). 1 chèque=25%=10h
 
 var ACTS={"Festivités":["Feria 2025 nouveaux parents","Fête du jeu","Dintrada Sept. 2025","Portes ouvertes","Martror (Halloween)","Vide-grenier","Loto","Prima bela","FAUM Maraussan","Guinguette","Total festum","Course d'obstacle","Vente de chocolats, miel","Marchés divers","Feria 2026","Forfait festivités","Cap d'An","Maraussan musique","Journée des familles","Projet Fédé","Pasqueta"],"Commissions":["Remplacement journée","Ménage fin journée et vacances scolaires","Cantine gestion et relations prestataire","Ménage gestion et relations prestataires","Environnement","Dossier d'inscription","Mercat","Camel / référent feria 2026","Travaux","Sécurité","Informatique","Mécénat","Photos de classe","Communication","Ateliers / activités","Suivi des heures d'investissement","Festivités","CDI","Achats scolaires et péri-scolaire","Livret culturel","Soleth Cantadis","Mission coups de main","Forfait commissions"],"Administratif / CA":["Bureau","Conseil d'administration (2h/CA)","Contractualisation","Aide pédagogique"]};
 // ── FIREBASE ─────────────────────────────────
@@ -253,7 +262,7 @@ function familyKey(eleve){
 // "Paul", "Paulo", "Paul Alves", "paulo alves" → même prénom
 // Extrait le prénom principal (1er mot significatif)
 function chequeKey(fk,prenom){return fk+"_"+nrm(prenom).replace(/\s+/g,"").slice(0,8);}
-function chequesH(fk,prenom){return (CHEQUES_MAP[chequeKey(fk,prenom)]||0)*10;}
+function chequesH(fk,prenom){return (CHEQUES_MAP[chequeKey(fk,prenom)]||0)*H_CHEQUE;}
 function normPrenom(s){
   var p=nrm((String(s||"").split(/\s*[&\+]\s*|\s+et\s+/)[0]||"").trim());
   // Prend le 1er mot de plus de 2 lettres (ignore titres courts)
@@ -374,7 +383,7 @@ function badge(s){if(s==="complete")return'<span class="badge bg2">Objectif atte
 function fcls(s){return(s==="complete"||s==="ok")?"fg":s==="warn"?"fa":"fr";}
 function catPills(byAct){
   return'<div class="cat-bar">'+Object.keys(byAct).map(function(k){
-    return'<span class="cat-pill">'+esc(k)+' <span>'+rnd(byAct[k])+'h</span></span>';
+    return`<span class="cat-pill">${esc(k)} <span>`+rnd(byAct[k])+'h</span></span>';
   }).join("")+'</div>';
 }
 // -- INDEX COMPLET (toutes familles)
@@ -455,8 +464,7 @@ function render(){
   if(tb)document.documentElement.style.setProperty("--topbar-h",tb.offsetHeight+"px");
 }
 function tb(title,back,sub){
-  return'<div class="topbar"><button class="tb-back" data-a="back" data-v="'+back+'">←</button>'+
-    '<div><div class="tb-t">'+esc(title)+'</div>'+(sub?'<div class="tb-s">'+esc(sub)+'</div>':"")+
+  return`<div class="topbar"><button class="tb-back" data-a="back" data-v="${back}">←</button><div><div class="tb-t">`+esc(title)+'</div>'+(sub?`<div class="tb-s">${esc(sub)}</div>`:"")+
   "</div></div>";
 }
 // ── ÉCRAN D'ACCÈS PARENTS ─────────────────────
@@ -796,14 +804,9 @@ function rSuccess(){
 // ── LOGIN ─────────────────────────────────────
 function rLogin(){
   return tb("Administration","home")+
-    '<div class="wrap" style="text-align:center;padding-top:0">'+
-      '<div style="font-size:48px;margin:44px 0 16px">🔒</div>'+
-      '<h2 class="ptt">Espace administrateur</h2>'+
-      '<p class="pss">Entrez le code PIN</p>'+
-      '<input class="inp" id="pi" type="password" placeholder="Code PIN" value="'+esc(S.pinInput)+'" style="text-align:center;font-size:22px;letter-spacing:8px;'+(S.pinErr?"border-color:var(--red)":"")+'" autofocus>'+
+    `<div class="wrap" style="text-align:center;padding-top:0"><div style="font-size:48px;margin:44px 0 16px">🔒</div><h2 class="ptt">Espace administrateur</h2><p class="pss">Entrez le code PIN</p><input class="inp" id="pi" type="password" placeholder="Code PIN" value="${esc(S.pinInput)}" style="text-align:center;font-size:22px;letter-spacing:8px;`+(S.pinErr?"border-color:var(--red)":"")+'" autofocus>'+
       (S.pinErr?'<div class="al ae mt8">Code incorrect</div>':"")+
-      '<div class="mt16"><button class="btn bp" data-a="check-pin">Accéder</button></div>'+
-    '</div>';
+      '<div class="mt16"><button class="btn bp" data-a="check-pin">Accéder</button></div></div>';
 }
 // ── ADMIN ─────────────────────────────────────
 function rAdmin(){
@@ -817,19 +820,12 @@ function rAdmin(){
   if(S.adminTab==="reglages")c=rReglages();
   if(S.adminTab==="saisie-admin")c=rManSaisie();
   return tb("Tableau de bord","home",subs.length+" saisies · "+rnd(tot)+"h total")+
-    (S.err?'<div class="al ae" style="margin:8px 16px">'+esc(S.err)+'</div>':"")+
-    '<div style="display:flex;justify-content:flex-end;padding:4px 16px 0">'+
-      '<button data-a="refresh-overview" style="display:flex;align-items:center;gap:0;border:none;border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.15);font-family:inherit">'+
-        '<span style="display:flex;align-items:center;justify-content:center;background:var(--redm);width:26px;height:26px;font-size:13px;line-height:1">↻</span>'+
-        '<span style="background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:0 10px;height:26px;display:flex;align-items:center;letter-spacing:.04em;text-transform:uppercase">Rafraîchir</span>'+
-      '</button>'+
-    '</div>'+
-    '<div class="tabs">'+
+    (S.err?`<div class="al ae" style="margin:8px 16px">${esc(S.err)}</div>`:"")+
+    '<div style="display:flex;justify-content:flex-end;padding:4px 16px 0"><button data-a="refresh-overview" style="display:flex;align-items:center;gap:0;border:none;border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.15);font-family:inherit"><span style="display:flex;align-items:center;justify-content:center;background:var(--redm);width:26px;height:26px;font-size:13px;line-height:1">↻</span><span style="background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:0 10px;height:26px;display:flex;align-items:center;letter-spacing:.04em;text-transform:uppercase">Rafraîchir</span></button></div><div class="tabs">'+
       [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["reglages","⚙ Réglages"]].map(function(t){
         return'<button class="tab'+(S.adminTab===t[0]?" on":"")+'" data-a="tab" data-v="'+t[0]+'">'+t[1]+'</button>';
       }).join("")+
-    '</div>'+
-    '<div class="wlg" style="padding-top:16px">'+c+'</div>';
+    `</div><div class="wlg" style="padding-top:16px">${c}</div>`;
 }
 function rOverview(fs,tot){
   var att=rnd(hAtt()),ct=curTri();
@@ -837,45 +833,23 @@ function rOverview(fs,tot){
   var fsForStats=(S.subs!==null)?buildFullFamilies(S.subs):fs;
   var nLate=fsForStats.filter(function(f){var s=status(f.totalH);return s==="late"||f.totalH===0;}).length;
   var nOk=fsForStats.filter(function(f){var s=status(f.totalH);return s==="ok"||s==="complete";}).length;
-  var stats='<div class="srow">'+
-    '<div class="sc"><div class="sv">'+fsForStats.length+'</div><div class="slbl">Familles</div></div>'+
-    '<div class="sc"><div class="sv">'+rnd(tot)+'h</div><div class="slbl">Total heures</div></div>'+
-    '<div class="sc"><div class="sv" style="color:'+(nLate?"var(--red)":"var(--gn)")+'">'+ nLate+'</div><div class="slbl">En retard</div></div>'+
-    '</div>';
-  var info='<div class="card mt12" style="font-size:13px;color:var(--mu);line-height:2">'+
-    '<p>Annee scolaire : <strong style="color:var(--tx)">'+ANNEE+'</strong></p>'+
-    '<p>Trimestre en cours : <strong style="color:var(--tx)">T'+ct+(TRI[ct-1]?" - "+TRI[ct-1].m:"")+'</strong></p>'+
-    '<p>Heures attendues a ce jour : <strong style="color:var(--tx)">'+att+'h / famille</strong></p>'+
-    '<p>Familles a jour : <strong style="color:var(--gn)">'+nOk+'</strong></p>'+
-    '<p>Familles en retard / sans heure : <strong style="color:var(--red)">'+nLate+'</strong></p>'+
-    '</div>';
+  var stats=`<div class="srow"><div class="sc"><div class="sv">${fsForStats.length}</div><div class="slbl">Familles</div></div><div class="sc"><div class="sv">`+rnd(tot)+'h</div><div class="slbl">Total heures</div></div><div class="sc"><div class="sv" style="color:'+(nLate?"var(--red)":"var(--gn)")+`">${nLate}</div><div class="slbl">En retard</div></div></div>`;
+  var info=`<div class="card mt12" style="font-size:13px;color:var(--mu);line-height:2"><p>Annee scolaire : <strong style="color:var(--tx)">${ANNEE}</strong></p><p>Trimestre en cours : <strong style="color:var(--tx)">T`+ct+(TRI[ct-1]?" - "+TRI[ct-1].m:"")+`</strong></p><p>Heures attendues a ce jour : <strong style="color:var(--tx)">${att}h / famille</strong></p><p>Familles a jour : <strong style="color:var(--gn)">`+nOk+`</strong></p><p>Familles en retard / sans heure : <strong style="color:var(--red)">${nLate}</strong></p></div>`;
   var lates=fsForStats.filter(function(f){var s=status(f.totalH);return s==="late"||f.totalH===0;})
     .sort(function(a,b){return a.totalH-b.totalH;});
   var lateH=lates.length?lates.slice(0,15).map(function(f){
     var nbPar=f.parents.length||1,famObj=nbPar*OBJ;
     var parentsDisp=f.parents.map(function(p){return displayPrenom(p.prenoms);}).join(", ");
     if(!parentsDisp){var pp=[];Object.keys(PARENTS_MAP).forEach(function(e){if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){if(pp.indexOf(p)===-1)pp.push(p);});});parentsDisp=pp.join(", ");}
-    return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)">'+
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
-        '<div>'+
-          '<div style="font-size:13px;font-weight:600">Famille '+esc(f.key)+'</div>'+
-          '<div style="font-size:11px;color:var(--mu)">'+esc(parentsDisp)+'</div>'+
-          '<div style="font-size:11px;color:var(--mu)">'+esc(Object.keys(f.children).join(", "))+'</div>'+
-        '</div>'+
-        '<div style="text-align:right">'+
-          '<div style="font-size:15px;font-weight:700;color:'+(f.totalH===0?"var(--mu)":"var(--red)")+'">'+
+    return`<div style="padding:10px 0;border-bottom:1px solid var(--bd)"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:13px;font-weight:600">Famille ${esc(f.key)}</div><div style="font-size:11px;color:var(--mu)">`+esc(parentsDisp)+'</div><div style="font-size:11px;color:var(--mu)">'+esc(Object.keys(f.children).join(", "))+'</div></div><div style="text-align:right"><div style="font-size:15px;font-weight:700;color:'+(f.totalH===0?"var(--mu)":"var(--red)")+'">'+
             (f.totalH===0?"0h":rnd(f.totalH)+"h")+
-            '<span style="font-size:10px;color:var(--mu)"> /'+famObj+'h</span>'+
-          '</div>'+
+            `<span style="font-size:10px;color:var(--mu)"> /${famObj}h</span></div>`+
           (f.totalH===0?'<span style="font-size:10px;background:#F5F5F5;color:#999;padding:2px 6px;border-radius:8px">Aucune heure</span>':badge(status(f.totalH)))+
-        '</div>'+
-      '</div>'+
-    '</div>';
+        '</div></div></div>';
   }).join(""):
     '<p class="empty" style="padding:14px">Toutes les familles sont a jour</p>';
   var lateCard=lates.length?
-    '<div class="card mt12">'+
-      '<h3 style="font-size:14px;font-weight:700;margin-bottom:4px">Familles en retard / sans heure ('+lates.length+')</h3>'+
+    `<div class="card mt12"><h3 style="font-size:14px;font-weight:700;margin-bottom:4px">Familles en retard / sans heure (${lates.length})</h3>`+
       lateH+
       (lates.length>15?'<p style="font-size:11px;color:var(--mu);text-align:center;margin-top:6px">+ '+(lates.length-15)+' autres</p>':"")+
     '</div>'  :"";
@@ -893,7 +867,7 @@ function rHeures(fs){
     return elevesActuels.some(function(e){return nrm(e)===eNrm;});
   });
   var fsAll=buildFullFamilies(subsActuels);
-  var OBJ=40;
+  var OBJ=OBJ_HEURES;
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
   var allParents=[];
   fsAll.forEach(function(f){f.parents.forEach(function(p){allParents.push(p);});});
@@ -1131,7 +1105,7 @@ function rRapport(fs,tot){
     byCateg[cat][sous]=(byCateg[cat][sous]||0)+h;
   });
 
-  var ORDER=["Commissions","Festivités","Administratif / gestion Collège / CA"];
+  var ORDER=["Commissions","Festivités",CAT_ADM];
   var COLORS_COM=[
     "#C0472A","#E8714F","#F4A07A","#F7C4A6","#FAE0D0",
     "#8B2A18","#D45D3A","#E89060","#F2B68A","#F8D4B8",
@@ -1185,71 +1159,37 @@ function rRapport(fs,tot){
     if(catTotal===0)return;
 
     // En-tête catégorie
-    var catColor=cat==="Commissions"?"#C0472A":cat==="Festivités"?"#2E7D4F":"#8B6000";
+    var catColor=cat===CAT_COM?"#C0472A":cat===CAT_FES?"#2E7D4F":"#8B6000";
     var catPct=Math.round(catTotal/(grandTotal||1)*100);
-    tableRows+='<tr style="background:'+catColor+';color:#fff">'+
-      '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">'+cat+
-        '<span style="font-size:11px;font-weight:400;opacity:0.8;margin-left:10px">'+catPct+'% du total</span>'+
-      '</td>'+
-      '<td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">'+rnd(catTotal)+' h</td>'+
-    '</tr>';
+    tableRows+=`<tr style="background:${catColor};color:#fff"><td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">`+cat+
+        `<span style="font-size:11px;font-weight:400;opacity:0.8;margin-left:10px">${catPct}% du total</span></td><td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">`+rnd(catTotal)+' h</td></tr>';
 
     // Lignes sous-activité
     Object.keys(subMap).sort().forEach(function(sous){
       var h=subMap[sous];
       if(h<=0)return;
       var pct=Math.round(h/catTotal*100);
-      tableRows+='<tr style="border-bottom:1px solid #EEE">'+
-        '<td style="padding:6px 12px 6px 24px;font-size:12px;color:#555;width:16px;vertical-align:middle">↳</td>'+
-        '<td style="padding:6px 4px 6px 0;font-size:12px;color:#333;vertical-align:middle">'+sous+'</td>'+
-        '<td style="padding:6px 12px;text-align:right;white-space:nowrap;font-size:12px;font-weight:600;vertical-align:middle">'+
-          '<span style="color:#888;font-size:11px;margin-right:6px">'+pct+'%</span>'+rnd(h)+' h'+
-        '</td>'+
-      '</tr>';
+      tableRows+=`<tr style="border-bottom:1px solid #EEE"><td style="padding:6px 12px 6px 24px;font-size:12px;color:#555;width:16px;vertical-align:middle">↳</td><td style="padding:6px 4px 6px 0;font-size:12px;color:#333;vertical-align:middle">${sous}</td><td style="padding:6px 12px;text-align:right;white-space:nowrap;font-size:12px;font-weight:600;vertical-align:middle"><span style="color:#888;font-size:11px;margin-right:6px">`+pct+`%</span>${rnd(h)} h</td></tr>`;
     });
   });
 
   // ── Section Chèques ──
   if(totalCheques>0){
     var cheqPct=Math.round(totalCheques/(grandTotal||1)*100);
-    tableRows+='<tr style="background:#5B4A9B;color:#fff">'+
-      '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">🎫 Ch&egrave;ques encaiss&eacute;s pour non investissement = 40 heures'+
-        '<span style="font-size:11px;font-weight:400;opacity:0.8;margin-left:10px">'+cheqPct+'% du total</span>'+
-      '</td>'+
-      '<td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">'+rnd(totalCheques)+' h</td>'+
-    '</tr>';
+    tableRows+=`<tr style="background:#5B4A9B;color:#fff"><td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">🎫 Ch&egrave;ques encaiss&eacute;s pour non investissement = 40 heures<span style="font-size:11px;font-weight:400;opacity:0.8;margin-left:10px">${cheqPct}% du total</span></td><td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">`+rnd(totalCheques)+' h</td></tr>';
     var nbCheqParents=Object.keys(chequeByPar).length;
     Object.keys(chequeByPar).sort().forEach(function(label){
       var h=chequeByPar[label];
-      var nb=Math.round(h/10);
+      var nb=Math.round(h/H_CHEQUE);
       var pct=Math.round(h/totalCheques*100);
-      tableRows+='<tr style="border-bottom:1px solid #EEE">'+
-        '<td style="padding:6px 12px 6px 24px;font-size:12px;color:#555;width:16px;vertical-align:middle">↳</td>'+
-        '<td style="padding:6px 4px 6px 0;font-size:12px;color:#333;vertical-align:middle">'+esc(label)+
-          '<span style="font-size:10px;background:#EDE8FB;color:#5B4A9B;border-radius:8px;padding:1px 6px;margin-left:6px">'+nb+' chèque'+(nb>1?'s':'')+'</span>'+
-        '</td>'+
-        '<td style="padding:6px 12px;text-align:right;white-space:nowrap;font-size:12px;font-weight:600;vertical-align:middle">'+
-          '<span style="color:#888;font-size:11px;margin-right:6px">'+pct+'%</span>'+rnd(h)+' h'+
-        '</td>'+
-      '</tr>';
+      tableRows+=`<tr style="border-bottom:1px solid #EEE"><td style="padding:6px 12px 6px 24px;font-size:12px;color:#555;width:16px;vertical-align:middle">↳</td><td style="padding:6px 4px 6px 0;font-size:12px;color:#333;vertical-align:middle">${esc(label)}<span style="font-size:10px;background:#EDE8FB;color:#5B4A9B;border-radius:8px;padding:1px 6px;margin-left:6px">`+nb+' chèque'+(nb>1?'s':'')+`</span></td><td style="padding:6px 12px;text-align:right;white-space:nowrap;font-size:12px;font-weight:600;vertical-align:middle"><span style="color:#888;font-size:11px;margin-right:6px">${pct}%</span>`+rnd(h)+' h</td></tr>';
     });
   }
 
   // Ligne de total général
-  tableRows+='<tr style="border-top:3px solid #1C1814;background:#1C1814;color:#fff">'+
-    '<td colspan="2" style="padding:10px 12px;font-weight:700;font-size:14px;letter-spacing:0.04em">TOTAL GÉNÉRAL (toutes catégories + chèques)</td>'+
-    '<td style="padding:10px 12px;font-weight:700;font-size:16px;text-align:right;white-space:nowrap">'+rnd(grandTotal)+' h</td>'+
-  '</tr>';
+  tableRows+=`<tr style="border-top:3px solid #1C1814;background:#1C1814;color:#fff"><td colspan="2" style="padding:10px 12px;font-weight:700;font-size:14px;letter-spacing:0.04em">TOTAL GÉNÉRAL (toutes catégories + chèques)</td><td style="padding:10px 12px;font-weight:700;font-size:16px;text-align:right;white-space:nowrap">${rnd(grandTotal)} h</td></tr>`;
 
-  var table='<div style="overflow-x:auto;margin-bottom:28px">'+
-    '<table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #E0D9D3">'+
-      '<thead><tr style="background:#F7F4F1">'+
-        '<th colspan="2" style="padding:9px 12px;text-align:left;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #C0472A">Activité</th>'+
-        '<th style="padding:9px 12px;text-align:right;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #C0472A">Heures</th>'+
-      '</tr></thead>'+
-      '<tbody>'+tableRows+'</tbody>'+
-    '</table>'+
-  '</div>';
+  var table=`<div style="overflow-x:auto;margin-bottom:28px"><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #E0D9D3"><thead><tr style="background:#F7F4F1"><th colspan="2" style="padding:9px 12px;text-align:left;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #C0472A">Activité</th><th style="padding:9px 12px;text-align:right;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #C0472A">Heures</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;
 
   // ── Camemberts SVG ──
   function makePie(title,dataMap,colors){
@@ -1269,37 +1209,25 @@ function rRapport(fs,tot){
       var col=colors[i%colors.length];
       // tooltip via title element
       var pct=Math.round(v*100);
-      slices+='<path d="M'+cx+','+cy+' L'+x1+','+y1+' A'+r+','+r+' 0 '+large+',1 '+x2+','+y2+' Z" fill="'+col+'" stroke="#fff" stroke-width="1.5">'+
-        '<title>'+k+' : '+rnd(dataMap[k])+'h ('+pct+'%)</title>'+
-      '</path>';
+      slices+=`<path d="M${cx},`+cy+' L'+x1+','+y1+' A'+r+','+r+' 0 '+large+',1 '+x2+','+y2+' Z" fill="'+col+`" stroke="#fff" stroke-width="1.5"><title>${k} : `+rnd(dataMap[k])+`h (${pct}%)</title></path>`;
       // mid angle for small label (only if >=5%)
       if(v>=0.05){
         var mid=a1+v*Math.PI;
         var lx=cx+(r*0.65)*Math.cos(mid),ly=cy+(r*0.65)*Math.sin(mid);
-        slices+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="9" font-weight="700">'+pct+'%</text>';
+        slices+=`<text x="${lx}" y="`+ly+`" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="9" font-weight="700">${pct}%</text>`;
       }
       angle=a2;
     });
     // Légende
     var legend=items.map(function(k,i){
       var pct=Math.round(dataMap[k]/total*100);
-      return'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px">'+
-        '<div style="width:10px;height:10px;border-radius:2px;flex-shrink:0;background:'+colors[i%colors.length]+'"></div>'+
-        '<span style="color:#333;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+k+'">'+k+'</span>'+
-        '<span style="color:#666;white-space:nowrap;font-weight:600">'+rnd(dataMap[k])+'h ('+pct+'%)</span>'+
-      '</div>';
+      return'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px"><div style="width:10px;height:10px;border-radius:2px;flex-shrink:0;background:'+colors[i%colors.length]+`"></div><span style="color:#333;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${k}">`+k+`</span><span style="color:#666;white-space:nowrap;font-weight:600">${rnd(dataMap[k])}h (`+pct+'%)</span></div>';
     }).join('');
-    return'<div style="background:#F7F4F1;border-radius:10px;padding:16px;margin-bottom:20px">'+
-      '<h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:#1C1814">'+title+'</h3>'+
-      '<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">'+
-        '<svg viewBox="0 0 220 220" width="180" height="180" style="flex-shrink:0">'+slices+'</svg>'+
-        '<div style="flex:1;min-width:180px;max-height:220px;overflow-y:auto">'+legend+'</div>'+
-      '</div>'+
-    '</div>';
+    return`<div style="background:#F7F4F1;border-radius:10px;padding:16px;margin-bottom:20px"><h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:#1C1814">${title}</h3><div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap"><svg viewBox="0 0 220 220" width="180" height="180" style="flex-shrink:0">`+slices+`</svg><div style="flex:1;min-width:180px;max-height:220px;overflow-y:auto">${legend}</div></div></div>`;
   }
 
-  var pieCommissions = (byCateg["Commissions"])?makePie("Répartition des heures — Commissions",byCateg["Commissions"],COLORS_COM):'<p style="color:#999;font-style:italic">Aucune donnée Commissions</p>';
-  var pieFestivites  = (byCateg["Festivités"])  ?makePie("Répartition des heures — Festivités",byCateg["Festivités"],COLORS_FES):'<p style="color:#999;font-style:italic">Aucune donnée Festivités</p>';
+  var pieCommissions = (byCateg[CAT_COM])?makePie("Répartition des heures — Commissions",byCateg[CAT_COM],COLORS_COM):'<p style="color:#999;font-style:italic">Aucune donnée Commissions</p>';
+  var pieFestivites  = (byCateg[CAT_FES])  ?makePie("Répartition des heures — Festivités",byCateg[CAT_FES],COLORS_FES):'<p style="color:#999;font-style:italic">Aucune donnée Festivités</p>';
 
   // ── Stats résumé ──
   // ── Graphique synthèse potentiel/réalisé/chèques ──
@@ -1339,27 +1267,22 @@ function rRapport(fs,tot){
     var y=30+i*(barH+gap);
     var w=Math.max(2,Math.round((b.val/maxVal)*(bw-ml-mr)));
     var inside=w>50;
-    return'<text x="'+ml+'" y="'+(y+barH/2+1)+'" dominant-baseline="middle" text-anchor="end" font-size="11" fill="#444" font-family="inherit">'+b.label+'</text>'+
-      '<rect x="'+ml+'" y="'+y+'" width="'+w+'" height="'+barH+'" rx="4" fill="'+b.color+'"/>'+
+    return`<text x="${ml}" y="`+(y+barH/2+1)+`" dominant-baseline="middle" text-anchor="end" font-size="11" fill="#444" font-family="inherit">${b.label}</text><rect x="`+ml+'" y="'+y+'" width="'+w+'" height="'+barH+'" rx="4" fill="'+b.color+'"/>'+
       (inside
-        ?'<text x="'+(ml+w-6)+'" y="'+(y+barH/2+1)+'" dominant-baseline="middle" text-anchor="end" font-size="11" font-weight="700" fill="'+b.textColor+'" font-family="inherit">'+rnd(b.val)+'h</text>'
-        :'<text x="'+(ml+w+6)+'" y="'+(y+barH/2+1)+'" dominant-baseline="middle" text-anchor="start" font-size="11" font-weight="700" fill="#333" font-family="inherit">'+rnd(b.val)+'h</text>'
+        ?'<text x="'+(ml+w-6)+'" y="'+(y+barH/2+1)+`" dominant-baseline="middle" text-anchor="end" font-size="11" font-weight="700" fill="${b.textColor}" font-family="inherit">`+rnd(b.val)+'h</text>'
+        :'<text x="'+(ml+w+6)+'" y="'+(y+barH/2+1)+`" dominant-baseline="middle" text-anchor="start" font-size="11" font-weight="700" fill="#333" font-family="inherit">${rnd(b.val)}h</text>`
       );
   }).join('');
-  var chartSvg='<div style="background:#F7F4F1;border-radius:10px;padding:16px;margin-bottom:20px;overflow-x:auto">'+
-    '<h3 style="font-size:13px;font-weight:700;margin-bottom:14px;color:#1C1814">Synthèse globale — Investissement des adhérents</h3>'+
-    '<svg viewBox="0 0 '+(bw)+' '+svgH+'" width="100%" style="max-width:520px;display:block">'+
+  var chartSvg='<div style="background:#F7F4F1;border-radius:10px;padding:16px;margin-bottom:20px;overflow-x:auto"><h3 style="font-size:13px;font-weight:700;margin-bottom:14px;color:#1C1814">Synthèse globale — Investissement des adhérents</h3><svg viewBox="0 0 '+(bw)+` ${svgH}" width="100%" style="max-width:520px;display:block">`+
       svgBars+
-    '</svg>'+
-    '<p style="font-size:10px;color:#999;margin-top:6px">1 adhérent = 1 parent — Objectif : 40h par adhérent</p>'+
-  '</div>';
+    '</svg><p style="font-size:10px;color:#999;margin-top:6px">1 adhérent = 1 parent — Objectif : 40h par adhérent</p></div>';
 
   var statsH='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px">'+
     [
       ["Total global",rnd(grandTotal)+"h","var(--red)"],
-      ["Commissions",categTotals["Commissions"]?rnd(categTotals["Commissions"])+"h":"---","#C0472A"],
-      ["Festivités",categTotals["Festivités"]?rnd(categTotals["Festivités"])+"h":"---","#2E7D4F"],
-      ["Admin / CA",categTotals["Administratif / gestion Collège / CA"]?rnd(categTotals["Administratif / gestion Collège / CA"])+"h":"---","#8B6000"],
+      ["Commissions",categTotals[CAT_COM]?rnd(categTotals[CAT_COM])+"h":"---","#C0472A"],
+      ["Festivités",categTotals[CAT_FES]?rnd(categTotals[CAT_FES])+"h":"---","#2E7D4F"],
+      ["Admin / CA",categTotals[CAT_ADM]?rnd(categTotals[CAT_ADM])+"h":"---","#8B6000"],
       ["Ch&egrave;ques encaiss&eacute;s",totalCheques>0?rnd(totalCheques)+"h":"---","#5B4A9B"]
     ].map(function(s){
       return'<div class="sc"><div class="sv" style="font-size:18px;color:'+s[2]+'">'+s[1]+'</div><div class="slbl">'+s[0]+'</div></div>';
@@ -1367,20 +1290,13 @@ function rRapport(fs,tot){
   '</div>';
 
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
-  return'<div id="rapport-content">'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">'+
-      '<div><h2 style="font-size:17px;font-weight:700">Calcul du total global des heures</h2>'+
-      '<p style="font-size:12px;color:var(--mu)">Édition du '+dt+' — Toutes commissions, festivités et Administratif/CA confondues</p></div>'+
-      '<button class="btn bp bsm" style="flex-shrink:0" onclick="printRapport()">🖨️ Imprimer / PDF</button>'+
-    '</div>'+
+  return`<div id="rapport-content"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px"><div><h2 style="font-size:17px;font-weight:700">Calcul du total global des heures</h2><p style="font-size:12px;color:var(--mu)">Édition du ${dt} — Toutes commissions, festivités et Administratif/CA confondues</p></div><button class="btn bp bsm" style="flex-shrink:0" onclick="printRapport()">🖨️ Imprimer / PDF</button></div>`+
     statsH+
     chartSvg+
     table+
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">'+
       pieCommissions+pieFestivites+
-    '</div>'+
-    '<p style="font-size:11px;color:var(--mu);margin-top:12px">Seules les saisies avec des heures valides sont comptabilisées. Clardeluna '+ANNEE+' — '+dt+'</p>'+
-  '</div>';
+    `</div><p style="font-size:11px;color:var(--mu);margin-top:12px">Seules les saisies avec des heures valides sont comptabilisées. Clardeluna ${ANNEE} — `+dt+'</p></div>';
 }
 
 function printOverview(){
@@ -1474,37 +1390,13 @@ function printHeures(){
     });
     if(!dispPars.length)dispPars=f.parents.map(function(par){return displayPrenom(par.prenoms);});
     var stLabel2=s==="zero"?"Aucune heure":s==="complete"?"Objectif atteint":s==="ok"?"A jour":s==="warn"?"Vigilance":"En retard";
-    return'<tr>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #E0D9D3;font-size:12px">'+
-        '<strong>Famille '+esc(f.key)+'</strong>'+
-        '<div style="color:#888">'+esc(dispPars.join(", "))+'</div>'+
-        '<div style="color:#888">'+esc(Object.keys(f.children).join(", "))+'</div>'+
-      '</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #E0D9D3;text-align:right;font-weight:700;color:'+color+'">'+
+    return`<tr><td style="padding:8px 10px;border-bottom:1px solid #E0D9D3;font-size:12px"><strong>Famille ${esc(f.key)}</strong><div style="color:#888">`+esc(dispPars.join(", "))+'</div><div style="color:#888">'+esc(Object.keys(f.children).join(", "))+`</div></td><td style="padding:8px 10px;border-bottom:1px solid #E0D9D3;text-align:right;font-weight:700;color:${color}">`+
         (f.totalH===0?"0h":rnd(f.totalH)+"h")+
-        '<div style="font-size:10px;color:#999">/ '+famObj+'h</div>'+
-      '</td>'+
-      '<td style="padding:8px 10px;border-bottom:1px solid #E0D9D3">'+
-        '<div style="height:5px;background:#E0D9D3;border-radius:3px;margin-bottom:3px">'+
-          '<div style="height:100%;width:'+p+'%;background:'+color+';border-radius:3px"></div>'+
-        '</div>'+
-        '<span style="font-size:10px;background:#F5F5F5;color:'+color+';padding:1px 6px;border-radius:8px;font-weight:700">'+p+'% - '+stLabel2+'</span>'+
-      '</td>'+
-    '</tr>';
+        `<div style="font-size:10px;color:#999">/ ${famObj}h</div></td><td style="padding:8px 10px;border-bottom:1px solid #E0D9D3"><div style="height:5px;background:#E0D9D3;border-radius:3px;margin-bottom:3px"><div style="height:100%;width:`+p+`%;background:${color};border-radius:3px"></div></div><span style="font-size:10px;background:#F5F5F5;color:`+color+`;padding:1px 6px;border-radius:8px;font-weight:700">${p}% - `+stLabel2+'</span></td></tr>';
   }).join("");
   var totalH=filtered.reduce(function(a,f){return a+f.totalH;},0);
   var html=
-    '<h1 style="font-size:16px;font-weight:700;color:#C0472A;margin-bottom:4px">Clardeluna - Heures par famille</h1>'+
-    '<div style="font-size:11px;color:#666;margin-bottom:12px">'+dt+' - '+ANNEE+' - '+clsLabel+' - Filtre : '+stLabel+'</div>'+
-    '<table style="width:100%;border-collapse:collapse">'+
-      '<thead><tr>'+
-        '<th style="padding:7px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Famille</th>'+
-        '<th style="padding:7px 10px;text-align:right;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Heures</th>'+
-        '<th style="padding:7px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Progression</th>'+
-      '</tr></thead>'+
-      '<tbody>'+rows+'</tbody>'+
-    '</table>'+
-    '<p style="font-size:11px;color:#aaa;margin-top:8px">'+filtered.length+' familles - Total filtre : '+rnd(totalH)+'h</p>';
+    `<h1 style="font-size:16px;font-weight:700;color:#C0472A;margin-bottom:4px">Clardeluna - Heures par famille</h1><div style="font-size:11px;color:#666;margin-bottom:12px">${dt} - `+ANNEE+' - '+clsLabel+' - Filtre : '+stLabel+`</div><table style="width:100%;border-collapse:collapse"><thead><tr><th style="padding:7px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Famille</th><th style="padding:7px 10px;text-align:right;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Heures</th><th style="padding:7px 10px;text-align:left;font-size:11px;color:#888;text-transform:uppercase;border-bottom:2px solid #E0D9D3;background:#F7F4F1">Progression</th></tr></thead><tbody>${rows}</tbody></table><p style="font-size:11px;color:#aaa;margin-top:8px">`+filtered.length+` familles - Total filtre : ${rnd(totalH)}h</p>`;
   var overlay=document.getElementById("print-overlay");
   if(overlay){overlay.innerHTML=html;window.print();setTimeout(function(){overlay.innerHTML="";},2000);}
 }
@@ -1516,27 +1408,8 @@ function printRapport(){
   var w=window.open("","_blank","width=900,height=700");
   if(!w){alert("Autorisez les popups pour imprimer.");return;}
   w.document.open();
-  w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'+
-    '<title>Rapport Clardeluna — '+dt+'<\/title>'+
-    '<style>'+
-    '*{box-sizing:border-box;margin:0;padding:0}'+
-    'body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:12px;padding:20px 24px;color:#1C1814}'+
-    'h1{font-size:18px;font-weight:700;color:#C0472A;margin-bottom:4px}'+
-    '.meta{display:flex;gap:20px;margin:8px 0 14px;font-size:11px;color:#666;flex-wrap:wrap}'+
-    'table{width:100%;border-collapse:collapse;margin-bottom:20px}'+
-    'th,td{padding:7px 10px;border-bottom:1px solid #E0D9D3}'+
-    'thead tr{background:#F7F4F1}'+
-    '.sc{background:#F7F4F1;border-radius:8px;padding:10px;display:inline-block;min-width:110px;text-align:center;margin:0 6px 6px 0}'+
-    '.sv{font-size:16px;font-weight:700}'+
-    '.slbl{font-size:10px;color:#777;margin-top:2px}'+
-    'button{display:none!important}'+
-    'svg{max-width:100%;height:auto}'+
-    '@media print{'+
-      '@page{margin:15mm}'+
-      'button{display:none!important}'+
-      '.no-print{display:none!important}'+
-      'body{padding:0}'+
-    '}'+
+  w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport Clardeluna — '+dt+'<\/title>'+
+    '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:12px;padding:20px 24px;color:#1C1814}h1{font-size:18px;font-weight:700;color:#C0472A;margin-bottom:4px}.meta{display:flex;gap:20px;margin:8px 0 14px;font-size:11px;color:#666;flex-wrap:wrap}table{width:100%;border-collapse:collapse;margin-bottom:20px}th,td{padding:7px 10px;border-bottom:1px solid #E0D9D3}thead tr{background:#F7F4F1}.sc{background:#F7F4F1;border-radius:8px;padding:10px;display:inline-block;min-width:110px;text-align:center;margin:0 6px 6px 0}.sv{font-size:16px;font-weight:700}.slbl{font-size:10px;color:#777;margin-top:2px}button{display:none!important}svg{max-width:100%;height:auto}@media print{@page{margin:15mm}button{display:none!important}.no-print{display:none!important}body{padding:0}}'+
     '<\/style>'+
     '<\/head><body>'+
     '<h1>Clardeluna — Rapport d’investissement '+ANNEE+'<\/h1>'+
@@ -1753,29 +1626,18 @@ function rAccessSec(){
   var passDisplay=ACCESS_ENABLED?
     ' · Mot de passe : '+
     (S.passVisible&&ACCESS_PLAIN
-      ?'<code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px;color:var(--tx)">'+esc(ACCESS_PLAIN)+'</code>'
+      ?`<code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px;color:var(--tx)">${esc(ACCESS_PLAIN)}</code>`
       :'<code style="background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px">••••••••</code>')+
     '<button data-a="toggle-pass-visible" style="background:none;border:none;cursor:pointer;font-size:12px;margin-left:4px;padding:0 4px;color:var(--mu);font-family:inherit" title="'+(S.passVisible?'Masquer':'Afficher')+'">'+
       (S.passVisible?'🙈':'👁')+
     '</button>'
     :'';
-  return'<div class="card" style="margin-top:16px">'+
-    '<h3 style="font-size:15px;font-weight:700;margin-bottom:4px">🔑 Mot de passe parents</h3>'+
-    '<p style="font-size:12px;color:var(--mu);margin-bottom:14px">'+
-      'Statut : '+statusLabel+passDisplay+
-    '</p>'+
-    '<div style="display:flex;gap:8px;margin-bottom:10px">'+
-      '<button class="btn bsm" style="border:1px solid var(--bd);background:'+(ACCESS_ENABLED?"var(--redl)":"var(--gnl)")+';color:'+(ACCESS_ENABLED?"var(--red)":"var(--gn)")+'" data-a="toggle-access">'+
+  return'<div class="card" style="margin-top:16px"><h3 style="font-size:15px;font-weight:700;margin-bottom:4px">🔑 Mot de passe parents</h3><p style="font-size:12px;color:var(--mu);margin-bottom:14px">Statut : '+statusLabel+passDisplay+
+    '</p><div style="display:flex;gap:8px;margin-bottom:10px"><button class="btn bsm" style="border:1px solid var(--bd);background:'+(ACCESS_ENABLED?"var(--redl)":"var(--gnl)")+';color:'+(ACCESS_ENABLED?"var(--red)":"var(--gn)")+'" data-a="toggle-access">'+
         (ACCESS_ENABLED?"⏸ Désactiver":"▶ Activer")+
-      '</button>'+
-    '</div>'+
-    '<label class="lbl">Changer le mot de passe</label>'+
-    '<div style="display:flex;gap:8px">'+
-      '<input class="inp" id="new-ap" type="text" placeholder="Nouveau mot de passe (min 4 car.)" style="flex:1;font-size:14px">'+
-      '<button class="btn bp bsm" data-a="save-access-pass" style="flex-shrink:0">Enregistrer</button>'+
-    '</div>'+
+      '</button></div><label class="lbl">Changer le mot de passe</label><div style="display:flex;gap:8px"><input class="inp" id="new-ap" type="text" placeholder="Nouveau mot de passe (min 4 car.)" style="flex:1;font-size:14px"><button class="btn bp bsm" data-a="save-access-pass" style="flex-shrink:0">Enregistrer</button></div>'+
     (S.accessPassSaved?'<div class="al aok mt8">✓ Paramètre sauvegardé</div>':'')+
-    (S.accessPassErr?'<div class="al ae mt8">'+esc(S.accessPassErr)+'</div>':'')+
+    (S.accessPassErr?`<div class="al ae mt8">${esc(S.accessPassErr)}</div>`:'')+
   '</div>';
 }
 // ── SAISIE MANUELLE ADMIN ─────────────────────
@@ -2307,7 +2169,7 @@ function doSearch(){
   }).catch(function(e2){
     sil({loading:false,err:"Erreur : "+e2.message});
     var r=document.getElementById("portal-results");
-    if(r){r.innerHTML='<div class="al ae">'+esc(S.err)+'</div>';reattach();}
+    if(r){r.innerHTML=`<div class="al ae">${esc(S.err)}</div>`;reattach();}
   });
 }
 function sha256hex(str){
@@ -2608,16 +2470,7 @@ function exportCsv(){
 function showErr(msg){
   var el=document.getElementById("app");
   el.style.cssText="max-width:460px;margin:40px auto;padding:20px;font-family:-apple-system,sans-serif";
-  el.innerHTML='<div style="text-align:center;margin-bottom:20px"><div style="font-size:44px;margin-bottom:12px">⚠️</div>'+
-    '<h2 style="font-size:17px;font-weight:700;margin-bottom:6px">Connexion Firebase impossible</h2>'+
-    '<code style="font-size:12px;color:#C0472A;word-break:break-all">'+msg+'</code></div>'+
-    '<div style="background:#FFF8E1;border:1px solid #F0D060;border-radius:8px;padding:14px;font-size:13px;color:#7A5800;margin-bottom:16px">'+
-      '<p style="font-weight:700;margin-bottom:8px">Solutions :</p>'+
-      '<p style="margin-bottom:6px">1. Activer Firestore (Firebase Console → Build → Firestore Database)</p>'+
-      '<p style="margin-bottom:6px">2. Firestore → Règles → allow read, write: if true;</p>'+
-      '<p>3. Vérifier la config Firebase dans index.html</p>'+
-    '</div>'+
-    '<button onclick="location.reload()" style="width:100%;padding:12px;background:#C0472A;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:700">Réessayer</button>';
+  el.innerHTML=`<div style="text-align:center;margin-bottom:20px"><div style="font-size:44px;margin-bottom:12px">⚠️</div><h2 style="font-size:17px;font-weight:700;margin-bottom:6px">Connexion Firebase impossible</h2><code style="font-size:12px;color:#C0472A;word-break:break-all">${msg}</code></div><div style="background:#FFF8E1;border:1px solid #F0D060;border-radius:8px;padding:14px;font-size:13px;color:#7A5800;margin-bottom:16px"><p style="font-weight:700;margin-bottom:8px">Solutions :</p><p style="margin-bottom:6px">1. Activer Firestore (Firebase Console → Build → Firestore Database)</p><p style="margin-bottom:6px">2. Firestore → Règles → allow read, write: if true;</p><p>3. Vérifier la config Firebase dans index.html</p></div><button onclick="location.reload()" style="width:100%;padding:12px;background:#C0472A;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:700">Réessayer</button>`;
 }
 (function(){
   try{
