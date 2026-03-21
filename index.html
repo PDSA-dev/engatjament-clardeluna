@@ -1108,7 +1108,11 @@ function rRapport(fs,tot){
   // ── Agrégation des heures par catégorie et sous-activité ──
   var subs=(S.subs||[]).filter(function(s){
     var h=parseFloat(s.heures);
-    return !isNaN(h)&&h>0&&s.activiteType&&s.activiteType.trim();
+    if(isNaN(h)||h<=0)return false;
+    if(!s.activiteType||!s.activiteType.trim())return false;
+    // Exclure l'activité "Bureau" dans Admin / CA (hors Bureau)
+    if((s.sousActivite||"").trim()==="Bureau")return false;
+    return true;
   });
 
   // totaux par catégorie > sous-activité
