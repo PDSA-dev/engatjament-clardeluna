@@ -935,12 +935,8 @@ function rOverview(fs,tot){
       (lates.length>15?'<p style="font-size:11px;color:var(--mu);text-align:center;margin-top:6px">+ '+(lates.length-15)+' autres</p>':"")+
     '</div>'  :"";
   var loadingNote=S.subs===null?'<div class="al aw mt8">Chargement...</div>'  :"";
-  return gaugeHtml+stats+loadingNote+info+
-    '<div class="mt16"><button class="btn bo" data-a="print-overview">Exporter PDF</button></div>'+
-    lateCard;
-}
-  var heuresPot=Math.max(1,fs.length*2*OBJ_HEURES);
-  var gaugeHtml='<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px">'+
+  var heuresPot=Math.max(1,Math.max(fsForStats.length,1)*2*OBJ_HEURES);
+  var gaugeHtml='<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px">'+
     '<div class="sc" style="flex:1;min-width:140px;padding:16px">'+
       '<div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Avancement global</div>'+
       gauge(tot,heuresPot,'var(--red)')+
@@ -948,10 +944,14 @@ function rOverview(fs,tot){
     '</div>'+
     '<div class="sc" style="flex:1;min-width:140px;padding:16px">'+
       '<div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Objectif atteint</div>'+
-      gauge(nOk,fs.length,'var(--gn)')+
-      '<div style="font-size:11px;color:var(--mu)">'+nOk+' / '+fs.length+' familles</div>'+
+      gauge(nOk,Math.max(fsForStats.length,1),'var(--gn)')+
+      '<div style="font-size:11px;color:var(--mu)">'+nOk+' / '+fsForStats.length+' familles</div>'+
     '</div>'+
   '</div>';
+  return gaugeHtml+stats+loadingNote+info+
+    '<div class="mt16"><button class="btn bo" data-a="print-overview">Exporter PDF</button></div>'+
+    lateCard;
+}
 
 
 function rHeures(fs){
