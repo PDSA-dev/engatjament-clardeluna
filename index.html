@@ -1180,8 +1180,11 @@ function rRapport(fs,tot){
 
     // En-tête catégorie
     var catColor=cat==="Commissions"?"#C0472A":cat==="Festivités"?"#2E7D4F":"#8B6000";
+    var catPct=Math.round(catTotal/(grandTotal||1)*100);
     tableRows+='<tr style="background:'+catColor+';color:#fff">'+
-      '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">'+cat+'</td>'+
+      '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">'+cat+
+        '<span style="font-size:11px;font-weight:400;opacity:0.8;margin-left:10px">'+catPct+'% du total</span>'+
+      '</td>'+
       '<td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">'+rnd(catTotal)+' h</td>'+
     '</tr>';
 
@@ -1203,9 +1206,12 @@ function rRapport(fs,tot){
   // ── Section Chèques ──
   if(totalCheques>0){
     grandTotal+=totalCheques;
+    var cheqPct=Math.round(totalCheques/(grandTotal||1)*100);
     tableRows+='<tr style="background:#5B4A9B;color:#fff">'+
-      '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">🎫 Ch&egrave;ques encaiss&eacute;s pour non investissement = 40 heures</td>'+
-      '<td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">'+rnd(totalCheques)+' h <span style="font-size:11px;font-weight:400;opacity:0.85">('+Math.round(totalCheques/(grandTotal||1)*100)+'% du total)</span></td>'+
+      '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">🎫 Ch&egrave;ques encaiss&eacute;s pour non investissement = 40 heures'+
+        '<span style="font-size:11px;font-weight:400;opacity:0.8;margin-left:10px">'+cheqPct+'% du total</span>'+
+      '</td>'+
+      '<td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">'+rnd(totalCheques)+' h</td>'+
     '</tr>';
     var nbCheqParents=Object.keys(chequeByPar).length;
     Object.keys(chequeByPar).sort().forEach(function(label){
