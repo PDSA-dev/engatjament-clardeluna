@@ -1234,6 +1234,8 @@ function rRapport(fs,tot){
     Object.keys(ACTS).forEach(function(actCat){
       if(ACTS[actCat].indexOf(sous)!==-1)cat=actCat;
     });
+    // Normaliser "Administratif / CA" (nom court dans ACTS) → nom complet CAT_ADM
+    if(cat==="Administratif / CA")cat=CAT_ADM;
     if(!byCateg[cat])byCateg[cat]={};
     byCateg[cat][sous]=(byCateg[cat][sous]||0)+h;
   });
