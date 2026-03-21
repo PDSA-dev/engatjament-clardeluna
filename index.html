@@ -1116,11 +1116,17 @@ function rRapport(fs,tot){
   });
 
   // totaux par catégorie > sous-activité
+  // Correction automatique : si la sous-activité appartient à une autre catégorie dans ACTS,
+  // on utilise la bonne catégorie (ex. "Cap d'An" mal classé en Admin → Festivités)
   var byCateg={}; // { "Commissions": { "Travaux": 12, ... }, ... }
   subs.forEach(function(s){
-    var cat=s.activiteType.trim();
     var sous=(s.sousActivite||"").trim()||"(non précisé)";
     var h=parseFloat(s.heures)||0;
+    // Déterminer la vraie catégorie via ACTS
+    var cat=s.activiteType.trim();
+    Object.keys(ACTS).forEach(function(actCat){
+      if(ACTS[actCat].indexOf(sous)!==-1)cat=actCat;
+    });
     if(!byCateg[cat])byCateg[cat]={};
     byCateg[cat][sous]=(byCateg[cat][sous]||0)+h;
   });
