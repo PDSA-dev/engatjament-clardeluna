@@ -1513,21 +1513,38 @@ function printRapport(){
   var content=document.getElementById("rapport-content");
   if(!content){alert("Ouvrez d'abord l'onglet Rapport");return;}
   var dt=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
-  var html=
-    "<style>"+
-    "*{box-sizing:border-box;margin:0;padding:0}"+
-    "body{font-family:-apple-system,sans-serif;font-size:13px;padding:20px;color:#1C1814}"+
-    "table{width:100%;border-collapse:collapse}"+
-    "th,td{padding:8px 10px;border-bottom:1px solid #E0D9D3}"+
-    "thead tr{background:#F7F4F1}"+
-    "h1{font-size:20px;font-weight:700;color:#C0472A;margin-bottom:4px}"+
-    ".meta{display:flex;gap:20px;margin:10px 0 16px;font-size:12px;color:#666}"+
-    "</style>"+
-    "<h1>Clardeluna — Rapport d'investissement familial 2025-2026</h1>"+
-    "<div class='meta'><span>Date d'édition : "+dt+"</span><span>Objectif : 40h par famille</span></div>"+
-    content.outerHTML;
-  var overlay=document.getElementById("print-overlay");
-  if(overlay){overlay.innerHTML=html;window.print();setTimeout(function(){overlay.innerHTML="";},2000);}
+  var w=window.open("","_blank","width=900,height=700");
+  if(!w){alert("Autorisez les popups pour imprimer.");return;}
+  w.document.open();
+  w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">'+
+    '<title>Rapport Clardeluna — '+dt+'<\/title>'+
+    '<style>'+
+    '*{box-sizing:border-box;margin:0;padding:0}'+
+    'body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:12px;padding:20px 24px;color:#1C1814}'+
+    'h1{font-size:18px;font-weight:700;color:#C0472A;margin-bottom:4px}'+
+    '.meta{display:flex;gap:20px;margin:8px 0 14px;font-size:11px;color:#666;flex-wrap:wrap}'+
+    'table{width:100%;border-collapse:collapse;margin-bottom:20px}'+
+    'th,td{padding:7px 10px;border-bottom:1px solid #E0D9D3}'+
+    'thead tr{background:#F7F4F1}'+
+    '.sc{background:#F7F4F1;border-radius:8px;padding:10px;display:inline-block;min-width:110px;text-align:center;margin:0 6px 6px 0}'+
+    '.sv{font-size:16px;font-weight:700}'+
+    '.slbl{font-size:10px;color:#777;margin-top:2px}'+
+    'button{display:none!important}'+
+    'svg{max-width:100%;height:auto}'+
+    '@media print{'+
+      '@page{margin:15mm}'+
+      'button{display:none!important}'+
+      '.no-print{display:none!important}'+
+      'body{padding:0}'+
+    '}'+
+    '<\/style>'+
+    '<\/head><body>'+
+    '<h1>Clardeluna — Rapport d’investissement '+ANNEE+'<\/h1>'+
+    '<div class="meta"><span>Date d’édition : '+dt+'<\/span><span>Objectif : 40h par adhérent<\/span><\/div>'+
+    content.innerHTML+
+    '<script>setTimeout(function(){window.print();window.close();},400);<\/script>'+
+    '<\/body><\/html>');
+  w.document.close();
 }
 
 
