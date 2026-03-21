@@ -1204,7 +1204,7 @@ function rRapport(fs,tot){
   if(totalCheques>0){
     grandTotal+=totalCheques;
     tableRows+='<tr style="background:#5B4A9B;color:#fff">'+
-      '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">🎫 Ch&egrave;ques d&rsquo;engagement</td>'+
+      '<td colspan="2" style="padding:8px 12px;font-weight:700;font-size:13px;letter-spacing:0.03em">🎫 Ch&egrave;ques encaiss&eacute;s pour non investissement = 40 heures</td>'+
       '<td style="padding:8px 12px;font-weight:700;text-align:right;white-space:nowrap">'+rnd(totalCheques)+' h</td>'+
     '</tr>';
     var nbCheqParents=Object.keys(chequeByPar).length;
@@ -1291,13 +1291,65 @@ function rRapport(fs,tot){
   var pieFestivites  = (byCateg["Festivités"])  ?makePie("Répartition des heures — Festivités",byCateg["Festivités"],COLORS_FES):'<p style="color:#999;font-style:italic">Aucune donnée Festivités</p>';
 
   // ── Stats résumé ──
+  // ── Graphique synthèse potentiel/réalisé/chèques ──
+  // Compter le nombre total de parents (adhérents)
+  var fsAll3=buildFullFamilies(S.subs||[]);
+  var totalParents=0;
+  fsAll3.forEach(function(f){
+    // Compter les parents avec au moins une heure OU un chèque OU dans PARENTS_MAP
+    var pSet=[];
+    Object.keys(PARENTS_MAP).forEach(function(e){
+      if(familyKey(e)===f.key)(PARENTS_MAP[e]||[]).forEach(function(p){
+        if(p&&pSet.indexOf(p)===-1)pSet.push(p);
+      });
+    });
+    f.parents.forEach(function(par){
+      var pname=displayPrenom(par.prenoms);
+      var alreadyIn=pSet.some(function(p){return prenomMatch(p,pname)||nrm(p)===nrm(pname);});
+      if(!alreadyIn)pSet.push(pname);
+    });
+    totalParents+=Math.max(1,pSet.length);
+  });
+  var heuresPotentielles=totalParents*OBJ;
+  var heuresEffectuees=grandTotal-totalCheques; // heures réelles sans chèques
+  var heuresReste=Math.max(0,heuresPotentielles-grandTotal); // ni faites ni chèques
+
+  // SVG barchart horizontal
+  var bw=460,bh=170,ml=180,mr=80,barH=32,gap=14;
+  var maxVal=heuresPotentielles||1;
+  var bars=[
+    {label:"Potentiel ("+totalParents+" parents × 40h)",val:heuresPotentielles,color:"#D0D0D0",textColor:"#555"},
+    {label:"Heures effectuées",val:heuresEffectuees,color:"#2E7D4F",textColor:"#fff"},
+    {label:"Chèques encaissés",val:totalCheques,color:"#5B4A9B",textColor:"#fff"},
+    {label:"Reste non comblé",val:heuresReste,color:"#F4A07A",textColor:"#fff"}
+  ];
+  var svgH=bars.length*(barH+gap)+40;
+  var svgBars=bars.map(function(b,i){
+    var y=30+i*(barH+gap);
+    var w=Math.max(2,Math.round((b.val/maxVal)*(bw-ml-mr)));
+    var inside=w>50;
+    return'<text x="'+ml+'" y="'+(y+barH/2+1)+'" dominant-baseline="middle" text-anchor="end" font-size="11" fill="#444" font-family="inherit">'+b.label+'</text>'+
+      '<rect x="'+ml+'" y="'+y+'" width="'+w+'" height="'+barH+'" rx="4" fill="'+b.color+'"/>'+
+      (inside
+        ?'<text x="'+(ml+w-6)+'" y="'+(y+barH/2+1)+'" dominant-baseline="middle" text-anchor="end" font-size="11" font-weight="700" fill="'+b.textColor+'" font-family="inherit">'+rnd(b.val)+'h</text>'
+        :'<text x="'+(ml+w+6)+'" y="'+(y+barH/2+1)+'" dominant-baseline="middle" text-anchor="start" font-size="11" font-weight="700" fill="#333" font-family="inherit">'+rnd(b.val)+'h</text>'
+      );
+  }).join('');
+  var chartSvg='<div style="background:#F7F4F1;border-radius:10px;padding:16px;margin-bottom:20px;overflow-x:auto">'+
+    '<h3 style="font-size:13px;font-weight:700;margin-bottom:14px;color:#1C1814">Synthèse globale — Investissement des adhérents</h3>'+
+    '<svg viewBox="0 0 '+(bw)+' '+svgH+'" width="100%" style="max-width:520px;display:block">'+
+      svgBars+
+    '</svg>'+
+    '<p style="font-size:10px;color:#999;margin-top:6px">1 adhérent = 1 parent — Objectif : 40h par adhérent</p>'+
+  '</div>';
+
   var statsH='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px">'+
     [
       ["Total global",rnd(grandTotal)+"h","var(--red)"],
       ["Commissions",categTotals["Commissions"]?rnd(categTotals["Commissions"])+"h":"---","#C0472A"],
       ["Festivités",categTotals["Festivités"]?rnd(categTotals["Festivités"])+"h":"---","#2E7D4F"],
       ["Admin / CA",categTotals["Administratif / gestion Collège / CA"]?rnd(categTotals["Administratif / gestion Collège / CA"])+"h":"---","#8B6000"],
-      ["Chèques",totalCheques>0?rnd(totalCheques)+"h":"---","#5B4A9B"]
+      ["Ch&egrave;ques encaiss&eacute;s",totalCheques>0?rnd(totalCheques)+"h":"---","#5B4A9B"]
     ].map(function(s){
       return'<div class="sc"><div class="sv" style="font-size:18px;color:'+s[2]+'">'+s[1]+'</div><div class="slbl">'+s[0]+'</div></div>';
     }).join('')+
@@ -1311,6 +1363,7 @@ function rRapport(fs,tot){
       '<button class="btn bp bsm" style="flex-shrink:0" onclick="printRapport()">🖨️ Imprimer / PDF</button>'+
     '</div>'+
     statsH+
+    chartSvg+
     table+
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">'+
       pieCommissions+pieFestivites+
