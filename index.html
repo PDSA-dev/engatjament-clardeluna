@@ -1664,7 +1664,7 @@ function rReglages(){
               return'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'+
                 '<span style="font-size:12px;font-weight:600">'+esc(p)+'</span>'+
                 '<div style="display:flex;align-items:center;gap:6px">'+
-                  '<select data-a="set-cheque" data-ck="'+esc(ck)+'" style="padding:4px 8px;border:1px solid var(--bd);border-radius:var(--rs);font-size:12px;background:var(--sf);font-family:inherit">'+
+                  '<select data-a="set-cheque" data-ck="'+esc(ck)+'" style="padding:4px 8px;border:1px solid var(--bd);border-radius:var(--rs);font-size:12px;background:var(--sf);color:var(--tx);font-family:inherit">'+
                     [0,1,2,3,4].map(function(n){
                       return'<option value="'+n+'"'+(nbCh===n?' selected':'')+'>'+n+' chèque'+(n>1?'s':n===0?' (aucun':'')+( n>0?' = '+rnd(n*10)+'h'+(n===4?' ✓ 100%':''): n===0?')':'')+' </option>';
                     }).join('')+
