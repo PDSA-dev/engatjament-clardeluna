@@ -1392,7 +1392,7 @@ function rRapport(fs,tot){
   var bw=460,bh=170,ml=180,mr=80,barH=32,gap=14;
   var maxVal=heuresPotentielles||1;
   var bars=[
-    {label:"Potentiel ("+totalParents+" parents × 40h)",val:heuresPotentielles,color:"var(--hi)",textColor:"var(--tx)"},
+    {label:"Potentiel ("+totalParents+" parents × 40h)",val:heuresPotentielles,color:"#8A8278",textColor:"#fff"},
     {label:"Heures effectuées",val:heuresEffectuees,color:"#2E7D4F",textColor:"#fff"},
     {label:"Chèques encaissés",val:totalCheques,color:"#5B4A9B",textColor:"#fff"},
     {label:"Reste non comblé",val:heuresReste,color:"#F4A07A",textColor:"#fff"}
@@ -1402,10 +1402,10 @@ function rRapport(fs,tot){
     var y=30+i*(barH+gap);
     var w=Math.max(2,Math.round((b.val/maxVal)*(bw-ml-mr)));
     var inside=w>50;
-    return`<text x="${ml}" y="`+(y+barH/2+1)+`" dominant-baseline="middle" text-anchor="end" font-size="11" fill="var(--tx)" font-family="inherit">${b.label}</text><rect x="`+ml+'" y="'+y+'" width="'+w+'" height="'+barH+'" rx="4" fill="'+b.color+'"/>'+
+    return`<text x="${ml}" y="`+(y+barH/2+1)+`" dominant-baseline="middle" text-anchor="end" font-size="11" fill="#1C1814" font-family="inherit">${b.label}</text><rect x="`+ml+'" y="'+y+'" width="'+w+'" height="'+barH+'" rx="4" fill="'+b.color+'"/>'+
       (inside
         ?'<text x="'+(ml+w-6)+'" y="'+(y+barH/2+1)+`" dominant-baseline="middle" text-anchor="end" font-size="11" font-weight="700" fill="${b.textColor}" font-family="inherit">`+rnd(b.val)+'h</text>'
-        :'<text x="'+(ml+w+6)+'" y="'+(y+barH/2+1)+`" dominant-baseline="middle" text-anchor="start" font-size="11" font-weight="700" fill="var(--tx)" font-family="inherit">${rnd(b.val)}h</text>`
+        :'<text x="'+(ml+w+6)+'" y="'+(y+barH/2+1)+`" dominant-baseline="middle" text-anchor="start" font-size="11" font-weight="700" fill="#1C1814" font-family="inherit">${rnd(b.val)}h</text>`
       );
   }).join('');
   var chartSvg='<div style="background:var(--sf);border-radius:10px;border:1px solid var(--bd);padding:16px;margin-bottom:20px;overflow-x:auto"><h3 style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--tx)">Synthèse globale — Investissement des adhérents</h3><svg viewBox="0 0 '+(bw)+` ${svgH}" width="100%" style="max-width:520px;display:block">`+
