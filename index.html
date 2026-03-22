@@ -124,11 +124,17 @@ p.pss{font-size:14px;color:var(--mu);margin-bottom:16px}
 .icon-print::before{content:"";display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:5px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='1.4'%3E%3Crect x='2' y='5' width='10' height='6' rx='1'/%3E%3Cpath d='M4 5V2h6v3M4 8.5h6M4 10.5h4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:contain}
 .icon-logout::before{content:"";display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:4px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='1.4'%3E%3Cpath d='M9 2h3v10H9M5.5 9.5L3 7l2.5-2.5M3 7h7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:contain}
 
+select{background:var(--sf);color:var(--tx);border:1px solid var(--bd)}
+select:focus{outline:2px solid var(--red);border-color:transparent}
+select option{background:var(--sf);color:var(--tx)}
+
 @media(prefers-color-scheme:dark){
   .htbl th{background:var(--bg)}
   .htbl tr:hover td{background:rgba(255,255,255,.03)}
   table thead tr{background:var(--bg)!important}
   .skel{background:linear-gradient(90deg,var(--sf) 25%,var(--bd) 50%,var(--sf) 75%);background-size:200% 100%}
+  select{background:var(--sf)!important;color:var(--tx)!important}
+  select option{background:var(--sf);color:var(--tx)}
 }
 </style>
 </head>
@@ -1664,7 +1670,7 @@ function rReglages(){
               return'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'+
                 '<span style="font-size:12px;font-weight:600">'+esc(p)+'</span>'+
                 '<div style="display:flex;align-items:center;gap:6px">'+
-                  '<select data-a="set-cheque" data-ck="'+esc(ck)+'" style="padding:4px 8px;border:1px solid var(--bd);border-radius:var(--rs);font-size:12px;background:var(--sf);color:var(--tx);font-family:inherit">'+
+                  '<select data-a="set-cheque" data-ck="'+esc(ck)+'" style="padding:4px 28px 4px 8px;border:1px solid var(--bd);border-radius:var(--rs);font-size:12px;background:var(--sf);color:var(--tx);font-family:inherit;-webkit-appearance:none;appearance:none;cursor:pointer;min-width:160px">'+
                     [0,1,2,3,4].map(function(n){
                       return'<option value="'+n+'"'+(nbCh===n?' selected':'')+'>'+n+' chèque'+(n>1?'s':n===0?' (aucun':'')+( n>0?' = '+rnd(n*10)+'h'+(n===4?' ✓ 100%':''): n===0?')':'')+' </option>';
                     }).join('')+
