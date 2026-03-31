@@ -489,7 +489,7 @@ var S={
   page:"home",subs:null,loading:false,err:"",
   step:0,form:{cl:"",eleve:"",nbParents:1,p1:"",p2:"",typeAct:"",sousAct:"",heures:""},
   done:false,sending:false,sendErr:"",eleveQ:"",
-  portalQ:"",portalFam:null,
+  portalQ:"",portalFam:null,portalParentFilter:null,
   adminTab:"overview",aFilter:"all",aCls:"all",aSubQ:"",aHeureQ:"",
   elevesOpen:null,regSaving:false,regSaved:false,promoSaved:false,promoArchiving:false,pinSaved:false,archives:null,archivesLoading:false,archivesErr:"",restoring:null,restoreDone:null,
   pinInput:"",pinErr:false,deleting:null,
@@ -609,7 +609,7 @@ function portalResults(fam){
       return'<div>'+found.map(function(fm){
         var p2=Math.min(100,Math.round(fm.totalH/(Math.max(1,fm.parents.length)*OBJ_HEURES)*100));
         var bc2=fm.totalH>=OBJ_HEURES?'var(--gn)':fm.totalH<10?'var(--red)':'#E6A817';
-        return'<div class="card" style="margin-bottom:8px;cursor:pointer" data-a="select-family" data-key="'+esc(fm.key)+'">'+
+        return'<div class="card" style="margin-bottom:8px;cursor:pointer" data-a="portal-sel" data-key="'+esc(fm.key)+'">'+
           '<div style="display:flex;justify-content:space-between;align-items:center">'+
             '<div><div style="font-weight:700">Famille '+esc(fm.key)+'</div>'+
             '<div style="font-size:11px;color:var(--mu)">'+esc(Object.keys(fm.children).join(', '))+'</div></div>'+
@@ -640,7 +640,25 @@ function portalResults(fam){
       '<span>'+p+'% atteint</span>'+badge(s)+
     '</div>'+
   '</div>';
-  var parsH=f.parents.map(function(par){
+  var parsH='';
+  if(f.parents.length>1){
+    var activeFilter=S.portalParentFilter;
+    var filterBtns=f.parents.map(function(par){
+      var pname=displayPrenom(par.prenoms);
+      var isActive=activeFilter===pname;
+      return'<button class="btn '+(isActive?'bp':'bo')+'" style="padding:6px 14px;font-size:12px;flex-shrink:0" data-a="set-par-filter" data-pname="'+esc(pname)+'">'+esc(pname)+'</button>';
+    }).join('');
+    var allActive=!activeFilter;
+    parsH+='<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px">'+
+      '<span style="font-size:11px;color:var(--mu);flex-shrink:0">Voir :</span>'+
+      '<button class="btn '+(allActive?'bp':'bo')+'" style="padding:6px 14px;font-size:12px;flex-shrink:0" data-a="set-par-filter" data-pname="">Tous</button>'+
+      filterBtns+
+    '</div>';
+  }
+  parsH+=f.parents.filter(function(par){
+    if(!S.portalParentFilter)return true;
+    return displayPrenom(par.prenoms)===S.portalParentFilter;
+  }).map(function(par){
     var pname=displayPrenom(par.prenoms);
     var ph=par.totalH||0;
     var pp=Math.min(100,Math.round(ph/OBJ*100));
@@ -2021,7 +2039,7 @@ function onClick(e){
   var nf={cl:"",eleve:"",nbParents:1,p1:"",p2:"",typeAct:"",sousAct:"",heures:""};
   switch(a){
     case"go-home":go({page:"home"});break;
-    case"go-portal":go({page:"portal",portalQ:""});break;
+    case"go-portal":go({page:"portal",portalQ:"",portalParentFilter:null});break;
     case"logout":
       try{sessionStorage.removeItem("cl_unlocked");}catch(e){}
       go({page:"access",accessInput:"",accessErr:false});break;
@@ -2059,11 +2077,16 @@ function onClick(e){
       });break;
         case"submit":saveInputs();doSubmit();break;
     case"new-form":go({page:"form",step:0,form:nf,done:false,sendErr:"",eleveQ:""});break;
+    case"set-par-filter":
+      go({portalParentFilter:el.dataset.pname||null});
+      var res2=document.getElementById("portal-results");
+      if(res2){res2.innerHTML=portalResults(S.portalFam||undefined);reattach();}
+      break;
     case"portal-sel":
       var key=el.dataset.key;
-      var allFams=computeFamilies(S.subs||[]);
+      var allFams=buildFullFamilies(S.subs||[]);
       var fm=allFams.find(function(f){return f.key===key;});
-      if(fm)go({page:"portal-view",portalFam:fm});break;
+      if(fm)go({page:"portal-view",portalFam:fm,portalParentFilter:null});break;
     case"man-cl":go({manCl:v,manEleve:'',manParent:'',manSousAct:'',manHeures:''});break;
     case"man-eleve":go({manEleve:v,manParent:''});break;
     case"man-parent":go({manParent:v});break;
