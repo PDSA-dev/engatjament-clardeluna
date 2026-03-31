@@ -2355,7 +2355,14 @@ function doSubmit(){
   var pl={classe:f.cl,eleve:f.eleve,nbParents:f.nbParents,parents:f.nbParents===2?(f.p1+" & "+f.p2):f.p1,activiteType:f.typeAct,sousActivite:f.sousAct,heures:parseFloat(f.heures)};
   fbAdd(pl).then(function(ref){
     var ns=Object.assign({id:ref.id,ts:new Date().toISOString()},pl);
-    go({sending:false,done:true,subs:(S.subs||[]).concat([ns])});
+    // Recharger TOUTES les saisies depuis Firebase pour avoir les données complètes
+    // (évite que S.subs ne contienne qu'une seule entrée si le parent n'avait pas encore chargé)
+    fbLoad().then(function(allSubs){
+      go({sending:false,done:true,subs:allSubs});
+    }).catch(function(){
+      // En cas d'erreur Firebase, au moins ajouter la nouvelle saisie
+      go({sending:false,done:true,subs:(S.subs||[]).concat([ns])});
+    });
   }).catch(function(e){go({sending:false,sendErr:"Erreur : "+e.message});});
 }
 function doDel(id){
