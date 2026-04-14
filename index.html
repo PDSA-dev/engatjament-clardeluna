@@ -274,6 +274,7 @@ var PARENTS_MAP={
 };
 
 var CHEQUES_MAP={};
+var ANNUAIRE_MAP={};
 // ── CONSTANTES MÉTIER ──────────────────────────────
 var OBJ_HEURES = 40;         // Objectif heures par adhérent
 var H_CHEQUE   = 10;         // Heures équivalentes par chèque
@@ -303,6 +304,8 @@ function fbSaveActs(){return db.collection("config").doc("activites").set({acts:
 function fbLoadActs(){return db.collection("config").doc("activites").get();}
 function fbSaveAccess(){return db.collection("config").doc("access").set({hash:ACCESS_HASH,enabled:ACCESS_ENABLED});}
 function fbLoadAccess(){return db.collection("config").doc("access").get();}
+function fbSaveAnnuaire(){return db.collection("config").doc("annuaire").set({annuaire:ANNUAIRE_MAP});}
+function fbLoadAnnuaire(){return db.collection("config").doc("annuaire").get();}
 // ── UTILITAIRES ───────────────────────────────
 function nrm(s){return String(s||"").replace(/æ/gi,"ae").replace(/œ/gi,"oe").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
@@ -489,7 +492,8 @@ var S={
   editSaisieId:null,editSaisieErr:"",pinErr2:"",passVisible:false,
   saisiesFamille:[],saisiesFam:"all",saisiesPar:"all",saisiesTableOpen:false,
   accessInput:"",accessErr:false,
-  accessPassSaved:false,accessPassErr:""
+  accessPassSaved:false,accessPassErr:"",
+  annuaireQ:"",annuaireClsFilter:"all",annuaireSaved:false
 };
 // ── RENDU ─────────────────────────────────────
 function go(p){saveInputs();Object.assign(S,typeof p==="function"?p(S):p);render();}
@@ -938,10 +942,11 @@ function rAdmin(){
   if(S.adminTab==="rapport")c=rRapport(fs,tot);
   if(S.adminTab==="reglages")c=rReglages();
   if(S.adminTab==="saisie-admin")c=rManSaisie();
+  if(S.adminTab==="annuaire")c=rAnnuaire();
   return tb("Tableau de bord","home",subs.length+" saisies · "+rnd(tot)+"h total")+
     (S.err?`<div class="al ae" style="margin:8px 16px">${esc(S.err)}</div>`:"")+
     '<div style="display:flex;justify-content:flex-end;padding:4px 16px 0"><button data-a="refresh-overview" style="display:flex;align-items:center;gap:0;border:none;border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.15);font-family:inherit"><span style="display:flex;align-items:center;justify-content:center;background:var(--redm);width:26px;height:26px;font-size:13px;line-height:1">↻</span><span style="background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:0 10px;height:26px;display:flex;align-items:center;letter-spacing:.04em;text-transform:uppercase">Rafraîchir</span></button></div><div class="tabs">'+
-      [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["reglages","⚙ Réglages"]].map(function(t){
+      [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["annuaire","📋 Annuaire"],["reglages","⚙ Réglages"]].map(function(t){
         return'<button class="tab'+(S.adminTab===t[0]?" on":"")+'" data-a="tab" data-v="'+t[0]+'">'+t[1]+'</button>';
       }).join("")+
     `</div><div class="wlg" style="padding-top:16px">${c}</div>`;
@@ -1863,6 +1868,105 @@ function doManSaisie(){
     setTimeout(function(){go({manSaved:false});},3000);
   }).catch(function(e){go({manSaving:false,manErr:'Erreur Firebase : '+e.message});});
 }
+function rAnnuaire(){
+  var q=nrm(S.annuaireQ||"");
+  var cls=Object.keys(ELEVES);
+  var clsFilter=S.annuaireClsFilter||"all";
+  var families={};
+  cls.forEach(function(cl){
+    ELEVES[cl].forEach(function(e){
+      var fk=familyKey(e);
+      if(!families[fk])families[fk]={key:fk,parents:[],classes:[]};
+      var fam=families[fk];
+      if(fam.classes.indexOf(cl)===-1)fam.classes.push(cl);
+      (PARENTS_MAP[e]||[]).forEach(function(p){
+        var already=fam.parents.some(function(par){return nrm(par.prenom)===nrm(p)||prenomMatch(par.prenom,p);});
+        if(!already)fam.parents.push({prenom:p});
+      });
+    });
+  });
+  var allFams=Object.values(families).sort(function(a,b){return a.key.localeCompare(b.key);});
+  var filtered=allFams.filter(function(fam){
+    var clsOk=clsFilter==="all"||fam.classes.indexOf(clsFilter)!==-1;
+    var qOk=!q||nrm(fam.key).includes(q)||fam.parents.some(function(par){return nrm(par.prenom).includes(q);});
+    return clsOk&&qOk;
+  });
+  var total=0,filled=0;
+  allFams.forEach(function(fam){
+    fam.parents.forEach(function(par){
+      total++;
+      var info=ANNUAIRE_MAP[chequeKey(fam.key,par.prenom)]||{};
+      if(info.email||info.tel)filled++;
+    });
+  });
+  var clsFilterBtns='<div class="fbar" style="margin-bottom:12px">'+
+    '<button class="fc2'+(clsFilter==="all"?" on":"")+'" data-a="ann-cls" data-v="all">Toutes</button>'+
+    cls.map(function(cl){
+      return'<button class="fc2'+(clsFilter===cl?" on":"")+'" data-a="ann-cls" data-v="'+esc(cl)+'">'+esc(cl)+'</button>';
+    }).join("")+
+  '</div>';
+  var famCards=filtered.length?filtered.map(function(fam){
+    var parRows=fam.parents.map(function(par){
+      var ak=chequeKey(fam.key,par.prenom);
+      var info=ANNUAIRE_MAP[ak]||{};
+      var hasData=info.email||info.tel;
+      return'<div style="padding:8px 0;border-bottom:1px solid var(--bd)">'+
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'+
+          '<span style="font-size:13px;font-weight:600">'+esc(par.prenom)+'</span>'+
+          (hasData?'<span style="font-size:10px;background:var(--gnl);color:var(--gn);padding:1px 6px;border-radius:10px">✓</span>':'<span style="font-size:10px;background:var(--bg);color:var(--hi);padding:1px 6px;border-radius:10px">à renseigner</span>')+
+        '</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+          '<div>'+
+            '<label class="lbl" style="font-size:10px">Email</label>'+
+            '<input class="inp ann-field" data-ak="'+esc(ak)+'" data-field="email" type="email" placeholder="email@..." value="'+esc(info.email||'')+'" style="font-size:12px;padding:7px 10px" autocomplete="off">'+
+          '</div>'+
+          '<div>'+
+            '<label class="lbl" style="font-size:10px">Téléphone</label>'+
+            '<input class="inp ann-field" data-ak="'+esc(ak)+'" data-field="tel" type="tel" placeholder="06 XX XX XX XX" value="'+esc(info.tel||'')+'" style="font-size:12px;padding:7px 10px" autocomplete="off">'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+    var enfants=[];
+    cls.forEach(function(cl){ELEVES[cl].forEach(function(e){if(familyKey(e)===fam.key)enfants.push(e+' ('+cl+')');});});
+    return'<div class="card" style="margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'+
+        '<div>'+
+          '<div style="font-size:15px;font-weight:700">Famille '+esc(fam.key)+'</div>'+
+          '<div style="font-size:11px;color:var(--mu)">'+esc(enfants.join(' · '))+'</div>'+
+        '</div>'+
+        '<div style="font-size:11px;color:var(--mu)">'+fam.parents.length+' parent'+(fam.parents.length>1?'s':'')+'</div>'+
+      '</div>'+
+      parRows+
+    '</div>';
+  }).join(''):'<p class="empty">Aucune famille trouvée</p>';
+  return'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+    '<h2 style="font-size:17px;font-weight:700">📋 Annuaire</h2>'+
+    (S.annuaireSaved?'<span style="font-size:11px;color:var(--gn)">✓ Enregistré</span>':'')+
+  '</div>'+
+  '<p style="font-size:13px;color:var(--mu);margin-bottom:12px">'+filled+' / '+total+' contacts renseignés · Sauvegarde auto à la saisie</p>'+
+  '<input class="inp" id="ann-q" placeholder="Rechercher par famille ou prénom..." value="'+esc(S.annuaireQ||'')+'" style="margin-bottom:10px;font-size:13px" autocomplete="off">'+
+  clsFilterBtns+
+  famCards+
+  '<button class="btn bo" data-a="ann-export-csv" style="margin-top:12px">'+ICONS.download+'Exporter CSV annuaire</button>';
+}
+function exportAnnuaireCsv(){
+  var rows=[];
+  Object.keys(ELEVES).forEach(function(cl){
+    ELEVES[cl].forEach(function(e){
+      var fk=familyKey(e);
+      (PARENTS_MAP[e]||[]).forEach(function(p){
+        var ak=chequeKey(fk,p);
+        var info=ANNUAIRE_MAP[ak]||{};
+        rows.push([cl,e,fk,p,info.email||'',info.tel||'']);
+      });
+    });
+  });
+  var hd=['Classe','Élève','Famille','Parent','Email','Téléphone'];
+  var csv="\uFEFF"+[hd].concat(rows).map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='clardeluna-annuaire-'+ANNEE+'.csv';a.click();
+}
 function rActivites(){
   var cats=Object.keys(ACTS);
   var saved=S.actsSaved?'<div class="al aok mt8">Activites enregistrees !</div>':"";
@@ -2024,7 +2128,28 @@ function bindChequeSelects(){
   if(spar)spar.onchange=function(){go({saisiesPar:spar.value});};
 }
 
-function reattach(){bindChequeSelects();}
+function reattach(){bindChequeSelects();bindAnnuaire();}
+function bindAnnuaire(){
+  var annQ=document.getElementById('ann-q');
+  if(annQ){
+    annQ.oninput=function(){
+      var pos=annQ.selectionStart;
+      sil({annuaireQ:annQ.value});go({});
+      var newAnnQ=document.getElementById('ann-q');
+      if(newAnnQ){newAnnQ.focus();newAnnQ.setSelectionRange(pos,pos);}
+    };
+  }
+  document.querySelectorAll('.ann-field').forEach(function(inp){
+    inp.onblur=function(){
+      var ak=inp.dataset.ak,field=inp.dataset.field,val=inp.value.trim();
+      if(!ANNUAIRE_MAP[ak])ANNUAIRE_MAP[ak]={};
+      ANNUAIRE_MAP[ak][field]=val;
+      fbSaveAnnuaire()
+        .then(function(){showToast('Contact enregistré','ok');go({annuaireSaved:true});setTimeout(function(){go({annuaireSaved:false});},2000);})
+        .catch(function(e){showToast('Erreur: '+e.message,'err');});
+    };
+  });
+}
 function onClick(e){
   var el=e.target.closest("[data-a]");if(!el)return;
   var a=el.dataset.a,v=el.dataset.v;
@@ -2294,6 +2419,8 @@ function onClick(e){
       go({accessPassSaved:true,accessPassErr:""});
       fbSaveAccess().catch(function(){});
       setTimeout(function(){go({accessPassSaved:false});},3000);break;
+    case"ann-cls":go({annuaireClsFilter:v});break;
+    case"ann-export-csv":exportAnnuaireCsv();break;
   }
   reattach();
 }
@@ -2399,7 +2526,10 @@ function loadElevesConfig(){
         if(typeof data.pass==="string"&&data.pass)ACCESS_PLAIN=data.pass;
         if(typeof data.enabled==="boolean")ACCESS_ENABLED=data.enabled;
       }
-    }).catch(function(e){console.warn("[config] access:",e.message);})
+    }).catch(function(e){console.warn("[config] access:",e.message);}),
+    fbLoadAnnuaire().then(function(doc){
+      if(doc.exists){var data=doc.data();if(data.annuaire)Object.assign(ANNUAIRE_MAP,data.annuaire);}
+    }).catch(function(e){console.warn("[config] annuaire:",e.message);})
   ]);
 }
 function doPromotion(){
