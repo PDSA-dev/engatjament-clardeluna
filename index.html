@@ -2105,6 +2105,28 @@ function bindAll(){
     var btn=document.querySelector('[data-a="man-submit"]');
     if(btn)btn.disabled=!(S.manEleve&&S.manParent&&S.manTypeAct&&S.manSousAct&&parseFloat(manHInp.value)>0);
   });
+  bindAnnuaire();
+}
+function bindAnnuaire(){
+  var annQ=document.getElementById('ann-q');
+  if(annQ){
+    annQ.oninput=function(){
+      var pos=annQ.selectionStart;
+      sil({annuaireQ:annQ.value});go({});
+      var newAnnQ=document.getElementById('ann-q');
+      if(newAnnQ){newAnnQ.focus();newAnnQ.setSelectionRange(pos,pos);}
+    };
+  }
+  document.querySelectorAll('.ann-field').forEach(function(inp){
+    inp.onblur=function(){
+      var ak=inp.dataset.ak,field=inp.dataset.field,val=inp.value.trim();
+      if(!ANNUAIRE_MAP[ak])ANNUAIRE_MAP[ak]={};
+      ANNUAIRE_MAP[ak][field]=val;
+      fbSaveAnnuaire()
+        .then(function(){showToast('Contact enregistré','ok');go({annuaireSaved:true});setTimeout(function(){go({annuaireSaved:false});},2000);})
+        .catch(function(e){showToast('Erreur: '+e.message,'err');});
+    };
+  });
 }
 function bindChequeSelects(){
   document.querySelectorAll('[data-a="set-cheque"]').forEach(function(sel){
@@ -2129,27 +2151,6 @@ function bindChequeSelects(){
 }
 
 function reattach(){bindChequeSelects();bindAnnuaire();}
-function bindAnnuaire(){
-  var annQ=document.getElementById('ann-q');
-  if(annQ){
-    annQ.oninput=function(){
-      var pos=annQ.selectionStart;
-      sil({annuaireQ:annQ.value});go({});
-      var newAnnQ=document.getElementById('ann-q');
-      if(newAnnQ){newAnnQ.focus();newAnnQ.setSelectionRange(pos,pos);}
-    };
-  }
-  document.querySelectorAll('.ann-field').forEach(function(inp){
-    inp.onblur=function(){
-      var ak=inp.dataset.ak,field=inp.dataset.field,val=inp.value.trim();
-      if(!ANNUAIRE_MAP[ak])ANNUAIRE_MAP[ak]={};
-      ANNUAIRE_MAP[ak][field]=val;
-      fbSaveAnnuaire()
-        .then(function(){showToast('Contact enregistré','ok');go({annuaireSaved:true});setTimeout(function(){go({annuaireSaved:false});},2000);})
-        .catch(function(e){showToast('Erreur: '+e.message,'err');});
-    };
-  });
-}
 function onClick(e){
   var el=e.target.closest("[data-a]");if(!el)return;
   var a=el.dataset.a,v=el.dataset.v;
