@@ -301,6 +301,8 @@ function fbSaveAccess(){return db.collection("config").doc("access").set({hash:A
 function fbLoadAccess(){return db.collection("config").doc("access").get();}
 function fbSaveAnnuaire(){return db.collection("config").doc("annuaire").set({annuaire:ANNUAIRE_MAP});}
 function fbLoadAnnuaire(){return db.collection("config").doc("annuaire").get();}
+function fbSavePin(){return db.collection("config").doc("pin").set({hash:PIN_HASH});}
+function fbLoadPin(){return db.collection("config").doc("pin").get();}
 // ── UTILITAIRES ───────────────────────────────
 function nrm(s){return String(s||"").replace(/æ/gi,"ae").replace(/œ/gi,"oe").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
@@ -2423,12 +2425,17 @@ function onClick(e){
       var cpEl=document.getElementById("cp"),cpv=cpEl?cpEl.value:"";
       var npEl=document.getElementById("np"),npv=npEl?npEl.value.trim():"";
       var np2El=document.getElementById("np2"),np2v=np2El?np2El.value.trim():"";
-      if(cpv!==PIN){go({pinErr2:"Code PIN actuel incorrect"});break;}
       if(npv.length<4){go({pinErr2:"Nouveau code trop court (min 4 caractères)"});break;}
       if(npv!==np2v){go({pinErr2:"Les deux codes ne correspondent pas"});break;}
-      PIN=npv;
-      go({pinSaved:true,pinErr2:""});
-      setTimeout(function(){go({pinSaved:false});},3000);break;
+      sha256hex(cpv).then(function(ch){
+        if(ch!==PIN_HASH){go({pinErr2:"Code PIN actuel incorrect"});return;}
+        sha256hex(npv).then(function(nh){
+          PIN_HASH=nh;
+          go({pinSaved:true,pinErr2:""});
+          fbSavePin().catch(function(){});
+          setTimeout(function(){go({pinSaved:false});},3000);
+        });
+      });break;
     case"save-access-pass":
       var napEl=document.getElementById("new-ap"),napv=napEl?napEl.value.trim():"";
       if(napv.length<4){go({accessPassErr:"Mot de passe trop court (min 4 caractères)"});break;}
@@ -2556,7 +2563,10 @@ function loadElevesConfig(){
     }).catch(function(e){console.warn("[config] access:",e.message);}),
     fbLoadAnnuaire().then(function(doc){
       if(doc.exists){var data=doc.data();if(data.annuaire)Object.assign(ANNUAIRE_MAP,data.annuaire);}
-    }).catch(function(e){console.warn("[config] annuaire:",e.message);})
+    }).catch(function(e){console.warn("[config] annuaire:",e.message);}),
+    fbLoadPin().then(function(doc){
+      if(doc.exists){var data=doc.data();if(typeof data.hash==="string"&&data.hash)PIN_HASH=data.hash;}
+    }).catch(function(e){console.warn("[config] pin:",e.message);})
   ]);
 }
 function doPromotion(){
