@@ -297,7 +297,7 @@ function fbSaveAnnee(){return db.collection("config").doc("annee").set({rentree:
 function fbLoadAnnee(){return db.collection("config").doc("annee").get();}
 function fbSaveActs(){return db.collection("config").doc("activites").set({acts:ACTS});}
 function fbLoadActs(){return db.collection("config").doc("activites").get();}
-function fbSaveAccess(){return db.collection("config").doc("access").set({hash:ACCESS_HASH,enabled:ACCESS_ENABLED});}
+function fbSaveAccess(){return db.collection("config").doc("access").set({hash:ACCESS_HASH,enabled:ACCESS_ENABLED,pass:ACCESS_PLAIN});}
 function fbLoadAccess(){return db.collection("config").doc("access").get();}
 function fbSaveAnnuaire(){return db.collection("config").doc("annuaire").set({annuaire:ANNUAIRE_MAP});}
 function fbLoadAnnuaire(){return db.collection("config").doc("annuaire").get();}
