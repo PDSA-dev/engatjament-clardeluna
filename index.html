@@ -958,11 +958,11 @@ function rAdmin(){
   if(S.adminTab==="saisie-admin")c=rManSaisie();
   if(S.adminTab==="activites")c=rActivites();
   if(S.adminTab==="annuaire")c=rAnnuaire();
+    if(S.adminTab==="log")c=rAdminLogSec();
   return tb("Tableau de bord","home",subs.length+" saisies · "+rnd(tot)+"h total")+
     (S.err?`<div class="al ae" style="margin:8px 16px">${esc(S.err)}</div>`:"")+
     '<div style="display:flex;justify-content:flex-end;padding:4px 16px 0"><button data-a="refresh-overview" style="display:flex;align-items:center;gap:0;border:none;border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.15);font-family:inherit"><span style="display:flex;align-items:center;justify-content:center;background:var(--redm);width:26px;height:26px;font-size:13px;line-height:1">↻</span><span style="background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:0 10px;height:26px;display:flex;align-items:center;letter-spacing:.04em;text-transform:uppercase">Rafraîchir</span></button></div><div class="tabs">'+
-      [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["activites","📋 Activités"],["annuaire","👥 Annuaire"],["reglages","⚙ Réglages"]].map(function(t){
-        return'<button class="tab'+(S.adminTab===t[0]?" on":"")+'" data-a="tab" data-v="'+t[0]+'">'+t[1]+'</button>';
+      [["overview","Vue d'ensemble"],["heures","Heures"],["saisies","Saisies"],["rapport","📄 Rapport"],["saisie-admin","✏️ Saisie"],["activites","📋 Activités"],["annuaire","👥 Annuaire"],["log","🕐 Historique"],["reglages","⚙ Réglages"]].map(function(t){        return'<button class="tab'+(S.adminTab===t[0]?" on":"")+'" data-a="tab" data-v="'+t[0]+'">'+t[1]+'</button>';
       }).join("")+
     `</div><div class="wlg" style="padding-top:16px">${c}</div>`;
 }
@@ -2422,9 +2422,18 @@ function onClick(e){
         case"check-pin":checkPin();break;
         case"save-admin-name":saveAdminName();break;
         case"change-admin-name":go({page:"admin-name",adminNameInput:ADMIN_NAME,adminNameErr:false,adminNameReturn:S.adminTab||"overview"});break;
-    case"tab":go({adminTab:v});break;
+    case"tab":
+          var toLog=v==="log"&&!S.adminLog&&!S.adminLogLoading;
+          go({adminTab:v,adminLogLoading:toLog?true:S.adminLogLoading});
+          if(toLog){
+                    fbLoadLog().then(function(snap){
+                                var log=snap.docs.map(function(d){return d.data();});
+                                go({adminLogLoading:false,adminLog:log});
+                    }).catch(function(e){go({adminLogLoading:false,err:"Erreur journal : "+e.message});});
+          }
+      break;
     case"fcls":go({aCls:v});break;
-    case"fst":go({aFilter:v});break;
+        case"fst":go({aFilter:v});break;
     case"do-search":
       var pqEl=document.getElementById("pq");
       if(pqEl)sil({portalQ:pqEl.value});
