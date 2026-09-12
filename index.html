@@ -940,9 +940,9 @@ function rLogin(){
 }
 function rAdminName(){
   return tb("Administration","home")+
-    '<div class="wrap" style="text-align:center;padding-top:0"><div style="font-size:48px;margin:44px 0 16px">🧑</div><h2 class="ptt">Qui êtes-vous ?</h2><p class="pss">Ce prénom sera associé aux actions effectuées depuis cet appareil.</p>'+
-    '<input class="inp" id="an" type="text" placeholder="Votre prénom" value="'+esc(S.adminNameInput||"")+'" style="text-align:center;font-size:18px" autofocus>'+
-    (S.adminNameErr?'<div class="al ae mt8">Merci de saisir un prénom (2 caractères min.)</div>':"")+
+        '<div class="wrap" style="text-align:center;padding-top:0"><div style="font-size:48px;margin:44px 0 16px">🧑</div><h2 class="ptt">Qui êtes-vous ?</h2><p class="pss">Ce nom sera associé aux actions effectuées depuis cet appareil.</p>'+
+        '<input class="inp" id="an" type="text" placeholder="Nom Prénom" value="'+esc(S.adminNameInput||"")+'" style="text-align:center;font-size:18px" autofocus>'+
+        (S.adminNameErr?'<div class="al ae mt8">Merci de saisir votre nom et prénom (2 caractères min.)</div>':"")+
     '<div class="mt16"><button class="btn bp" data-a="save-admin-name">Continuer</button></div></div>';
 }
 // ── ADMIN ─────────────────────────────────────
