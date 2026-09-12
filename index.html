@@ -1787,8 +1787,10 @@ function rReglages(){
   '</div>';
   var idSec='<div class="card" style="margin-bottom:12px"><h3 style="font-size:15px;font-weight:700;margin-bottom:6px">🧑 Identifiant administrateur</h3>'+
     '<p style="font-size:13px;color:var(--mu)">Connecté en tant que : <strong style="color:var(--tx)">'+esc(ADMIN_NAME||"Non renseigné")+'</strong></p>'+
-    '<button class="btn bo bsm" style="margin-top:8px" data-a="change-admin-name">Changer</button></div>';
-  return idSec+'<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">Réglages</h2>'+
+        '<button class="btn bo bsm" style="margin-top:8px" data-a="change-admin-name">Changer</button> '+
+        '<button class="btn bo bsm" style="margin-top:8px" data-a="forget-device">Se déconnecter de cet appareil</button>'+
+        '<p style="font-size:11px;color:var(--mu);margin-top:6px">Cet appareil est reconnu automatiquement : le code PIN ne sera plus demandé tant que vous ne vous déconnectez pas.</p></div>';
+  turn idSec+'<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">Réglages</h2>'+
     anneeSec+promo+
     '<h3 style="font-size:13px;font-weight:700;margin:16px 0 10px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em">Listes des élèves</h3>'+
     clsSecs+saved+saving+pinSec+
@@ -2223,7 +2225,15 @@ function onClick(e){
       try{sessionStorage.removeItem("cl_unlocked");}catch(e){}
       go({page:"access",accessInput:"",accessErr:false});break;
     case"go-form":go({page:"form",step:0,form:nf,done:false,sendErr:"",eleveQ:""});break;
-    case"go-login":go({page:"login",pinInput:"",pinErr:false});break;
+    case"go-login":
+          if(ADMIN_NAME){go({page:"admin",adminTab:"overview",err:""});loadSubs();fbLogAction("login",ADMIN_NAME);}
+          else go({page:"login",pinInput:"",pinErr:false});
+          break;
+        case"forget-device":
+          if(!confirm("Se déconnecter de cet appareil ?\n\nLe code PIN sera de nouveau demandé lors de la prochaine connexion administrateur."))break;
+          ADMIN_NAME="";
+          try{localStorage.removeItem("cl_admin_name");}catch(e){}
+          go({page:"home"});break;
     case"back":
       if(v==="form-back"){saveInputs();S.step===0?go({page:"home"}):go({step:S.step-1});}
       else go({page:v});break;
