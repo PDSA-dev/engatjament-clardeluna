@@ -171,6 +171,9 @@ function slabel(h){
 // ── CONFIG ───────────────────────────────────
 var FB_CFG={apiKey:"AIzaSyB-wIHxxQKYKlss2byJiN26d4VPc5dozlc",authDomain:"clardeluna-2026.firebaseapp.com",projectId:"clardeluna-2026",storageBucket:"clardeluna-2026.firebasestorage.app",messagingSenderId:"65241322899",appId:"1:65241322899:web:0c94d1ab9c178f030f0466"};
 var PIN_HASH="158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab", OBJ=40;
+// ── SUIVI DES ACTIONS ADMIN ─────────────────
+var ADMIN_NAME=(function(){try{return localStorage.getItem("cl_admin_name")||"";}catch(e){return "";}})();
+function setAdminNameLS(n){try{localStorage.setItem("cl_admin_name",n);}catch(e){}}
 // ── MOT DE PASSE PARENTS ─────────────────────
 var ACCESS_HASH="32c648ed8cb4f5d0bc6c5466231c04a3f749de269c30488bb78e82c7032619f8"; // mot de passe parents (hash SHA-256)
 var ACCESS_PLAIN=""; // mot de passe en clair — chargé depuis Firebase, jamais dans le code
@@ -303,6 +306,8 @@ function fbSaveAnnuaire(){return db.collection("config").doc("annuaire").set({an
 function fbLoadAnnuaire(){return db.collection("config").doc("annuaire").get();}
 function fbSavePin(){return db.collection("config").doc("pin").set({hash:PIN_HASH});}
 function fbLoadPin(){return db.collection("config").doc("pin").get();}
+function fbLogAction(action,detail){return db.collection("admin_log").add({by:ADMIN_NAME||"?",action:action,detail:detail||"",ts:new Date().toISOString()}).catch(function(){});}
+function fbLoadLog(){return db.collection("admin_log").orderBy("ts","desc").limit(100).get();}
 // ── UTILITAIRES ───────────────────────────────
 function nrm(s){return String(s||"").replace(/æ/gi,"ae").replace(/œ/gi,"oe").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
@@ -322,7 +327,9 @@ function familyKey(eleve){
 // "Paul", "Paulo", "Paul Alves", "paulo alves" → même prénom
 // Extrait le prénom principal (1er mot significatif)
 function chequeKey(fk,prenom){return fk+"_"+nrm(prenom).replace(/\s+/g,"").slice(0,8);}
-function chequesH(fk,prenom){return (CHEQUES_MAP[chequeKey(fk,prenom)]||0)*H_CHEQUE;}
+function chequeNb(ck){var v=CHEQUES_MAP[ck];if(v==null)return 0;return typeof v==="object"?(v.nb||0):v;}
+function chequeMeta(ck){var v=CHEQUES_MAP[ck];return(v&&typeof v==="object")?v:null;}
+function chequesH(fk,prenom){return chequeNb(chequeKey(fk,prenom))*H_CHEQUE;}
 function normPrenom(s){
   var p=nrm((String(s||"").split(/\s*[&\+]\s*|\s+et\s+/)[0]||"").trim());
   // Prend le 1er mot de plus de 2 lettres (ignore titres courts)
@@ -483,6 +490,7 @@ var S={
   adminTab:"overview",aFilter:"all",aCls:"all",aSubQ:"",aHeureQ:"",
   elevesOpen:null,regSaving:false,regSaved:false,promoSaved:false,promoArchiving:false,pinSaved:false,archives:null,archivesLoading:false,archivesErr:"",restoring:null,restoreDone:null,
   pinInput:"",pinErr:false,deleting:null,
+  adminNameInput:"",adminNameErr:false,adminNameReturn:null,adminLog:null,adminLogLoading:false,
   anneeSaved:false,anneeSaving:false,
   manCl:"",manEleve:"",manParent:"",manTypeAct:"",manSousAct:"",manHeures:"",manDate:"",
   manSaving:false,manSaved:false,manErr:"",
@@ -517,6 +525,7 @@ function render(){
   else if(S.page==="portal-view")h=rView();
   else if(S.page==="form")h=rForm();
   else if(S.page==="login")h=rLogin();
+  else if(S.page==="admin-name")h=rAdminName();
   else if(S.page==="admin")h=rAdmin();
   else h=rHome();
   document.getElementById("app").innerHTML=h;
@@ -928,6 +937,13 @@ function rLogin(){
     `<div class="wrap" style="text-align:center;padding-top:0"><div style="font-size:48px;margin:44px 0 16px">🔒</div><h2 class="ptt">Espace administrateur</h2><p class="pss">Entrez le code PIN</p><input class="inp" id="pi" type="password" placeholder="Code PIN" value="${esc(S.pinInput)}" style="text-align:center;font-size:22px;letter-spacing:8px;`+(S.pinErr?"border-color:var(--red)":"")+'" autofocus>'+
       (S.pinErr?'<div class="al ae mt8">Code incorrect</div>':"")+
       '<div class="mt16"><button class="btn bp" data-a="check-pin">Accéder</button></div></div>';
+}
+function rAdminName(){
+  return tb("Administration","home")+
+    '<div class="wrap" style="text-align:center;padding-top:0"><div style="font-size:48px;margin:44px 0 16px">🧑</div><h2 class="ptt">Qui êtes-vous ?</h2><p class="pss">Ce prénom sera associé aux actions effectuées depuis cet appareil.</p>'+
+    '<input class="inp" id="an" type="text" placeholder="Votre prénom" value="'+esc(S.adminNameInput||"")+'" style="text-align:center;font-size:18px" autofocus>'+
+    (S.adminNameErr?'<div class="al ae mt8">Merci de saisir un prénom (2 caractères min.)</div>':"")+
+    '<div class="mt16"><button class="btn bp" data-a="save-admin-name">Continuer</button></div></div>';
 }
 // ── ADMIN ─────────────────────────────────────
 function rAdmin(){
@@ -1677,8 +1693,11 @@ function rReglages(){
             '<div style="font-size:11px;font-weight:700;color:var(--am);margin-bottom:5px">💳 Chèques encaissés (1 chèque = 10h = 25%)</div>'+
             knownParents.map(function(p){
               var ck=chequeKey(fkE,p);
-              var nbCh=CHEQUES_MAP[ck]||0;
-              return'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'+
+              var nbCh=chequeNb(ck);
+              var meta=chequeMeta(ck);
+              var metaTxt=meta&&meta.updatedAt?('Modifié le '+new Date(meta.updatedAt).toLocaleDateString("fr-FR")+(meta.updatedBy?' par '+meta.updatedBy:'')):'';
+              return'<div style="margin-bottom:4px">'+
+                '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'+
                 '<span style="font-size:12px;font-weight:600">'+esc(p)+'</span>'+
                 '<div style="display:flex;align-items:center;gap:6px">'+
                   '<select data-a="set-cheque" data-ck="'+esc(ck)+'" style="padding:4px 28px 4px 8px;border:1px solid var(--bd);border-radius:var(--rs);font-size:12px;background:var(--sf);color:var(--tx);font-family:inherit;-webkit-appearance:none;appearance:none;cursor:pointer;min-width:160px">'+
@@ -1687,6 +1706,8 @@ function rReglages(){
                     }).join('')+
                   '</select>'+
                 '</div>'+
+              '</div>'+
+              '<div id="meta-'+esc(ck)+'" style="font-size:10px;color:var(--mu);text-align:right;margin-top:2px">'+esc(metaTxt)+'</div>'+
               '</div>';
             }).join('')+
           '</div>':'';
@@ -1764,11 +1785,35 @@ function rReglages(){
     (S.pinSaved?'<div class="al aok mt8">✓ Code PIN modifié avec succès</div>':"")+
     (S.pinErr2?'<div class="al ae mt8">'+esc(S.pinErr2)+'</div>':"")+
   '</div>';
-  return'<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">Réglages</h2>'+
+  var idSec='<div class="card" style="margin-bottom:12px"><h3 style="font-size:15px;font-weight:700;margin-bottom:6px">🧑 Identifiant administrateur</h3>'+
+    '<p style="font-size:13px;color:var(--mu)">Connecté en tant que : <strong style="color:var(--tx)">'+esc(ADMIN_NAME||"Non renseigné")+'</strong></p>'+
+    '<button class="btn bo bsm" style="margin-top:8px" data-a="change-admin-name">Changer</button></div>';
+  return idSec+'<h2 style="font-size:17px;font-weight:700;margin-bottom:16px">Réglages</h2>'+
     anneeSec+promo+
     '<h3 style="font-size:13px;font-weight:700;margin:16px 0 10px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em">Listes des élèves</h3>'+
     clsSecs+saved+saving+pinSec+
-    rAccessSec();
+    rAccessSec()+rAdminLogSec();
+}
+function rAdminLogSec(){
+  var body;
+  if(!S.adminLog&&!S.adminLogLoading){
+    body='<button class="btn bo" data-a="load-admin-log">📜 Voir le journal des actions</button>';
+  }else if(S.adminLogLoading){
+    body='<p style="font-size:13px;color:var(--mu)">⏳ Chargement du journal…</p>';
+  }else if(S.adminLog.length===0){
+    body='<div class="al" style="background:#F5F5F5;border:1px solid #DDD;color:var(--mu);border-radius:var(--rs);padding:10px;font-size:13px">Aucune action enregistrée.</div>';
+  }else{
+    var LBL={login:"Connexion","nom-modifie":"Nom modifié",cheque:"Chèque","saisie-modifiee":"Saisie modifiée","saisie-supprimee":"Saisie supprimée","saisie-manuelle":"Saisie manuelle","eleves-parents":"Élèves/parents",activites:"Activités",annee:"Année scolaire","mdp-parents":"Mdp parents","acces-parents":"Accès parents",pin:"Code PIN",annuaire:"Annuaire",promotion:"Promotion",restauration:"Restauration"};
+    body='<div style="max-height:360px;overflow-y:auto">'+S.adminLog.map(function(l){
+      var d=new Date(l.ts);
+      return'<div style="padding:8px 0;border-bottom:1px solid var(--bd);font-size:12px">'+
+        '<div style="display:flex;justify-content:space-between;gap:8px"><strong>'+esc(l.by||"?")+'</strong><span style="color:var(--mu)">'+d.toLocaleDateString("fr-FR")+' '+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})+'</span></div>'+
+        '<div style="color:var(--mu)">'+esc(LBL[l.action]||l.action)+(l.detail?' — '+esc(l.detail):'')+'</div>'+
+      '</div>';
+    }).join('')+'</div>'+
+    '<button class="btn bo bsm" style="margin-top:8px" data-a="load-admin-log">🔁 Rafraîchir</button>';
+  }
+  return'<div class="card" style="margin-top:16px"><h3 style="font-size:15px;font-weight:700;margin-bottom:8px">🕐 Journal des actions</h3>'+body+'</div>';
 }
 
 // ── SECTION RÉGLAGES : MOT DE PASSE PARENTS ───
@@ -1864,6 +1909,7 @@ function doManSaisie(){
   go({manSaving:true,manErr:''});
   fbAdd(pl).then(function(ref){
     var ns=Object.assign({id:ref.id},pl);
+    fbLogAction("saisie-manuelle",S.manEleve+" — "+S.manParent+" — "+heures+"h");
     var newSubs2=[ns].concat(S.subs||[]);go({manSaving:false,manSaved:true,manSousAct:'',manHeures:'',manDate:'',subs:newSubs2,adminTab:'saisies'});
     setTimeout(function(){go({manSaved:false});},3000);
   }).catch(function(e){go({manSaving:false,manErr:'Erreur Firebase : '+e.message});});
@@ -2050,6 +2096,8 @@ function bindAll(){
   }
   var pi=document.getElementById("pi");
   if(pi)pi.addEventListener("keydown",function(e){if(e.key==="Enter")checkPin();});
+  var an=document.getElementById("an");
+  if(an)an.addEventListener("keydown",function(e){if(e.key==="Enter")saveAdminName();});
   // Validation dynamique step 2
   var bn2=document.getElementById("bn2");
   if(bn2){
@@ -2120,9 +2168,13 @@ function bindChequeSelects(){
   document.querySelectorAll('[data-a="set-cheque"]').forEach(function(sel){
     sel.onchange=function(){
       var ck=sel.dataset.ck,v=parseInt(sel.value);
-      CHEQUES_MAP[ck]=v;
-      fbSaveCheques().then(function(){sel.style.background="#E8F5EE";setTimeout(function(){sel.style.background="";},1200);})
-        .catch(function(e){alert("Erreur cheque: "+e.message);});
+      CHEQUES_MAP[ck]={nb:v,updatedAt:new Date().toISOString(),updatedBy:ADMIN_NAME||"?"};
+      fbSaveCheques().then(function(){
+        sel.style.background="#E8F5EE";setTimeout(function(){sel.style.background="";},1200);
+        var mEl=document.getElementById("meta-"+ck);
+        if(mEl)mEl.textContent="Modifié le "+new Date().toLocaleDateString("fr-FR")+(ADMIN_NAME?" par "+ADMIN_NAME:"");
+        fbLogAction("cheque",ck+" → "+v+"x");
+      }).catch(function(e){alert("Erreur cheque: "+e.message);});
     };
   });
   // Filtres famille compacts (onglet Heures)
@@ -2154,7 +2206,7 @@ function bindAnnuaire(){
       if(!ANNUAIRE_MAP[ak])ANNUAIRE_MAP[ak]={};
       ANNUAIRE_MAP[ak][field]=val;
       fbSaveAnnuaire()
-        .then(function(){showToast('Contact enregistré','ok');go({annuaireSaved:true});setTimeout(function(){go({annuaireSaved:false});},2000);})
+        .then(function(){showToast('Contact enregistré','ok');fbLogAction("annuaire",ak+" / "+field+" = "+val);go({annuaireSaved:true});setTimeout(function(){go({annuaireSaved:false});},2000);})
         .catch(function(e){showToast('Erreur: '+e.message,'err');});
     };
   });
@@ -2238,7 +2290,7 @@ function onClick(e){
     case"tog-acts-table":go({saisiesTableOpen:!S.saisiesTableOpen});break;
     case"save-acts":
       go({actsSaving:true,actsSaved:false});
-      fbSaveActs().then(function(){go({actsSaving:false,actsSaved:true});setTimeout(function(){go({actsSaved:false});},3000);})
+      fbSaveActs().then(function(){fbLogAction("activites","Mise à jour des activités");go({actsSaving:false,actsSaved:true});setTimeout(function(){go({actsSaved:false});},3000);})
         .catch(function(e){go({actsSaving:false,err:"Erreur: "+e.message});});break;
     case"toggle-cat":go({actsCatOpen:S.actsCatOpen===el.dataset.cat?null:el.dataset.cat,actsSaved:false});break;
     case"close-cat":go({actsCatOpen:null});break;
@@ -2287,9 +2339,14 @@ function onClick(e){
       ACTS[eaCatx][eaIdxx]=eaNomx;
       go({editActKey:null,actsSaved:false});break;
     case"set-cheque":
-      var ckx=el.dataset.ck,ckvx=parseInt(el.value||"0");CHEQUES_MAP[ckx]=ckvx;
-      fbSaveCheques().then(function(){el.style.background="#E8F5EE";setTimeout(function(){el.style.background="";},1200);})
-        .catch(function(e){go({err:"Erreur cheque: "+e.message});});reattach();break;
+      var ckx=el.dataset.ck,ckvx=parseInt(el.value||"0");
+      CHEQUES_MAP[ckx]={nb:ckvx,updatedAt:new Date().toISOString(),updatedBy:ADMIN_NAME||"?"};
+      fbSaveCheques().then(function(){
+        el.style.background="#E8F5EE";setTimeout(function(){el.style.background="";},1200);
+        var mEl=document.getElementById("meta-"+ckx);
+        if(mEl)mEl.textContent="Modifié le "+new Date().toLocaleDateString("fr-FR")+(ADMIN_NAME?" par "+ADMIN_NAME:"");
+        fbLogAction("cheque",ckx+" → "+ckvx+"x");
+      }).catch(function(e){go({err:"Erreur cheque: "+e.message});});reattach();break;
     case"edit-eleve-name":go({editEleveKey:el.dataset.ekey,regSaved:false});break;
     case"cancel-edit-eleve":go({editEleveKey:null});break;
     case"save-eleve-name":
@@ -2330,7 +2387,7 @@ function onClick(e){
       if(finalP)sub4.parents=finalP;
       sub4.heures=finalH;
       fbUpdate(sid4,{parents:sub4.parents,heures:sub4.heures})
-        .then(function(){go({editSaisieId:null,editSaisieErr:""});})
+        .then(function(){fbLogAction("saisie-modifiee",sub4.eleve+" — "+sub4.parents+" — "+sub4.heures+"h");go({editSaisieId:null,editSaisieErr:""});})
         .catch(function(e){go({editSaisieErr:"Erreur: "+e.message});});
       break;
         case"tog-pw-vis":var tEl=document.getElementById(el.dataset.t);if(tEl)tEl.type=tEl.type==="password"?"text":"password";reattach();break;
@@ -2353,6 +2410,8 @@ function onClick(e){
         }
       });break;
         case"check-pin":checkPin();break;
+        case"save-admin-name":saveAdminName();break;
+        case"change-admin-name":go({page:"admin-name",adminNameInput:ADMIN_NAME,adminNameErr:false,adminNameReturn:S.adminTab||"overview"});break;
     case"tab":go({adminTab:v});break;
     case"fcls":go({aCls:v});break;
     case"fst":go({aFilter:v});break;
@@ -2417,7 +2476,7 @@ function onClick(e){
       TRI=buildTRI(RENTREE,ANNEE);
       document.title="Clardeluna "+ANNEE;
       fbSaveAnnee().then(function(){
-        showToast('Année enregistrée','ok');go({anneeSaving:false,anneeSaved:true});
+        showToast('Année enregistrée','ok');fbLogAction("annee","Année: "+ANNEE+" / rentrée "+RENTREE);go({anneeSaving:false,anneeSaved:true});
         setTimeout(function(){go({anneeSaved:false});},3000);
       }).catch(function(e){go({anneeSaving:false,err:"Erreur année : "+e.message});});
       break;
@@ -2432,7 +2491,7 @@ function onClick(e){
         sha256hex(npv).then(function(nh){
           PIN_HASH=nh;
           go({pinSaved:true,pinErr2:""});
-          fbSavePin().catch(function(){});
+          fbSavePin().then(function(){fbLogAction("pin","Code PIN modifié");}).catch(function(){});
           setTimeout(function(){go({pinSaved:false});},3000);
         });
       });break;
@@ -2442,7 +2501,7 @@ function onClick(e){
       sha256hex(napv).then(function(h){
         ACCESS_HASH=h;ACCESS_PLAIN=napv;ACCESS_ENABLED=true;
         go({accessPassSaved:true,accessPassErr:"",passVisible:false});
-        fbSaveAccess().catch(function(){});
+        fbSaveAccess().then(function(){fbLogAction("mdp-parents","Mot de passe parents modifié");}).catch(function(){});
         setTimeout(function(){go({accessPassSaved:false});},3000);
       });break;
     case"toggle-pass-visible":
@@ -2451,10 +2510,17 @@ function onClick(e){
       ACCESS_ENABLED=!ACCESS_ENABLED;
       if(!ACCESS_ENABLED){try{sessionStorage.removeItem("cl_unlocked");}catch(e){}}
       go({accessPassSaved:true,accessPassErr:""});
-      fbSaveAccess().catch(function(){});
+      fbSaveAccess().then(function(){fbLogAction("acces-parents",ACCESS_ENABLED?"Activé":"Désactivé");}).catch(function(){});
       setTimeout(function(){go({accessPassSaved:false});},3000);break;
     case"ann-cls":go({annuaireClsFilter:v});break;
     case"ann-export-csv":exportAnnuaireCsv();break;
+    case"load-admin-log":
+      go({adminLogLoading:true});
+      fbLoadLog().then(function(snap){
+        var log=snap.docs.map(function(d){return d.data();});
+        go({adminLogLoading:false,adminLog:log});
+      }).catch(function(e){go({adminLogLoading:false,err:"Erreur journal : "+e.message});});
+      break;
   }
   reattach();
 }
@@ -2500,9 +2566,22 @@ function checkPin(){
   var val=pi?pi.value:S.pinInput;
   if(!val){go({pinErr:true});return;}
   sha256hex(val).then(function(h){
-    if(h===PIN_HASH){go({page:"admin",adminTab:"overview",err:""});loadSubs();}
+    if(h===PIN_HASH){
+      if(!ADMIN_NAME){go({page:"admin-name",pinErr:false});}
+      else{go({page:"admin",adminTab:"overview",err:""});loadSubs();fbLogAction("login","");}
+    }
     else go({pinErr:true});
   });
+}
+function saveAdminName(){
+  var anEl=document.getElementById("an");
+  var anv=anEl?anEl.value.trim():(S.adminNameInput||"").trim();
+  if(anv.length<2){go({adminNameErr:true,adminNameInput:anv});return;}
+  var returnTab=S.adminNameReturn;
+  ADMIN_NAME=anv;setAdminNameLS(anv);
+  go({page:"admin",adminTab:returnTab||"overview",adminNameErr:false,adminNameInput:"",adminNameReturn:null});
+  if(returnTab){fbLogAction("nom-modifie",anv);}
+  else{loadSubs();fbLogAction("login",anv);}
 }
 function doSubmit(){
   var f=S.form;go({sending:true,sendErr:""});
@@ -2520,13 +2599,16 @@ function doSubmit(){
   }).catch(function(e){go({sending:false,sendErr:"Erreur : "+e.message});});
 }
 function doDel(id){
+  var delSub=(S.subs||[]).find(function(s){return s.id===id;});
   sil({deleting:id});render();
-  fbDel(id).then(function(){go({deleting:null,subs:(S.subs||[]).filter(function(s){return s.id!==id;})});})
-           .catch(function(e){go({deleting:null,err:"Erreur : "+e.message});});
+  fbDel(id).then(function(){
+    fbLogAction("saisie-supprimee",delSub?(delSub.eleve+" — "+delSub.parents+" — "+delSub.heures+"h"):id);
+    go({deleting:null,subs:(S.subs||[]).filter(function(s){return s.id!==id;})});
+  }).catch(function(e){go({deleting:null,err:"Erreur : "+e.message});});
 }
 function doSaveEleves(){
   go({regSaving:true,regSaved:false});
-  fbSaveEl(ELEVES).then(function(){go({regSaving:false,regSaved:true,elevesOpen:null});setTimeout(function(){go({regSaved:false});},3000);})
+  fbSaveEl(ELEVES).then(function(){fbLogAction("eleves-parents","Mise à jour listes élèves/parents");go({regSaving:false,regSaved:true,elevesOpen:null});setTimeout(function(){go({regSaved:false});},3000);})
                   .catch(function(e){go({regSaving:false,err:"Erreur : "+e.message});});
 }
 function loadElevesConfig(){
@@ -2654,6 +2736,7 @@ function doPromotion(){
     return fbSaveEl(ELEVES);
   }).then(function(){
     // Remettre les compteurs à zéro dans l'état
+    fbLogAction("promotion","Promotion annuelle effectuée");
     go({subs:[],promoSaved:true,aFilter:"all",aCls:"all",archives:null});
     setTimeout(function(){go({promoSaved:false});},6000);
   }).catch(function(e){
@@ -2780,6 +2863,7 @@ function doRestore(annee){
     // 6. Recharger les saisies
     return fbLoad();
   }).then(function(subs){
+    fbLogAction("restauration","Archive "+annee+" restaurée");
     go({subs:subs,restoring:null,restoreDone:annee,aFilter:"all",aCls:"all"});
     setTimeout(function(){go({restoreDone:null});},6000);
   }).catch(function(e){
